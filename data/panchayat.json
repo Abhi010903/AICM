@@ -1,0 +1,27 @@
+{
+  "id": "thekkumpuram",
+  "name_en": "Thekkumpuram Grama Panchayat",
+  "name_ml": "തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്",
+  "district_en": "Kozhikode",
+  "district_ml": "കോഴിക്കോട്",
+  "constituency_en": "Kunnamangalam",
+  "constituency_ml": "കുന്നമംഗലം",
+  "wards_count": 14,
+  "population": 28450,
+  "households": 6820,
+  "area_sq_km": 32.4,
+  "pdi_score": 71.4,
+  "district_avg_pdi": 72.5,
+  "total_spend_lakhs": 842.5,
+  "total_projects": 42,
+  "total_assets": 124,
+  "open_grievances": 18,
+  "delayed_projects": 7,
+  "wards_below_district_avg": 6,
+  "centroid": {
+    "lat": 11.305,
+    "lng": 75.885
+  },
+  "last_verified": "2026-10-30",
+  "source": "KSDI / eGramSwaraj / PDI Portal"
+}
