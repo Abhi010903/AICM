@@ -31,6 +31,7 @@ function BuildCheckContent() {
   const [address, setAddress] = useState<string>('Cheruvannur Central, Ward 7');
   const [allParcels, setAllParcels] = useState<LandParcel[]>([]);
   const [evaluation, setEvaluation] = useState<SitingEvaluation | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,6 +58,10 @@ function BuildCheckContent() {
     const found = allParcels.find((p) => p.survey_number.toLowerCase() === surveyNumber.trim().toLowerCase());
     if (found) {
       setEvaluation(evaluateSitingCompliance(found, buildingType));
+      setErrorMsg(null);
+    } else {
+      setEvaluation(null);
+      setErrorMsg(`Survey parcel "${surveyNumber}" was not found in demo records.`);
     }
   };
 
@@ -65,6 +70,10 @@ function BuildCheckContent() {
     const found = allParcels.find((p) => p.survey_number === sNo);
     if (found) {
       setEvaluation(evaluateSitingCompliance(found, buildingType));
+      setErrorMsg(null);
+    } else {
+      setEvaluation(null);
+      setErrorMsg(`Survey parcel "${sNo}" was not found in demo records.`);
     }
   };
 
@@ -153,17 +162,17 @@ function BuildCheckContent() {
               </button>
               <button
                 type="button"
-                onClick={() => handleSelectSurvey('308/1')}
+                onClick={() => handleSelectSurvey('316/3')}
                 className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold hover:bg-emerald-200"
               >
-                308/1 (Purayidom / Pass)
+                316/3 (Purayidom / Pass)
               </button>
               <button
                 type="button"
-                onClick={() => handleSelectSurvey('324/2')}
+                onClick={() => handleSelectSurvey('324/4')}
                 className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold hover:bg-amber-200"
               >
-                324/2 (Hazard / Needs Approval)
+                324/4 (Hazard / Needs Approval)
               </button>
             </div>
 
@@ -176,6 +185,13 @@ function BuildCheckContent() {
             </button>
           </div>
         </form>
+
+        {errorMsg && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
+            <AlertOctagon className="w-4 h-4 text-red-600 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
       </div>
 
       {/* Instant Verdict Card */}

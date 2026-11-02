@@ -275,21 +275,29 @@ export default function EquityAnalyserPage() {
                     ? 'bg-red-50 border-red-200 text-red-900'
                     : selectedData.flagType === 'well_under'
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    : selectedData.flagType === 'low_low'
+                    ? 'bg-orange-50 border-orange-200 text-orange-950'
                     : 'bg-blue-50 border-blue-200 text-blue-900'
                 }`}
               >
                 <div className="font-bold flex items-center gap-1.5 text-xs mb-1">
                   {selectedData.flagType === 'under_over' ? (
                     <AlertTriangle className="w-4 h-4 text-red-600" />
-                  ) : (
+                  ) : selectedData.flagType === 'well_under' ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  ) : selectedData.flagType === 'low_low' ? (
+                    <AlertTriangle className="w-4 h-4 text-orange-600" />
+                  ) : (
+                    <TrendingUp className="w-4 h-4 text-blue-600" />
                   )}
                   <span>
                     {selectedData.flagType === 'under_over'
                       ? 'Flagged: Under-Served & Over-Spent'
                       : selectedData.flagType === 'well_under'
                       ? 'Benchmark: High Efficiency Ward'
-                      : 'Equitable Growth Profile'}
+                      : selectedData.flagType === 'low_low'
+                      ? 'Flagged: Critical Intervention Candidate'
+                      : 'Equitable Growth Profile (High Performance & Investment)'}
                   </span>
                 </div>
                 <p className="text-[11px] leading-relaxed">
@@ -303,7 +311,17 @@ export default function EquityAnalyserPage() {
                     ? 'Achieving high development index metrics (' +
                       selectedData.pdi +
                       ') with disciplined, below-average capital allocation.'
-                    : 'Balanced trajectory in capital works and service delivery metrics.'}
+                    : selectedData.flagType === 'low_low'
+                    ? 'Low PDI score (' +
+                      selectedData.pdi +
+                      ') combined with low per-capita spend (₹' +
+                      selectedData.perCapita.toLocaleString() +
+                      '). This ward is an urgent priority for targeted GPDP capital grant infusions.'
+                    : 'Balanced, high-performing trajectory with sustained capital investment (₹' +
+                      selectedData.perCapita.toLocaleString() +
+                      '/capita) delivering above-average PDI (' +
+                      selectedData.pdi +
+                      ').'}
                 </p>
               </div>
 

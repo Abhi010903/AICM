@@ -41,6 +41,17 @@ interface InteractiveMapProps {
   className?: string;
 }
 
+// Pure HTML escaping helper to prevent XSS in Leaflet popup bindings (security.md)
+function escapeHtml(str: unknown): string {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   center = [11.305, 75.885],
   zoom = 14,
@@ -151,7 +162,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           }).addTo(map);
 
           if (poly.label) {
-            polygonLayer.bindPopup(`<strong>${poly.label}</strong>`);
+            polygonLayer.bindPopup(`<strong>${escapeHtml(poly.label)}</strong>`);
           }
           layersRef.current.push(polygonLayer);
         } catch (e) {
@@ -170,7 +181,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           }).addTo(map);
 
           if (line.label) {
-            lineLayer.bindPopup(`<strong>${line.label}</strong>`);
+            lineLayer.bindPopup(`<strong>${escapeHtml(line.label)}</strong>`);
           }
           layersRef.current.push(lineLayer);
         } catch (e) {
@@ -194,9 +205,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
           const popupHtml = `
             <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-              <strong style="font-size: 13px; color: #0f172a;">${m.title}</strong>
-              ${m.category ? `<div style="color: #64748b; margin-top: 2px;">Type: ${m.category}</div>` : ''}
-              ${m.details ? `<div style="margin-top: 4px; color: #334155;">${m.details}</div>` : ''}
+              <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(m.title)}</strong>
+              ${m.category ? `<div style="color: #64748b; margin-top: 2px;">Type: ${escapeHtml(m.category)}</div>` : ''}
+              ${m.details ? `<div style="margin-top: 4px; color: #334155;">${escapeHtml(m.details)}</div>` : ''}
               <div style="margin-top: 4px; font-size: 10px; color: #94a3b8;">Coords: ${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}</div>
             </div>
           `;

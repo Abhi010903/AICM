@@ -51,9 +51,11 @@ function AssetRegisterContent() {
         setAssets(aList);
         setGrievances(gList);
 
-        // If ward is preselected (e.g. Ward 7 in walkthrough), open a poor asset
+        // If ward is preselected (e.g. Ward 7 in walkthrough), open poor water tank asset #59 with matching pipeline grievance
         if (initialWard === 7) {
-          const poorW7 = aList.find((a) => a.ward_id === 7 && a.condition === 'poor');
+          const poorW7 =
+            aList.find((a) => a.ward_id === 7 && a.condition === 'poor' && a.type === 'water_tank') ||
+            aList.find((a) => a.ward_id === 7 && a.condition === 'poor');
           if (poorW7) setSelectedAsset(poorW7);
         }
       } catch (err) {
@@ -97,7 +99,16 @@ function AssetRegisterContent() {
         if (selectedAsset.type === 'drainage' && (g.category === 'sanitation' || g.category === 'road')) return true;
         if (selectedAsset.type === 'streetlight' && g.category === 'lighting') return true;
         if (selectedAsset.type === 'water_tank' && g.category === 'water') return true;
-        return true; // show ward grievances for context
+        if (
+          (selectedAsset.type === 'building' ||
+            selectedAsset.type === 'school' ||
+            selectedAsset.type === 'anganwadi' ||
+            selectedAsset.type === 'phc') &&
+          g.category === 'other'
+        ) {
+          return true;
+        }
+        return false;
       })
     : [];
 
@@ -127,7 +138,9 @@ function AssetRegisterContent() {
         <button
           onClick={() => {
             setSelectedWardId(7);
-            const poorW7 = assets.find((a) => a.ward_id === 7 && a.condition === 'poor');
+            const poorW7 =
+              assets.find((a) => a.ward_id === 7 && a.condition === 'poor' && a.type === 'water_tank') ||
+              assets.find((a) => a.ward_id === 7 && a.condition === 'poor');
             if (poorW7) setSelectedAsset(poorW7);
           }}
           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-[11px] ml-2 flex-shrink-0"

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 import { SourceChip } from '@/components/common/SourceChip';
-import { InteractiveMap } from '@/components/maps/InteractiveMap';
+import { InteractiveMap, MapPolygon } from '@/components/maps/InteractiveMap';
 import { getWards, getParcels, getHazardZones } from '@/lib/api';
 import { Ward, LandParcel, HazardZoneCollection, SitingEvaluation } from '@/lib/types';
 import { evaluateSitingCompliance } from '@/lib/siting-rules';
@@ -92,7 +92,7 @@ export default function SitingCompliancePage() {
   const wardParcels = parcels.filter((p) => p.ward_id === selectedWardId);
 
   // Map overlays setup
-  const mapPolygons = [];
+  const mapPolygons: MapPolygon[] = [];
 
   // Hazard zones polygons
   if (hazardZones) {

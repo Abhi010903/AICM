@@ -60,14 +60,20 @@ export function simulateBudgetShift(
     wards.reduce((sum, w) => sum + calculatePerCapitaSpend(w.spend_lakhs, w.population), 0) /
     wards.length;
 
+  // Ponytail fix: Cap effective transfer at donor ward's available spend to guarantee exact fiscal conservation
+  const donor = wards.find((w) => w.id === from_ward_id);
+  const effective_amount =
+    from_ward_id !== to_ward_id && donor
+      ? Math.min(Math.max(amount_lakhs, 0), donor.spend_lakhs)
+      : 0;
+
   const simulated_wards: WardBudgetSimulation[] = wards.map((ward) => {
     let delta_spend = 0;
-    // Ponytail fix: guard against identical donor and recipient wards
-    if (from_ward_id !== to_ward_id && amount_lakhs > 0) {
+    if (effective_amount > 0) {
       if (ward.id === to_ward_id) {
-        delta_spend = amount_lakhs;
+        delta_spend = effective_amount;
       } else if (ward.id === from_ward_id) {
-        delta_spend = -amount_lakhs;
+        delta_spend = -effective_amount;
       }
     }
 

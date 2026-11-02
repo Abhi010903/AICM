@@ -73,8 +73,8 @@ Follow this scripted 8-step path to verify the full functional loop:
 3. **Asset Health & Grievance Correlation (`/president/assets`):**
    - In the Ward 7 detail drawer, click **Filter Ward 7 Assets** (or navigate to `/president/assets?ward=7`).
    - Notice the assets filtered to Ward 7.
-   - Click a **Poor** condition asset (e.g., Road or Drainage asset).
-   - In the asset detail drawer, inspect the linked citizen grievances matching Ward 7 (e.g. road potholes and waterlogging).
+   - Click a **Poor** condition asset (e.g., Water Tank).
+   - In the asset detail drawer, inspect the linked citizen grievances matching Ward 7 (e.g. drinking water pipeline leak).
 
 4. **Plan Siting Compliance Checker (`/president/siting`):**
    - Navigate to `/president/siting`.

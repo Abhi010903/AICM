@@ -2,7 +2,7 @@
   {
     "id": 1,
     "type": "school",
-    "name_en": "Kizhakkumuri സ്കൂൾ (SCHOOL)",
+    "name_en": "Kizhakkumuri School",
     "name_ml": "കിഴക്കുമുറി സ്കൂൾ",
     "lat": 11.3135,
     "lng": 75.909,
@@ -15,7 +15,7 @@
   {
     "id": 2,
     "type": "phc",
-    "name_en": "Padinjarekkara പ്രാഥമികാരോഗ്യകേന്ദ്രം (PHC)",
+    "name_en": "Padinjarekkara Primary Health Centre",
     "name_ml": "പടിഞ്ഞാറേക്കര പ്രാഥമികാരോഗ്യകേന്ദ്രം",
     "lat": 11.3105,
     "lng": 75.864,
@@ -28,7 +28,7 @@
   {
     "id": 3,
     "type": "fhc",
-    "name_en": "Thazhe Angadi കുടുംബാരോഗ്യ കേന്ദ്രം (FHC)",
+    "name_en": "Thazhe Angadi Family Health Centre",
     "name_ml": "താഴെ അങ്ങാടി കുടുംബാരോഗ്യ കേന്ദ്രം",
     "lat": 11.2995,
     "lng": 75.874,
@@ -41,7 +41,7 @@
   {
     "id": 4,
     "type": "anganwadi",
-    "name_en": "Mele Angadi അങ്കണവാടി (ANGANWADI)",
+    "name_en": "Mele Angadi Anganwadi",
     "name_ml": "മേലെ അങ്ങാടി അങ്കണവാടി",
     "lat": 11.3085,
     "lng": 75.873,
@@ -54,7 +54,7 @@
   {
     "id": 5,
     "type": "akshaya",
-    "name_en": "Kallurutty അക്ഷയ കേന്ദ്രം (AKSHAYA)",
+    "name_en": "Kallurutty Akshaya Centre",
     "name_ml": "കല്ലുരുട്ടി അക്ഷയ കേന്ദ്രം",
     "lat": 11.3205,
     "lng": 75.895,
@@ -67,7 +67,7 @@
   {
     "id": 6,
     "type": "krishi",
-    "name_en": "Puthiyangadi കൃഷിഭവൻ (KRISHI)",
+    "name_en": "Puthiyangadi Krishi Bhavan",
     "name_ml": "പുതിയങ്ങാടി കൃഷിഭവൻ",
     "lat": 11.2875,
     "lng": 75.885,
@@ -80,7 +80,7 @@
   {
     "id": 7,
     "type": "vet",
-    "name_en": "Cheruvannur മൃഗാശുപത്രി (VET)",
+    "name_en": "Cheruvannur Veterinary Hospital",
     "name_ml": "ചെറുവണ്ണൂർ മൃഗാശുപത്രി",
     "lat": 11.3065,
     "lng": 75.882,
@@ -93,7 +93,7 @@
   {
     "id": 8,
     "type": "school",
-    "name_en": "Kottakkunnu സ്കൂൾ (SCHOOL)",
+    "name_en": "Kottakkunnu School",
     "name_ml": "കോട്ടക്കുന്ന് സ്കൂൾ",
     "lat": 11.3365,
     "lng": 75.879,
@@ -106,7 +106,7 @@
   {
     "id": 9,
     "type": "phc",
-    "name_en": "Manalody പ്രാഥമികാരോഗ്യകേന്ദ്രം (PHC)",
+    "name_en": "Manalody Primary Health Centre",
     "name_ml": "മണലോടി പ്രാഥമികാരോഗ്യകേന്ദ്രം",
     "lat": 11.2905,
     "lng": 75.901,
@@ -119,7 +119,7 @@
   {
     "id": 10,
     "type": "fhc",
-    "name_en": "Pulikkanny കുടുംബാരോഗ്യ കേന്ദ്രം (FHC)",
+    "name_en": "Pulikkanny Family Health Centre",
     "name_ml": "പുലിക്കണ്ണി കുടുംബാരോഗ്യ കേന്ദ്രം",
     "lat": 11.3135,
     "lng": 75.922,
@@ -132,7 +132,7 @@
   {
     "id": 11,
     "type": "anganwadi",
-    "name_en": "Velliparamba അങ്കണവാടി (ANGANWADI)",
+    "name_en": "Velliparamba Anganwadi",
     "name_ml": "വെള്ളിപ്പറമ്പ് അങ്കണവാടി",
     "lat": 11.2865,
     "lng": 75.862,
@@ -145,7 +145,7 @@
   {
     "id": 12,
     "type": "akshaya",
-    "name_en": "Nellikkode അക്ഷയ കേന്ദ്രം (AKSHAYA)",
+    "name_en": "Nellikkode Akshaya Centre",
     "name_ml": "നെല്ലിക്കോട് അക്ഷയ കേന്ദ്രം",
     "lat": 11.2825,
     "lng": 75.878,
@@ -158,7 +158,7 @@
   {
     "id": 13,
     "type": "krishi",
-    "name_en": "Kavumpuram കൃഷിഭവൻ (KRISHI)",
+    "name_en": "Kavumpuram Krishi Bhavan",
     "name_ml": "കവുമ്പുറം കൃഷിഭവൻ",
     "lat": 11.3235,
     "lng": 75.905,
@@ -171,7 +171,7 @@
   {
     "id": 14,
     "type": "vet",
-    "name_en": "Athanikkal മൃഗാശുപത്രി (VET)",
+    "name_en": "Athanikkal Veterinary Hospital",
     "name_ml": "അത്താണിക്കൽ മൃഗാശുപത്രി",
     "lat": 11.2805,
     "lng": 75.895,
@@ -184,7 +184,7 @@
   {
     "id": 15,
     "type": "school",
-    "name_en": "Kizhakkumuri സ്കൂൾ (SCHOOL)",
+    "name_en": "Kizhakkumuri School",
     "name_ml": "കിഴക്കുമുറി സ്കൂൾ",
     "lat": 11.3195,
     "lng": 75.915,
@@ -197,7 +197,7 @@
   {
     "id": 16,
     "type": "phc",
-    "name_en": "Padinjarekkara പ്രാഥമികാരോഗ്യകേന്ദ്രം (PHC)",
+    "name_en": "Padinjarekkara Primary Health Centre",
     "name_ml": "പടിഞ്ഞാറേക്കര പ്രാഥമികാരോഗ്യകേന്ദ്രം",
     "lat": 11.3165,
     "lng": 75.861,
@@ -210,7 +210,7 @@
   {
     "id": 17,
     "type": "fhc",
-    "name_en": "Thazhe Angadi കുടുംബാരോഗ്യ കേന്ദ്രം (FHC)",
+    "name_en": "Thazhe Angadi Family Health Centre",
     "name_ml": "താഴെ അങ്ങാടി കുടുംബാരോഗ്യ കേന്ദ്രം",
     "lat": 11.2935,
     "lng": 75.871,
@@ -223,7 +223,7 @@
   {
     "id": 18,
     "type": "anganwadi",
-    "name_en": "Mele Angadi അങ്കണവാടി (ANGANWADI)",
+    "name_en": "Mele Angadi Anganwadi",
     "name_ml": "മേലെ അങ്ങാടി അങ്കണവാടി",
     "lat": 11.3025,
     "lng": 75.879,
@@ -236,7 +236,7 @@
   {
     "id": 19,
     "type": "akshaya",
-    "name_en": "Kallurutty അക്ഷയ കേന്ദ്രം (AKSHAYA)",
+    "name_en": "Kallurutty Akshaya Centre",
     "name_ml": "കല്ലുരുട്ടി അക്ഷയ കേന്ദ്രം",
     "lat": 11.3265,
     "lng": 75.892,
@@ -249,7 +249,7 @@
   {
     "id": 20,
     "type": "krishi",
-    "name_en": "Puthiyangadi കൃഷിഭവൻ (KRISHI)",
+    "name_en": "Puthiyangadi Krishi Bhavan",
     "name_ml": "പുതിയങ്ങാടി കൃഷിഭവൻ",
     "lat": 11.2935,
     "lng": 75.882,
@@ -262,7 +262,7 @@
   {
     "id": 21,
     "type": "vet",
-    "name_en": "Cheruvannur മൃഗാശുപത്രി (VET)",
+    "name_en": "Cheruvannur Veterinary Hospital",
     "name_ml": "ചെറുവണ്ണൂർ മൃഗാശുപത്രി",
     "lat": 11.3005,
     "lng": 75.888,
@@ -275,7 +275,7 @@
   {
     "id": 22,
     "type": "school",
-    "name_en": "Kottakkunnu സ്കൂൾ (SCHOOL)",
+    "name_en": "Kottakkunnu School",
     "name_ml": "കോട്ടക്കുന്ന് സ്കൂൾ",
     "lat": 11.3305,
     "lng": 75.876,
@@ -288,7 +288,7 @@
   {
     "id": 23,
     "type": "phc",
-    "name_en": "Manalody പ്രാഥമികാരോഗ്യകേന്ദ്രം (PHC)",
+    "name_en": "Manalody Primary Health Centre",
     "name_ml": "മണലോടി പ്രാഥമികാരോഗ്യകേന്ദ്രം",
     "lat": 11.2965,
     "lng": 75.898,
@@ -301,7 +301,7 @@
   {
     "id": 24,
     "type": "fhc",
-    "name_en": "Pulikkanny കുടുംബാരോഗ്യ കേന്ദ്രം (FHC)",
+    "name_en": "Pulikkanny Family Health Centre",
     "name_ml": "പുലിക്കണ്ണി കുടുംബാരോഗ്യ കേന്ദ്രം",
     "lat": 11.3195,
     "lng": 75.928,
@@ -314,7 +314,7 @@
   {
     "id": 25,
     "type": "anganwadi",
-    "name_en": "Velliparamba അങ്കണവാടി (ANGANWADI)",
+    "name_en": "Velliparamba Anganwadi",
     "name_ml": "വെള്ളിപ്പറമ്പ് അങ്കണവാടി",
     "lat": 11.2805,
     "lng": 75.859,
@@ -327,7 +327,7 @@
   {
     "id": 26,
     "type": "akshaya",
-    "name_en": "Nellikkode അക്ഷയ കേന്ദ്രം (AKSHAYA)",
+    "name_en": "Nellikkode Akshaya Centre",
     "name_ml": "നെല്ലിക്കോട് അക്ഷയ കേന്ദ്രം",
     "lat": 11.2765,
     "lng": 75.875,
@@ -340,7 +340,7 @@
   {
     "id": 27,
     "type": "krishi",
-    "name_en": "Kavumpuram കൃഷിഭവൻ (KRISHI)",
+    "name_en": "Kavumpuram Krishi Bhavan",
     "name_ml": "കവുമ്പുറം കൃഷിഭവൻ",
     "lat": 11.3295,
     "lng": 75.911,
@@ -353,7 +353,7 @@
   {
     "id": 28,
     "type": "vet",
-    "name_en": "Athanikkal മൃഗാശുപത്രി (VET)",
+    "name_en": "Athanikkal Veterinary Hospital",
     "name_ml": "അത്താണിക്കൽ മൃഗാശുപത്രി",
     "lat": 11.2865,
     "lng": 75.892,
@@ -366,7 +366,7 @@
   {
     "id": 29,
     "type": "school",
-    "name_en": "Kizhakkumuri സ്കൂൾ (SCHOOL)",
+    "name_en": "Kizhakkumuri School",
     "name_ml": "കിഴക്കുമുറി സ്കൂൾ",
     "lat": 11.3135,
     "lng": 75.912,
@@ -379,7 +379,7 @@
   {
     "id": 30,
     "type": "phc",
-    "name_en": "Padinjarekkara പ്രാഥമികാരോഗ്യകേന്ദ്രം (PHC)",
+    "name_en": "Padinjarekkara Primary Health Centre",
     "name_ml": "പടിഞ്ഞാറേക്കര പ്രാഥമികാരോഗ്യകേന്ദ്രം",
     "lat": 11.3105,
     "lng": 75.867,
@@ -392,7 +392,7 @@
   {
     "id": 31,
     "type": "fhc",
-    "name_en": "Thazhe Angadi കുടുംബാരോഗ്യ കേന്ദ്രം (FHC)",
+    "name_en": "Thazhe Angadi Family Health Centre",
     "name_ml": "താഴെ അങ്ങാടി കുടുംബാരോഗ്യ കേന്ദ്രം",
     "lat": 11.2995,
     "lng": 75.868,
@@ -405,7 +405,7 @@
   {
     "id": 32,
     "type": "anganwadi",
-    "name_en": "Mele Angadi അങ്കണവാടി (ANGANWADI)",
+    "name_en": "Mele Angadi Anganwadi",
     "name_ml": "മേലെ അങ്ങാടി അങ്കണവാടി",
     "lat": 11.3085,
     "lng": 75.876,
@@ -418,7 +418,7 @@
   {
     "id": 33,
     "type": "akshaya",
-    "name_en": "Kallurutty അക്ഷയ കേന്ദ്രം (AKSHAYA)",
+    "name_en": "Kallurutty Akshaya Centre",
     "name_ml": "കല്ലുരുട്ടി അക്ഷയ കേന്ദ്രം",
     "lat": 11.3205,
     "lng": 75.898,
@@ -431,7 +431,7 @@
   {
     "id": 34,
     "type": "krishi",
-    "name_en": "Puthiyangadi കൃഷിഭവൻ (KRISHI)",
+    "name_en": "Puthiyangadi Krishi Bhavan",
     "name_ml": "പുതിയങ്ങാടി കൃഷിഭവൻ",
     "lat": 11.2875,
     "lng": 75.879,
@@ -444,7 +444,7 @@
   {
     "id": 35,
     "type": "vet",
-    "name_en": "Cheruvannur മൃഗാശുപത്രി (VET)",
+    "name_en": "Cheruvannur Veterinary Hospital",
     "name_ml": "ചെറുവണ്ണൂർ മൃഗാശുപത്രി",
     "lat": 11.3065,
     "lng": 75.885,

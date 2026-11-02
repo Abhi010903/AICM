@@ -100,7 +100,7 @@ export default function VulnerabilityEvacuationPage() {
         ]
       : [];
 
-  const mapMarkers = assets.slice(0, 60).map((a) => {
+  const mapMarkers = assets.map((a) => {
     const isAtRisk = assetsAtRisk.some((x) => x.asset.id === a.id);
     return {
       id: `asset_${a.id}`,
@@ -180,7 +180,7 @@ export default function VulnerabilityEvacuationPage() {
 
             <div className="flex items-center justify-between pt-2">
               <span className="text-[11px] text-slate-500">
-                Displaying 4 KSDMA flood/landslide risk polygons and 60 surveyed public assets
+                Displaying 4 KSDMA flood/landslide risk polygons and {assets.length} surveyed public assets
               </span>
               <button
                 onClick={() => setShowEvacRoute(!showEvacRoute)}

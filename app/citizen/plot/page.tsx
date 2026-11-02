@@ -143,7 +143,7 @@ function MyPlotContent() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Enter Survey Number (e.g., 412/2, 308/1, 316/2)..."
+              placeholder="Enter Survey Number (e.g., 412/2, 316/3, 324/4)..."
               className="w-full pl-9 p-2.5 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>

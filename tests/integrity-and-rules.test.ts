@@ -9,6 +9,7 @@ import {
 } from '../lib/calculations';
 import { getParcelBySurveyNumber } from '../lib/api';
 import { LandParcel, Ward } from '../lib/types';
+import { translations } from '../lib/i18n-dictionary';
 
 import panchayatData from '../data/panchayat.json';
 import wardsData from '../data/wards.json';
@@ -100,6 +101,30 @@ describe('1. Data Integrity Tests', () => {
     expect(evacuationRoutesData.type).toBe('FeatureCollection');
     expect(evacuationRoutesData.features.length).toBe(3);
     expect(evacuationRoutesData.features[0].properties.shelter_name_en).toBeDefined();
+  });
+
+  it('panchayat.json aggregates reconcile exactly with underlying datasets', () => {
+    const wardSpendTotal = wardsData.reduce((s, w) => s + w.spend_lakhs, 0);
+    expect(panchayatData.total_spend_lakhs).toBe(wardSpendTotal);
+
+    expect(panchayatData.total_projects).toBe(gpdpProjectsData.length);
+
+    const delayedCount = gpdpProjectsData.filter((p) => p.status === 'delayed').length;
+    expect(panchayatData.delayed_projects).toBe(delayedCount);
+  });
+
+  it('facilities.json name_en contains only English text and name_ml contains Malayalam', () => {
+    const malayalamRegex = /[\u0D00-\u0D7F]/;
+    facilitiesData.forEach((f) => {
+      expect(malayalamRegex.test(f.name_en)).toBe(false);
+      expect(malayalamRegex.test(f.name_ml)).toBe(true);
+    });
+  });
+
+  it('i18n-dictionary has exact 1:1 key parity between en and ml', () => {
+    const enKeys = Object.keys(translations.en);
+    const mlKeys = Object.keys(translations.ml);
+    expect(enKeys.sort()).toEqual(mlKeys.sort());
   });
 });
 
@@ -216,6 +241,27 @@ describe('3. Budget Simulation & Geo Calculations Tests', () => {
     const w7 = result.simulated_wards.find((sw) => sw.ward.id === 7);
     expect(w7?.delta_pdi).toBe(0);
     expect(w7?.new_spend_lakhs).toBe(w7?.old_spend_lakhs);
+  });
+
+  it('simulateBudgetShift conserves budget when amount exceeds donor ward spend (Ward 14)', () => {
+    const wards = wardsData as unknown as Ward[];
+    const w14 = wards.find((w) => w.id === 14)!;
+    // Ward 14 has 39.0 Lakhs; attempt to transfer 50 Lakhs
+    const result = simulateBudgetShift(wards, {
+      from_ward_id: 14,
+      to_ward_id: 2,
+      amount_lakhs: 50,
+    });
+
+    expect(result.is_conserved).toBe(true);
+    const fromSim = result.simulated_wards.find((sw) => sw.ward.id === 14)!;
+    const toSim = result.simulated_wards.find((sw) => sw.ward.id === 2)!;
+
+    // Clamped at donor available spend (39.0 Lakhs)
+    expect(fromSim.new_spend_lakhs).toBe(0);
+    expect(toSim.new_spend_lakhs).toBe(
+      Math.round((toSim.old_spend_lakhs + w14.spend_lakhs) * 10) / 10
+    );
   });
 
   it('isPointInPolygon safely handles malformed or empty polygon arrays', () => {

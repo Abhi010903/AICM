@@ -56,9 +56,12 @@ export default function BudgetSimulationPage() {
   const fromSim = simulationResult.simulated_wards.find((sw) => sw.ward.id === fromWardId);
   const toSim = simulationResult.simulated_wards.find((sw) => sw.ward.id === toWardId);
 
-  const originalDistrictAvg = 72.5;
-  const newDistrictAvg = simulationResult.district_avg_pdi;
-  const districtDelta = Math.round((newDistrictAvg - originalDistrictAvg) * 10) / 10;
+  const originalWardMean =
+    wards.length > 0
+      ? Math.round((wards.reduce((sum, w) => sum + w.pdi_score, 0) / wards.length) * 10) / 10
+      : 72.4;
+  const newWardMean = simulationResult.district_avg_pdi;
+  const meanDelta = Math.round((newWardMean - originalWardMean) * 10) / 10;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -257,23 +260,36 @@ export default function BudgetSimulationPage() {
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">
               Panchayat-Wide Impact
             </span>
-            <h4 className="text-base font-bold">District Average Projection</h4>
+            <h4 className="text-base font-bold">Panchayat Mean PDI Projection</h4>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="text-slate-400 block">New District Average PDI:</span>
+              <span className="text-slate-400 block">Projected Ward Mean PDI:</span>
               <div className="text-3xl font-black text-white mt-1">
-                {newDistrictAvg}
+                {newWardMean}
                 <span className="text-xs font-semibold text-slate-400 ml-1">/ 100</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1">
-                Base Average: 72.5 ({districtDelta >= 0 ? `+${districtDelta}` : districtDelta} pts shift)
+                Baseline Ward Mean: {originalWardMean} ({meanDelta >= 0 ? `+${meanDelta}` : meanDelta} pts shift)
               </div>
             </div>
 
             <div className="p-3 bg-slate-800 rounded border border-slate-700 text-[11px] text-slate-300">
-              Total Budget Conserved: <strong>₹{simulationResult.total_panchayat_spend} Lakhs</strong> (Exact fiscal neutrality maintained).
+              {simulationResult.is_conserved ? (
+                <>
+                  Total Budget Conserved: <strong>₹{simulationResult.total_panchayat_spend} Lakhs</strong> (Exact fiscal neutrality maintained).
+                  {fromSim && fromSim.old_spend_lakhs - fromSim.new_spend_lakhs < amountLakhs && (
+                    <div className="mt-1 text-amber-300">
+                      Applied transfer capped at ₹{Math.round((fromSim.old_spend_lakhs - fromSim.new_spend_lakhs) * 10) / 10} Lakhs (donor ward spend ceiling).
+                    </div>
+                  )}
+                </>
+              ) : (
+                <span className="text-amber-400">
+                  Warning: Total spend is ₹{simulationResult.total_panchayat_spend} Lakhs. Fiscal neutrality is not maintained.
+                </span>
+              )}
             </div>
           </div>
         </div>

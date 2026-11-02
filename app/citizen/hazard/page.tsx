@@ -16,8 +16,8 @@ import { useTranslation } from '@/lib/i18n';
 import { SourceChip } from '@/components/common/SourceChip';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { getHazardZones, getEvacuationRoutes } from '@/lib/api';
-import { HazardZoneCollection, EvacuationRouteCollection } from '@/lib/types';
-import { calculateDistanceKm } from '@/lib/calculations';
+import { HazardZoneCollection, EvacuationRouteCollection, EvacuationRouteFeature } from '@/lib/types';
+import { calculateDistanceKm, isPointInPolygon } from '@/lib/calculations';
 
 export default function CitizenHazardPage() {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ export default function CitizenHazardPage() {
   // Citizen address & pin state (default Ward 7 near river)
   const [addressInput, setAddressInput] = useState('Chaliyar Riverside, Ward 7, Cheruvannur');
   const [userLocation, setUserLocation] = useState<[number, number]>([11.3038, 75.8835]);
-  const [riskLevel, setRiskLevel] = useState<'HIGH' | 'MEDIUM' | 'LOW'>('HIGH');
+  const [riskLevel, setRiskLevel] = useState<'HIGH' | 'MEDIUM' | 'LOW' | 'UNAVAILABLE'>('HIGH');
   const [riskReason, setRiskReason] = useState(
     'Location falls directly inside the Chaliyar River Basin High Flood Zone (KSDMA Category 1). Annual monsoon inundation risk exceeds 1.5m.'
   );
@@ -52,35 +52,66 @@ export default function CitizenHazardPage() {
     setUserLocation([lat, lng]);
     setAddressInput(address);
 
-    // Simple deterministic risk classifier based on latitude
-    if (lat >= 11.30 && lat <= 11.31) {
-      setRiskLevel('HIGH');
-      setRiskReason(
-        'Location falls directly inside the Chaliyar River Basin High Flood Zone (KSDMA Category 1). Annual monsoon inundation risk exceeds 1.5m.'
-      );
-    } else if (lat >= 11.325) {
-      setRiskLevel('MEDIUM');
-      setRiskReason(
-        'Location lies adjacent to Kottakkunnu hill slope buffer. Moderate landslide runoff warning during orange alert rainfall.'
-      );
-    } else {
-      setRiskLevel('LOW');
-      setRiskReason(
-        'Elevated dry land terrace outside active flood inundation contours and steep slopes. Minimal historic flood exposure.'
-      );
+    if (!hazardZones || !hazardZones.features) {
+      setRiskLevel('UNAVAILABLE');
+      setRiskReason('Hazard zone spatial data is temporarily unavailable. Unable to determine exposure.');
+      return;
     }
+
+    // Derive deterministic hazard risk using isPointInPolygon on bundled KSDMA hazard polygons
+    let matchedRisk: 'HIGH' | 'MEDIUM' | 'LOW' = 'LOW';
+    let matchedReason =
+      'Elevated dry land terrace outside active flood inundation contours and steep slopes. Minimal historic flood exposure.';
+
+    for (const hz of hazardZones.features) {
+      const polyCoords = hz.geometry.coordinates[0];
+      if (isPointInPolygon([lng, lat], polyCoords)) {
+        if (hz.properties.hazard_type === 'flood_high') {
+          matchedRisk = 'HIGH';
+          matchedReason = `Location falls directly inside ${hz.properties.name_en} (${hz.properties.severity}). Annual monsoon inundation risk exceeds 1.5m.`;
+          break;
+        } else if (hz.properties.hazard_type === 'landslide') {
+          matchedRisk = 'MEDIUM';
+          matchedReason = `Location lies in ${hz.properties.name_en} (${hz.properties.severity}). Moderate landslide runoff warning during orange alert rainfall.`;
+          break;
+        } else if (hz.properties.hazard_type === 'flood_med') {
+          matchedRisk = 'MEDIUM';
+          matchedReason = `Location lies in ${hz.properties.name_en} (${hz.properties.severity}). Waterlogging risk during heavy rainfall events.`;
+        }
+      }
+    }
+
+    setRiskLevel(matchedRisk);
+    setRiskReason(matchedReason);
   };
 
   if (loading) {
     return <div className="p-8 text-center text-slate-500">{t('loading')}</div>;
   }
 
-  // Nearest Shelter info from evacuation routes
-  const primaryRoute = evacRoutes?.features[0];
+  // Match evacuation route whose origin serves userLocation (within reasonable proximity)
+  let nearestRoute: EvacuationRouteFeature | undefined;
+  let minOriginDist = Infinity;
+
+  if (evacRoutes && evacRoutes.features) {
+    for (const r of evacRoutes.features) {
+      const origin = r.geometry.coordinates[0];
+      const distToOrigin = calculateDistanceKm(
+        userLocation[0],
+        userLocation[1],
+        origin[1],
+        origin[0]
+      );
+      if (distToOrigin <= 1.5 && distToOrigin < minOriginDist) {
+        minOriginDist = distToOrigin;
+        nearestRoute = r;
+      }
+    }
+  }
+
+  const primaryRoute = nearestRoute;
   const shelter = primaryRoute?.properties;
-  const shelterDistance = shelter
-    ? calculateDistanceKm(userLocation[0], userLocation[1], shelter.shelter_lat, shelter.shelter_lng)
-    : 2.1;
+  const shelterDistance = shelter?.distance_km ?? 0;
 
   // Map elements
   const mapPolygons =
@@ -110,7 +141,14 @@ export default function CitizenHazardPage() {
       lng: userLocation[1],
       title: 'Your Location',
       category: `Risk: ${riskLevel}`,
-      color: riskLevel === 'HIGH' ? '#dc2626' : riskLevel === 'MEDIUM' ? '#ea580c' : '#16a34a',
+      color:
+        riskLevel === 'HIGH'
+          ? '#dc2626'
+          : riskLevel === 'MEDIUM'
+          ? '#ea580c'
+          : riskLevel === 'LOW'
+          ? '#16a34a'
+          : '#64748b',
       details: addressInput,
     },
     ...(shelter
@@ -147,7 +185,13 @@ export default function CitizenHazardPage() {
 
       {/* Address Test Controls */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row gap-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleEvaluateLocation(userLocation[0], userLocation[1], addressInput);
+          }}
+          className="flex flex-col sm:flex-row gap-2"
+        >
           <div className="relative flex-1">
             <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
@@ -158,7 +202,13 @@ export default function CitizenHazardPage() {
               className="w-full pl-9 p-2.5 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-        </div>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5"
+          >
+            <span>Evaluate Location</span>
+          </button>
+        </form>
 
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
           <span className="text-slate-500 font-semibold">Test Sample Locations:</span>
@@ -198,7 +248,9 @@ export default function CitizenHazardPage() {
               ? 'bg-red-50 border-red-300 text-red-950'
               : riskLevel === 'MEDIUM'
               ? 'bg-amber-50 border-amber-300 text-amber-950'
-              : 'bg-emerald-50 border-emerald-300 text-emerald-950'
+              : riskLevel === 'LOW'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
+              : 'bg-slate-50 border-slate-300 text-slate-800'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -208,21 +260,25 @@ export default function CitizenHazardPage() {
                   ? 'text-red-600'
                   : riskLevel === 'MEDIUM'
                   ? 'text-amber-600'
-                  : 'text-emerald-600'
+                  : riskLevel === 'LOW'
+                  ? 'text-emerald-600'
+                  : 'text-slate-500'
               }`}
             />
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 KSDMA Hazard Exposure Status
               </span>
-              <h2 className="text-2xl font-black">{riskLevel} RISK ZONE</h2>
+              <h2 className="text-2xl font-black">
+                {riskLevel === 'UNAVAILABLE' ? 'DATA UNAVAILABLE' : `${riskLevel} RISK ZONE`}
+              </h2>
             </div>
           </div>
           <p className="text-xs leading-relaxed font-medium">{riskReason}</p>
         </div>
 
         {/* Shelter Card */}
-        {shelter && (
+        {shelter ? (
           <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
             <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
@@ -235,7 +291,7 @@ export default function CitizenHazardPage() {
 
             <div className="grid grid-cols-3 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
               <div>
-                <span className="text-[11px] text-slate-400 block">Distance</span>
+                <span className="text-[11px] text-slate-400 block">Route Length</span>
                 <strong className="text-slate-900 font-bold">{shelterDistance} km</strong>
               </div>
               <div>
@@ -246,6 +302,28 @@ export default function CitizenHazardPage() {
                 <span className="text-[11px] text-slate-400 block">Helpdesk</span>
                 <strong className="text-blue-700 font-mono font-bold">2884101</strong>
               </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-center text-center">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                Evacuation Corridor
+              </span>
+              <h3 className="text-base font-bold text-slate-800">
+                {riskLevel === 'LOW'
+                  ? 'No Designated Evacuation Corridor Needed'
+                  : riskLevel === 'UNAVAILABLE'
+                  ? 'Evacuation Guidance Unavailable'
+                  : 'No Designated Evacuation Corridor Available'}
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {riskLevel === 'LOW'
+                  ? 'This location is on elevated terrain outside active hazard inundation routes. For emergency inquiries, contact the Grama Panchayat Control Cell.'
+                  : riskLevel === 'UNAVAILABLE'
+                  ? 'Hazard-zone data is unavailable, so evacuation guidance cannot be determined. For emergency inquiries, contact the Grama Panchayat Control Cell.'
+                  : 'No designated evacuation corridor is within 1.5 km of this location. Follow local emergency guidance and contact the Grama Panchayat Control Cell.'}
+              </p>
             </div>
           </div>
         )}
@@ -269,11 +347,16 @@ export default function CitizenHazardPage() {
           polygons={mapPolygons}
           lines={mapLines}
           markers={mapMarkers}
+          onMapClick={(lat, lng) =>
+            handleEvaluateLocation(lat, lng, `Pinned Coordinate (${lat.toFixed(4)}, ${lng.toFixed(4)})`)
+          }
           height="420px"
         />
 
         <div className="text-[11px] text-slate-500 text-center">
-          Green dashed polyline marks the safest designated higher-ground route to the Higher Secondary School camp.
+          {primaryRoute
+            ? `Green polyline marks the safest designated higher-ground route: ${primaryRoute.properties.name_en}.`
+            : 'No active evacuation route line designated for this location.'}
         </div>
       </div>
     </div>

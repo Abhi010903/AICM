@@ -174,8 +174,8 @@
     "ward_id": 4,
     "classification": "purayidom",
     "area_cents": 26.1,
-    "hazard_zone": "flood_med",
-    "road_setback_ok": false,
+    "hazard_zone": "flood_high",
+    "road_setback_ok": true,
     "permitted_activities_en": [
       "Residential Building (Single / Multi-family)",
       "Commercial Establishment (Subject to zoning)",
@@ -559,7 +559,7 @@
     "village_ml": "വെള്ളിപ്പറമ്പ്",
     "ward_id": 11,
     "classification": "purayidom",
-    "area_cents": 52.0,
+    "area_cents": 52,
     "hazard_zone": "none",
     "road_setback_ok": true,
     "permitted_activities_en": [

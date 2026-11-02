@@ -15,7 +15,7 @@ import {
 import { useTranslation } from '@/lib/i18n';
 import { SourceChip } from '@/components/common/SourceChip';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
-import { addDemoGrievance } from '@/lib/demo-store';
+import { addDemoGrievance, getAllGrievances } from '@/lib/demo-store';
 import { Grievance, GrievanceCategory } from '@/lib/types';
 
 export default function GrievanceTaggingPage() {
@@ -46,6 +46,29 @@ export default function GrievanceTaggingPage() {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      const clearAttachment = () => {
+        setPhotoName(null);
+        if (photoPreview) {
+          URL.revokeObjectURL(photoPreview);
+        }
+        setPhotoPreview(null);
+        e.target.value = '';
+      };
+
+      // Security check: validate MIME type and size limit (max 5MB) per security.md
+      if (!file.type.startsWith('image/')) {
+        setFormError('Only valid image files (JPEG, PNG, WebP) are accepted.');
+        clearAttachment();
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setFormError('Image size must be 5 MB or less.');
+        clearAttachment();
+        return;
+      }
+
+      setFormError(null);
       setPhotoName(file.name);
       if (photoPreview) {
         URL.revokeObjectURL(photoPreview);
@@ -57,18 +80,30 @@ export default function GrievanceTaggingPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description.trim()) {
+    const trimmed = description.trim();
+    if (!trimmed) {
       setFormError('Please enter a description for the grievance.');
       return;
     }
+    // Security check: enforce 500-character description limit
+    if (trimmed.length > 500) {
+      setFormError('Description cannot exceed 500 characters.');
+      return;
+    }
 
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    // Generate collision-free ticket ID checked against existing tickets
+    const existingIds = new Set(getAllGrievances().map((g) => g.id));
+    let randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    while (existingIds.has(`TK-2026-${randomSuffix}`)) {
+      randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    }
+
     const newTicket: Grievance = {
       id: `TK-2026-${randomSuffix}`,
       ward_id: wardId,
       category,
-      description_en: description,
-      description_ml: description,
+      description_en: trimmed,
+      description_ml: trimmed,
       lat: Number(pinCoords[0].toFixed(5)),
       lng: Number(pinCoords[1].toFixed(5)),
       status: 'open',
