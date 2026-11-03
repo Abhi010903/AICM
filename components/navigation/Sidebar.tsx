@@ -46,6 +46,7 @@ export const Sidebar: React.FC = () => {
     { href: '/president/siting', label: t('nav_siting'), icon: Compass },
     { href: '/president/assets', label: t('nav_assets'), icon: Building },
     { href: '/president/hazard', label: t('nav_hazard'), icon: AlertTriangle },
+    { href: '/president/grievances', label: 'Grievance Inbox', icon: FileQuestion },
     { href: '/president/promises', label: t('nav_promises'), icon: Clock },
     { href: '/president/budget', label: t('nav_budget'), icon: Sliders },
   ];

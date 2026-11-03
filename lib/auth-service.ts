@@ -9,6 +9,15 @@
  */
 
 import { UserRole } from './types';
+import demoUsers from '../data/demo-users.json';
+
+interface DemoUserProfile {
+  aadhaar: string;
+  name: string;
+  mobile: string;
+  block: string;
+  ward_id: number;
+}
 
 export interface AuthSession {
   token: string;
@@ -19,6 +28,10 @@ export interface AuthSession {
   district: string;
   pinCode: string;
   citizenAlias: string; // e.g. "Citizen 007" for privacy-preserving reporting
+  profileName?: string;
+  profileBlock?: string;
+  profileWardId?: number;
+  aadhaarLast4?: string;
   createdAt: number;
   expiresAt: number;
   isPreviewMode?: boolean; // Set when Panchayat President views as Citizen
@@ -61,6 +74,7 @@ interface OtpChallenge {
   code: string;
   expiresAt: number;
   failedAttempts: number;
+  profile?: DemoUserProfile;
 }
 
 const activeChallenges: Map<string, OtpChallenge> = new Map();
@@ -146,7 +160,8 @@ export async function requestOtp(
   role: UserRole,
   state: string,
   district: string,
-  pinCode: string
+  pinCode: string,
+  profile?: DemoUserProfile
 ): Promise<OtpRequestResult> {
   const phoneValidation = validatePhoneNumber(phone);
   if (!phoneValidation.isValid) {
@@ -201,6 +216,7 @@ export async function requestOtp(
     code,
     expiresAt: now + OTP_TTL_MS,
     failedAttempts: 0,
+    profile,
   });
 
   // Client-Side Demonstration Sandbox Notice
@@ -233,8 +249,17 @@ export async function requestAadhaarOtp(
     return { success: false, error: aadhaarValidation.error };
   }
 
-  const linkedMobile = role === 'president' ? AUTHORIZED_PRESIDENT_NUMBERS[0] : '9847654321';
-  return requestOtp(linkedMobile, role, state, district, pinCode);
+  const cleanedAadhaar = aadhaar.replace(/\D/g, '');
+  const profile = (demoUsers as DemoUserProfile[]).find((user) => user.aadhaar === cleanedAadhaar);
+  if (role === 'citizen' && !profile) {
+    return {
+      success: false,
+      error: 'This Aadhaar number is not present in the demonstration citizen directory.',
+    };
+  }
+
+  const linkedMobile = role === 'president' ? AUTHORIZED_PRESIDENT_NUMBERS[0] : profile!.mobile;
+  return requestOtp(linkedMobile, role, state, district, pinCode, profile);
 }
 
 /**
@@ -299,6 +324,10 @@ export async function verifyOtp(challengeId: string, inputCode: string): Promise
     district: challenge.district,
     pinCode: challenge.pinCode,
     citizenAlias,
+    profileName: challenge.profile?.name,
+    profileBlock: challenge.profile?.block,
+    profileWardId: challenge.profile?.ward_id,
+    aadhaarLast4: challenge.profile?.aadhaar.slice(-4),
     createdAt: now,
     expiresAt: now + SESSION_TTL_MS,
     isPreviewMode: false,

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aicm-twin-v1';
+const CACHE_NAME = 'aicm-twin-v2';
 const STATIC_ASSETS = [
   '/',
   '/president',
@@ -48,6 +48,12 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+
+  // Grievance data must always come from the live JSON-backed API.
+  if (url.pathname === '/api/grievances') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   // Network-first for dynamic navigation, falling back to cache
   if (event.request.mode === 'navigate') {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   FileQuestion,
@@ -13,13 +13,16 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
+import { useAuth } from '@/lib/auth-context';
 import { SourceChip } from '@/components/common/SourceChip';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
-import { addDemoGrievance, getAllGrievances } from '@/lib/demo-store';
+import { getAllGrievances } from '@/lib/demo-store';
+import { getGrievances } from '@/lib/api';
 import { Grievance, GrievanceCategory } from '@/lib/types';
 
 export default function GrievanceTaggingPage() {
   const { t, language } = useTranslation();
+  const { session } = useAuth();
   const router = useRouter();
 
   const [category, setCategory] = useState<GrievanceCategory>('road');
@@ -30,7 +33,36 @@ export default function GrievanceTaggingPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [submittedTicket, setSubmittedTicket] = useState<Grievance | null>(null);
+  const [myGrievances, setMyGrievances] = useState<Grievance[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.profileWardId) {
+      setWardId(session.profileWardId);
+    }
+  }, [session?.profileWardId]);
+
+  const loadMyGrievances = useCallback(async () => {
+    if (!session?.phone) {
+      setHistoryLoading(false);
+      return;
+    }
+    try {
+      setHistoryLoading(true);
+      setMyGrievances(await getGrievances(undefined, session.phone));
+      setHistoryError(null);
+    } catch (error) {
+      setHistoryError(error instanceof Error ? error.message : 'Unable to load your grievances.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [session?.phone]);
+
+  useEffect(() => {
+    void loadMyGrievances();
+  }, [loadMyGrievances]);
 
   // Ponytail optimization: prevent browser memory leaks from transient photo object URLs
   useEffect(() => {
@@ -78,11 +110,15 @@ export default function GrievanceTaggingPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = description.trim();
     if (!trimmed) {
       setFormError('Please enter a description for the grievance.');
+      return;
+    }
+    if (!session?.profileName || !session.phone || !session.profileBlock) {
+      setFormError('Your verified citizen profile is missing. Please sign in again before filing a grievance.');
       return;
     }
     // Security check: enforce 500-character description limit
@@ -116,13 +152,29 @@ export default function GrievanceTaggingPage() {
           : category === 'lighting'
           ? 'KSEB Electrical Section'
           : 'LSGD Sanitation',
+      reporter_name: session.profileName,
+      reporter_phone: session.phone,
+      reporter_block: session.profileBlock,
       local_photo_name: photoName || undefined,
     };
 
-    // Save to shared demo state
-    addDemoGrievance(newTicket);
-    setSubmittedTicket(newTicket);
-    setFormError(null);
+    try {
+      const response = await fetch('/api/grievances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTicket),
+      });
+      if (!response.ok) {
+        const result = (await response.json()) as { error?: string };
+        throw new Error(result.error || 'Unable to submit grievance.');
+      }
+      const created = (await response.json()) as Grievance;
+      setSubmittedTicket(created);
+      setMyGrievances((current) => [created, ...current.filter((item) => item.id !== created.id)]);
+      setFormError(null);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to submit grievance.');
+    }
   };
 
   return (
@@ -234,6 +286,11 @@ export default function GrievanceTaggingPage() {
               </div>
             </div>
 
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs text-blue-900">
+              <strong>Verified profile:</strong> {session?.profileName || 'Loading profile'} · {session?.phone || '—'} · {session?.profileBlock || '—'}
+              <span className="ml-1 text-blue-700">This information is securely added from your Aadhaar-linked profile.</span>
+            </div>
+
             {/* Description */}
             <div className="space-y-1 text-xs">
               <label className="font-bold text-slate-700">{t('grievance_description')}:</label>
@@ -300,6 +357,54 @@ export default function GrievanceTaggingPage() {
           </form>
         </div>
       )}
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-black text-slate-900">My filed grievances</h2>
+            <p className="text-xs text-slate-600">Status updates for complaints filed from your verified Aadhaar profile.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void loadMyGrievances()}
+            className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-500"
+          >
+            Refresh status
+          </button>
+        </div>
+        {historyError && <p className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-800">{historyError}</p>}
+        {historyLoading ? (
+          <p className="mt-4 text-xs text-slate-500">Loading your grievances...</p>
+        ) : myGrievances.length === 0 ? (
+          <p className="mt-4 text-xs text-slate-500">No grievances have been filed from this profile yet.</p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {myGrievances.map((grievance) => (
+              <div key={grievance.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-bold text-slate-900">{grievance.id}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                    grievance.status === 'resolved'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : grievance.status === 'in_progress'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {grievance.status.replace('_', ' ')}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-slate-700">{grievance.description_en}</p>
+                <p className="mt-1 text-[11px] text-slate-500">Ward {grievance.ward_id} · {grievance.category} · {grievance.filed_date}</p>
+                {grievance.resolution_note && (
+                  <p className="mt-2 rounded-lg bg-emerald-50 p-2 text-xs text-emerald-900">
+                    <strong>Latest update:</strong> {grievance.resolution_note}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

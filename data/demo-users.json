@@ -1,0 +1,23 @@
+[
+  {
+    "aadhaar": "234567890123",
+    "name": "Anita Nair",
+    "mobile": "9847654321",
+    "block": "Thekkumpuram Block",
+    "ward_id": 7
+  },
+  {
+    "aadhaar": "345678901234",
+    "name": "Rajesh Kumar",
+    "mobile": "9876543210",
+    "block": "Thekkumpuram Block",
+    "ward_id": 3
+  },
+  {
+    "aadhaar": "456789012345",
+    "name": "Fathima Basheer",
+    "mobile": "9123456789",
+    "block": "Thekkumpuram Block",
+    "ward_id": 11
+  }
+]

@@ -175,6 +175,11 @@ export interface Grievance {
   status: GrievanceStatus;
   filed_date: string;
   assigned_dept: string;
+  reporter_name?: string;
+  reporter_phone?: string;
+  reporter_block?: string;
+  resolution_note?: string;
+  updated_at?: string;
   source?: string;
   local_photo_name?: string;
 }

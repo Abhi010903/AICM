@@ -103,9 +103,21 @@ export async function getFacilities(filters?: {
   return facs;
 }
 
-export async function getGrievances(wardId?: number): Promise<Grievance[]> {
+export async function getGrievances(wardId?: number, reporterPhone?: string): Promise<Grievance[]> {
   await delay(200);
-  const list = getAllGrievances();
+  let list: Grievance[];
+  if (typeof window === 'undefined') {
+    list = getAllGrievances();
+  } else {
+    const params = new URLSearchParams({ refresh: Date.now().toString() });
+    if (reporterPhone) params.set('reporter_phone', reporterPhone);
+    const response = await fetch(`/api/grievances?${params.toString()}`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) throw new Error('Unable to load live grievances.');
+    list = (await response.json()) as Grievance[];
+  }
   if (wardId) {
     return list.filter((g) => g.ward_id === wardId);
   }
