@@ -4,13 +4,16 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Compass, AlertCircle, Building, BarChart3 } from 'lucide-react';
-import { useRole } from '@/lib/role-context';
-import { useTranslation } from '@/lib/i18n';
+import { useAuth } from '@/lib/auth-context';
 
 export const MobileTabBar: React.FC = () => {
   const pathname = usePathname();
-  const { role } = useRole();
-  const { t } = useTranslation();
+  const { isAuthenticated, role } = useAuth();
+
+  const isPublicPage = pathname === '/' || pathname.startsWith('/auth');
+  if (!isAuthenticated || isPublicPage) {
+    return null;
+  }
 
   const isPresident = role === 'president';
 
@@ -43,10 +46,18 @@ export const MobileTabBar: React.FC = () => {
             key={tab.href}
             href={tab.href}
             className={`flex flex-col items-center justify-center py-1 px-2 rounded text-[11px] font-medium transition-colors ${
-              active ? 'text-blue-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+              active
+                ? isPresident
+                  ? 'text-blue-400 font-bold'
+                  : 'text-coconut-400 font-bold'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Icon className={`w-5 h-5 mb-0.5 ${active ? 'text-blue-400' : 'text-slate-400'}`} />
+            <Icon
+              className={`w-5 h-5 mb-0.5 ${
+                active ? (isPresident ? 'text-blue-400' : 'text-coconut-400') : 'text-slate-400'
+              }`}
+            />
             <span className="truncate max-w-[64px]">{tab.label}</span>
           </Link>
         );

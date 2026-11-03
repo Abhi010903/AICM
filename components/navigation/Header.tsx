@@ -2,22 +2,30 @@
 
 import React, { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
   Globe,
-  UserCheck,
   Building2,
+  Users,
   Menu,
   X,
   RotateCcw,
   ShieldAlert,
+  LogOut,
+  ShieldCheck,
+  Search,
+  Eye,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
-import { useRole } from '@/lib/role-context';
+import { useAuth } from '@/lib/auth-context';
 import { resetDemoState } from '@/lib/demo-store';
+import { KLogo } from '@/components/common/KLogo';
+import { DashboardSearch } from '@/components/search/DashboardSearch';
+import { PreviewModeBanner } from '@/components/navigation/PreviewModeBanner';
 
 export const Header: React.FC = () => {
   const { language, setLanguage, t } = useTranslation();
-  const { role, switchRole } = useRole();
+  const { session, isAuthenticated, role, isPreviewMode, logout, exitPreviewMode } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,62 +35,108 @@ export const Header: React.FC = () => {
     setLanguage(language === 'en' ? 'ml' : 'en');
   };
 
-  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    switchRole(e.target.value as 'president' | 'citizen');
-  };
-
   const handleResetConfirm = () => {
     setResetModalOpen(false);
     resetDemoState();
   };
 
+  const isPresident = role === 'president';
+
   return (
     <>
       <header className="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Logo / Title */}
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between h-14 gap-3">
+            {/* Logo / Brand Mnemonic */}
+            <div className="flex items-center gap-3 flex-shrink-0">
               <button
-                onClick={() => router.push('/')}
-                className="flex items-center gap-2.5 text-left group focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                onClick={() => router.push(isAuthenticated ? (isPresident ? '/president' : '/citizen') : '/')}
+                className="flex items-center gap-2.5 text-left group focus:outline-none focus:ring-2 focus:ring-coconut-500 rounded"
               >
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow group-hover:bg-blue-500 transition-colors">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm tracking-tight text-slate-100 flex items-center gap-1.5">
-                    <span>{t('app_title')}</span>
-                  </div>
-                  <div className="text-[11px] text-slate-400 leading-none">
-                    {t('app_subtitle')}
-                  </div>
-                </div>
+                <KLogo size="sm" showText textVariant="light" />
               </button>
             </div>
 
-            {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Role Switcher */}
-              <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">
-                <UserCheck className="w-4 h-4 text-blue-400" />
-                <label htmlFor="role-select" className="text-xs text-slate-300 font-medium sr-only">
-                  {t('role_switch')}
-                </label>
-                <select
-                  id="role-select"
-                  value={role}
-                  onChange={handleRoleChange}
-                  className="bg-transparent text-xs text-slate-100 font-semibold focus:outline-none cursor-pointer"
-                >
-                  <option value="president" className="bg-slate-800 text-white">
-                    {t('role_president')}
-                  </option>
-                  <option value="citizen" className="bg-slate-800 text-white">
-                    {t('role_citizen')}
-                  </option>
-                </select>
+            {/* Prominent Search Bar (Rendered when authenticated) */}
+            {isAuthenticated ? (
+              <div className="hidden md:flex flex-1 justify-center max-w-md mx-2">
+                <DashboardSearch />
               </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-2 text-xs text-coconut-300/80 font-medium">
+                <span className="w-2 h-2 rounded-full bg-coconut-500 animate-pulse" />
+                <span>Thekkumpuram Grama Panchayat Digital Twin</span>
+              </div>
+            )}
+
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-2.5">
+              {isAuthenticated ? (
+                <>
+                  {/* Role & Anonymized User Badge */}
+                  <div
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${
+                      isPresident
+                        ? 'bg-blue-950/80 text-blue-200 border-blue-800'
+                        : 'bg-emerald-950/80 text-emerald-200 border-emerald-800'
+                    }`}
+                  >
+                    {isPresident ? (
+                      <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                    ) : (
+                      <Users className="w-3.5 h-3.5 text-emerald-400" />
+                    )}
+                    <span>
+                      {isPresident ? 'President' : session?.citizenAlias || 'Citizen'}
+                    </span>
+                    {session?.district && (
+                      <span className="text-[10px] text-slate-400 ml-0.5">
+                        ({session.district})
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Return from Preview Mode if active */}
+                  {isPreviewMode && (
+                    <button
+                      onClick={exitPreviewMode}
+                      className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white transition-colors"
+                      title="Return to President Dashboard"
+                    >
+                      <Eye className="w-3 h-3" />
+                      <span>Exit Preview</span>
+                    </button>
+                  )}
+
+                  {/* Sign Out */}
+                  <button
+                    onClick={logout}
+                    aria-label="Sign Out"
+                    title="Sign Out"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                /* Unauthenticated Entry Links */
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/auth/president"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>President Login</span>
+                  </Link>
+                  <Link
+                    href="/auth/citizen"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-coconut-700 hover:bg-coconut-600 text-white transition-colors flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Citizen Portal</span>
+                  </Link>
+                </div>
+              )}
 
               {/* Language Toggle */}
               <button
@@ -90,7 +144,7 @@ export const Header: React.FC = () => {
                 aria-label="Toggle language between English and Malayalam"
                 className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
               >
-                <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                <Globe className="w-3.5 h-3.5 text-coconut-400" />
                 <span>{language === 'en' ? 'മലയാളം' : 'English'}</span>
               </button>
 
@@ -99,18 +153,17 @@ export const Header: React.FC = () => {
                 onClick={() => setResetModalOpen(true)}
                 title={t('reset_demo')}
                 aria-label={t('reset_demo')}
-                className="flex items-center gap-1 text-xs px-2 py-1 rounded text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-1 text-xs p-1.5 rounded text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="hidden lg:inline">{t('reset_demo')}</span>
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Actions */}
+            <div className="flex md:hidden items-center gap-1.5">
               <button
                 onClick={toggleLanguage}
-                className="text-xs font-bold px-2 py-1 rounded bg-slate-800 text-emerald-300 border border-slate-700"
+                className="text-xs font-bold px-2 py-1 rounded bg-slate-800 text-coconut-300 border border-slate-700"
               >
                 {language === 'en' ? 'മ' : 'EN'}
               </button>
@@ -124,42 +177,67 @@ export const Header: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* Mobile Search Input (when authenticated) */}
+          {isAuthenticated && (
+            <div className="md:hidden pb-3 pt-1">
+              <DashboardSearch />
+            </div>
+          )}
         </div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-slate-800 bg-slate-900 px-4 py-3 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400">{t('role_switch')}:</span>
-              <div className="flex items-center gap-1">
+            {isAuthenticated ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
+                  <span className="text-slate-400">Signed In As:</span>
+                  <span className="font-bold text-white">
+                    {isPresident ? 'Panchayat President' : session?.citizenAlias || 'Citizen'}
+                  </span>
+                </div>
+                {isPreviewMode && (
+                  <button
+                    onClick={() => {
+                      exitPreviewMode();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 bg-amber-600 text-white font-bold rounded text-xs flex items-center justify-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Return to President Dashboard</span>
+                  </button>
+                )}
                 <button
                   onClick={() => {
-                    switchRole('president');
+                    logout();
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-xs px-2.5 py-1 rounded font-medium ${
-                    role === 'president'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-800 text-slate-300'
-                  }`}
+                  className="w-full py-2 bg-red-950 text-red-200 border border-red-800 font-bold rounded text-xs flex items-center justify-center gap-1.5"
                 >
-                  {t('role_president')}
-                </button>
-                <button
-                  onClick={() => {
-                    switchRole('citizen');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`text-xs px-2.5 py-1 rounded font-medium ${
-                    role === 'citizen'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-800 text-slate-300'
-                  }`}
-                >
-                  {t('role_citizen')}
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
                 </button>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/auth/president"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2.5 rounded bg-blue-600 text-white text-xs font-bold text-center"
+                >
+                  President Login
+                </Link>
+                <Link
+                  href="/auth/citizen"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2.5 rounded bg-coconut-700 text-white text-xs font-bold text-center"
+                >
+                  Citizen Portal
+                </Link>
+              </div>
+            )}
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800">
               <span className="text-xs text-slate-400">{t('reset_demo')}:</span>
@@ -168,7 +246,7 @@ export const Header: React.FC = () => {
                   setMobileMenuOpen(false);
                   setResetModalOpen(true);
                 }}
-                className="text-xs px-2.5 py-1 rounded bg-red-950 text-red-200 border border-red-800 flex items-center gap-1"
+                className="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-amber-400 flex items-center gap-1"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>{t('reset_demo')}</span>
@@ -176,6 +254,9 @@ export const Header: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Presidential Preview Mode Banner (rendered inside sticky header container to prevent mobile overlap) */}
+        <PreviewModeBanner />
       </header>
 
       {/* Reset Confirmation Dialog */}

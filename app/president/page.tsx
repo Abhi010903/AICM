@@ -24,14 +24,22 @@ import {
   Bot,
   Waves,
   Factory,
+  Eye,
+  Users,
+  ShieldCheck,
+  Activity,
+  CheckCircle2,
+  Info,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
+import { useAuth } from '@/lib/auth-context';
 import { SourceChip } from '@/components/common/SourceChip';
 import { getPanchayat, getWards, getProjects, getGrievances } from '@/lib/api';
 import { Panchayat, Ward, GPDPProject, Grievance } from '@/lib/types';
 
 export default function PresidentOverviewPage() {
   const { t, getLocalizedName } = useTranslation();
+  const { enterPreviewMode } = useAuth();
   const [panchayat, setPanchayat] = useState<Panchayat | null>(null);
   const [wards, setWards] = useState<Ward[]>([]);
   const [projects, setProjects] = useState<GPDPProject[]>([]);
@@ -355,6 +363,136 @@ export default function PresidentOverviewPage() {
           </Link>
         </div>
       </div>
+
+      {/* Panchayat-Wide Citizen Activity Analytics (Privacy-Preserving & Anonymized) */}
+      <section className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-coconut-100 text-coconut-800 text-[11px] font-bold uppercase tracking-wider mb-1">
+              <Activity className="w-3.5 h-3.5 text-coconut-700" />
+              <span>Civic Engagement Intelligence</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">
+              Panchayat-Wide Citizen Activity &amp; Service Demand
+            </h3>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Aggregated citizen utilization across ward services with strict anonymization.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span className="p-1 rounded bg-emerald-100 text-emerald-800 font-bold flex items-center gap-1 px-2 py-1">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Zero Identity Exposure</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Aggregated Demand Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-slate-500 block text-[11px]">Monthly Service Requests</span>
+            <strong className="text-lg font-black text-slate-900">142 Requests</strong>
+            <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">+14% vs last month</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-slate-500 block text-[11px]">Top Service Category</span>
+            <strong className="text-lg font-black text-blue-700">Drinking Water (38%)</strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">Ward 7 &amp; Ward 12</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-slate-500 block text-[11px]">Building Pre-Checks</span>
+            <strong className="text-lg font-black text-coconut-800">54 Inquiries</strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">ReLIS &amp; Wetland screening</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-slate-500 block text-[11px]">Grievance Resolution Rate</span>
+            <strong className="text-lg font-black text-emerald-700">76.5% Closed</strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">Avg turnaround 3.2 days</span>
+          </div>
+        </div>
+
+        {/* Anonymized Citizen Service Activity Table */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-xs">
+            <h4 className="font-bold text-slate-800">
+              Recent Anonymized Citizen Interaction Ledger
+            </h4>
+            <span className="text-[11px] text-slate-500 font-mono">
+              Privacy by Design · Identities Redacted
+            </span>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-2.5 px-3.5">Citizen ID</th>
+                  <th className="py-2.5 px-3.5">Ward</th>
+                  <th className="py-2.5 px-3.5">Service Category</th>
+                  <th className="py-2.5 px-3.5">Activity Description</th>
+                  <th className="py-2.5 px-3.5">Timestamp</th>
+                  <th className="py-2.5 px-3.5">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {[
+                  { id: 'Citizen 001', ward: 'Ward 7 (Cheruvannur)', cat: 'Water Supply', desc: 'Reported pipeline pressure drop near Thekkumpuram tank', time: '10 mins ago', status: 'In Progress', statusColor: 'bg-amber-100 text-amber-800' },
+                  { id: 'Citizen 002', ward: 'Ward 8 (Kottakkunnu)', cat: 'Building Suitability', desc: 'Pre-check on Survey 324/4 for residential dwelling', time: '42 mins ago', status: 'Needs Approval', statusColor: 'bg-amber-100 text-amber-800' },
+                  { id: 'Citizen 003', ward: 'Ward 3 (Palazhi)', cat: 'Streetlight', desc: 'Reported sodium vapor light replacement request', time: '2 hours ago', status: 'Resolved', statusColor: 'bg-emerald-100 text-emerald-800' },
+                  { id: 'Citizen 004', ward: 'Ward 7 (Cheruvannur)', cat: 'Hazard Safety', desc: 'Evaluated evacuation corridor for flood preparedness', time: '3 hours ago', status: 'Verified', statusColor: 'bg-blue-100 text-blue-800' },
+                  { id: 'Citizen 005', ward: 'Ward 11 (Velliparamba)', cat: 'Cadastral Plot', desc: 'Queried Ente Bhoomi boundary for Survey 316/3', time: '5 hours ago', status: 'Completed', statusColor: 'bg-emerald-100 text-emerald-800' },
+                ].map((row, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-2.5 px-3.5 font-mono font-bold text-slate-900">{row.id}</td>
+                    <td className="py-2.5 px-3.5 text-slate-700">{row.ward}</td>
+                    <td className="py-2.5 px-3.5 font-semibold text-slate-800">{row.cat}</td>
+                    <td className="py-2.5 px-3.5 text-slate-600 max-w-xs truncate">{row.desc}</td>
+                    <td className="py-2.5 px-3.5 text-slate-500 font-mono text-[11px]">{row.time}</td>
+                    <td className="py-2.5 px-3.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${row.statusColor}`}>
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500 flex items-center gap-2">
+            <Info className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            <span>
+              <strong>Statutory Privacy Notice:</strong> Citizen mobile numbers, names, and exact cadastral residences are withheld from administrative logs to prevent re-identification, complying with the Digital Personal Data Protection Act (DPDP).
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Prominent VIEW AS CITIZEN Action Bar */}
+      <section className="bg-gradient-to-r from-coconut-900 via-emerald-950 to-slate-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-coconut-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-xl">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-coconut-500/20 text-coconut-300 text-xs font-bold border border-coconut-400/30">
+            <Eye className="w-3.5 h-3.5 text-coconut-400" />
+            <span>Presidential Delegation &amp; Audit Tool</span>
+          </div>
+          <h3 className="text-xl font-black tracking-tight">
+            Explore Citizen Services in Real-Time Preview
+          </h3>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Verify what citizens experience when accessing cadastral plot checks, building suitability, public healthcare directories, and hazard warning routes without logging out.
+          </p>
+        </div>
+
+        <button
+          onClick={enterPreviewMode}
+          className="px-6 py-3.5 bg-gradient-to-r from-coconut-600 to-emerald-600 hover:from-coconut-500 hover:to-emerald-500 text-white font-black text-sm rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 flex-shrink-0"
+        >
+          <Eye className="w-5 h-5 text-coconut-200" />
+          <span>VIEW AS CITIZEN</span>
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </button>
+      </section>
 
       {/* Phase 2 Future Capabilities Preview (Out of Scope for v1) */}
       <section className="bg-slate-900 text-white rounded-xl p-6 border border-slate-800 space-y-4">

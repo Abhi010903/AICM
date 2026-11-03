@@ -286,3 +286,140 @@ describe('3. Budget Simulation & Geo Calculations Tests', () => {
     expect(p412?.survey_number).toBe('412/2');
   });
 });
+
+describe('4. Advanced Platform Evolution Tests', () => {
+  it('lookupPinCode accurately resolves Kerala Grama Panchayat PINs and rejects invalid codes', async () => {
+    const { lookupPinCode } = await import('../lib/pincode-directory');
+
+    // Valid Kozhikode PIN
+    const kzk = lookupPinCode('673014');
+    expect(kzk.isValid).toBe(true);
+    expect(kzk.state).toBe('Kerala');
+    expect(kzk.district).toBe('Kozhikode');
+    expect(kzk.area).toContain('Cheruvannur');
+
+    // Valid Malappuram PIN
+    const mlp = lookupPinCode('676505');
+    expect(mlp.isValid).toBe(true);
+    expect(mlp.state).toBe('Kerala');
+    expect(mlp.district).toBe('Malappuram');
+
+    // Invalid PIN formats
+    const inv1 = lookupPinCode('12345'); // only 5 digits
+    expect(inv1.isValid).toBe(false);
+    expect(inv1.error).toBeDefined();
+
+    const inv2 = lookupPinCode('073014'); // starts with 0
+    expect(inv2.isValid).toBe(false);
+
+    const inv3 = lookupPinCode('ABCDEF');
+    expect(inv3.isValid).toBe(false);
+  });
+
+  it('requestOtp and verifyOtp manage cryptographic challenge lifecycle with privacy alias', async () => {
+    const { requestOtp, verifyOtp, maskPhoneNumber } = await import('../lib/auth-service');
+
+    // Phone masking test
+    expect(maskPhoneNumber('9847012345')).toBe('+91 ••••• ••2345');
+
+    // President authorization allowlist check: unauthorized number is rejected
+    const unauthPresident = await requestOtp('9876543210', 'president', 'Kerala', 'Kozhikode', '673014');
+    expect(unauthPresident.success).toBe(false);
+    expect(unauthPresident.error).toContain('not authorized for Panchayat President');
+
+    // Authorized president number succeeds
+    const authPresident = await requestOtp('9447100001', 'president', 'Kerala', 'Kozhikode', '673014');
+    expect(authPresident.success).toBe(true);
+    expect(authPresident.challengeId).toBeDefined();
+
+    // Request OTP challenge for citizen (any valid number allowed)
+    const reqRes = await requestOtp('9847012345', 'citizen', 'Kerala', 'Kozhikode', '673014');
+    expect(reqRes.success).toBe(true);
+    expect(reqRes.challengeId).toBeDefined();
+    expect(reqRes.devOtpCode).toBeDefined();
+
+    // Verify invalid OTP
+    const failRes = await verifyOtp(reqRes.challengeId!, '000000');
+    expect(failRes.success).toBe(false);
+
+    // Verify correct OTP
+    const passRes = await verifyOtp(reqRes.challengeId!, reqRes.devOtpCode!);
+    expect(passRes.success).toBe(true);
+    expect(passRes.session).toBeDefined();
+    expect(passRes.session?.role).toBe('citizen');
+    expect(passRes.session?.citizenAlias).toMatch(/^Citizen \d{3}$/);
+    expect(passRes.session?.state).toBe('Kerala');
+  });
+
+  it('searchSystem strictly enforces role-based filtering: Citizens cannot see President-only items', async () => {
+    const { searchSystem } = await import('../lib/search-engine');
+
+    // Search query that matches budget simulation
+    const presidentSearch = searchSystem('budget', 'president');
+    const hasFiscalInPresident = presidentSearch.some((r) => r.category === 'budget');
+    expect(hasFiscalInPresident).toBe(true);
+
+    const citizenSearch = searchSystem('budget', 'citizen');
+    const hasFiscalInCitizen = citizenSearch.some((r) => r.category === 'budget');
+    expect(hasFiscalInCitizen).toBe(false);
+
+    // Both roles can discover healthcare and schools
+    const phcSearchCitizen = searchSystem('health', 'citizen');
+    expect(phcSearchCitizen.length).toBeGreaterThan(0);
+    expect(phcSearchCitizen[0].href).toBe('/citizen/facilities');
+
+    // Facility keyword search accurately filters by facility type (CodeRabbit finding fix)
+    const schoolSearch = searchSystem('school', 'citizen');
+    const facilitySchools = schoolSearch.filter((r) => r.category === 'facility');
+    expect(facilitySchools.length).toBeGreaterThan(0);
+    facilitySchools.forEach((s) => {
+      expect(s.badge).toBe('SCHOOL');
+    });
+  });
+
+  it('evaluateDisasterRisk correctly classifies Critical, Warning, and Drought states', async () => {
+    const { evaluateDisasterRisk } = await import('../lib/hazard-engine');
+
+    // Baseline heavy monsoon
+    const baseline = evaluateDisasterRisk({
+      rainfall_mm_24h: 88,
+      rainfall_intensity_mm_hr: 18,
+      river_level_meters: 8.1,
+      reservoir_storage_percent: 78,
+      imd_alert: 'ORANGE',
+      drainage_blockage_percent: 35,
+      monsoon_deficit_percent: 5,
+      groundwater_depletion_meters: 0.4,
+    });
+    expect(['WATCH', 'WARNING', 'CRITICAL']).toContain(baseline.risk_level);
+
+    // Critical cloudburst (Danger mark breached)
+    const critical = evaluateDisasterRisk({
+      rainfall_mm_24h: 210,
+      rainfall_intensity_mm_hr: 45,
+      river_level_meters: 9.8, // > 9.5m danger mark
+      reservoir_storage_percent: 96,
+      imd_alert: 'RED',
+      drainage_blockage_percent: 60,
+      monsoon_deficit_percent: -30,
+      groundwater_depletion_meters: 0.0,
+    });
+    expect(critical.risk_level).toBe('CRITICAL');
+    expect(critical.admin_alert).toBeDefined();
+    expect(critical.admin_alert?.severity).toBe('CRITICAL');
+    expect(critical.vulnerable_wards.length).toBeGreaterThan(0);
+
+    // Severe drought
+    const drought = evaluateDisasterRisk({
+      rainfall_mm_24h: 0,
+      rainfall_intensity_mm_hr: 0,
+      river_level_meters: 3.1,
+      reservoir_storage_percent: 18,
+      imd_alert: 'GREEN',
+      drainage_blockage_percent: 5,
+      monsoon_deficit_percent: 50,
+      groundwater_depletion_meters: 2.2,
+    });
+    expect(drought.drought_status).toBe('SEVERE_DROUGHT');
+  });
+});
