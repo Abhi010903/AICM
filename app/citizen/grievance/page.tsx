@@ -145,7 +145,7 @@ export default function GrievanceTaggingPage() {
       {/* Walkthrough Tip */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 7):</span> Tap on the map to drop a pin, describe the issue, and submit. The generated ticket will immediately appear in the <strong>President Hazard Hotspot view</strong> (continuity verified).
+          <span className="font-bold">Reviewer Script (Step 7):</span> Tap on the map to drop a pin, describe the issue, and submit. The generated ticket will immediately appear in the <strong>MLA Hazard Hotspot view</strong> (continuity verified).
         </div>
       </div>
 

@@ -42,6 +42,10 @@ export const Header: React.FC = () => {
 
   const isPresident = role === 'president';
 
+  if (pathname === '/') {
+    return null;
+  }
+
   return (
     <>
       <header className="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-md">
@@ -87,7 +91,7 @@ export const Header: React.FC = () => {
                       <Users className="w-3.5 h-3.5 text-emerald-400" />
                     )}
                     <span>
-                      {isPresident ? 'President' : session?.citizenAlias || 'Citizen'}
+                      {isPresident ? 'MLA' : session?.citizenAlias || 'Citizen'}
                     </span>
                     {session?.district && (
                       <span className="text-[10px] text-slate-400 ml-0.5">
@@ -101,7 +105,7 @@ export const Header: React.FC = () => {
                     <button
                       onClick={exitPreviewMode}
                       className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white transition-colors"
-                      title="Return to President Dashboard"
+                      title="Return to MLA Dashboard"
                     >
                       <Eye className="w-3 h-3" />
                       <span>Exit Preview</span>
@@ -126,7 +130,7 @@ export const Header: React.FC = () => {
                     className="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>President Login</span>
+                    <span>MLA Login</span>
                   </Link>
                   <Link
                     href="/auth/citizen"
@@ -194,7 +198,7 @@ export const Header: React.FC = () => {
                 <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
                   <span className="text-slate-400">Signed In As:</span>
                   <span className="font-bold text-white">
-                    {isPresident ? 'Panchayat President' : session?.citizenAlias || 'Citizen'}
+                    {isPresident ? 'MLA' : session?.citizenAlias || 'Citizen'}
                   </span>
                 </div>
                 {isPreviewMode && (
@@ -206,7 +210,7 @@ export const Header: React.FC = () => {
                     className="w-full py-2 bg-amber-600 text-white font-bold rounded text-xs flex items-center justify-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    <span>Return to President Dashboard</span>
+                    <span>Return to MLA Dashboard</span>
                   </button>
                 )}
                 <button
@@ -227,7 +231,7 @@ export const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2.5 rounded bg-blue-600 text-white text-xs font-bold text-center"
                 >
-                  President Login
+                  MLA Login
                 </Link>
                 <Link
                   href="/auth/citizen"
@@ -255,7 +259,7 @@ export const Header: React.FC = () => {
           </div>
         )}
 
-        {/* Presidential Preview Mode Banner (rendered inside sticky header container to prevent mobile overlap) */}
+        {/* MLA Preview Mode Banner (rendered inside sticky header container to prevent mobile overlap) */}
         <PreviewModeBanner />
       </header>
 

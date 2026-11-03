@@ -17,10 +17,10 @@ export const PreviewModeBanner: React.FC = () => {
         </span>
         <div className="leading-tight">
           <span className="font-bold uppercase tracking-wider text-[10px] text-amber-200 block">
-            Presidential Citizen Preview Mode
+            MLA Citizen Preview Mode
           </span>
           <span className="font-medium">
-            You are exploring citizen-facing services. Your President session is preserved.
+            You are exploring citizen-facing services. Your MLA session is preserved.
           </span>
         </div>
       </div>
@@ -30,7 +30,7 @@ export const PreviewModeBanner: React.FC = () => {
         className="px-3 py-1.5 rounded-lg bg-white text-amber-900 hover:bg-amber-100 font-bold transition-all shadow-sm flex items-center gap-1.5 flex-shrink-0"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Return to President Dashboard</span>
+        <span>Return to MLA Dashboard</span>
       </button>
     </div>
   );

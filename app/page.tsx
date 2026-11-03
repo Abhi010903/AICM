@@ -1,283 +1,297 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
-  Building2,
-  Users,
-  Compass,
   ArrowRight,
-  ShieldCheck,
-  Globe2,
-  FileText,
-  Layers,
-  Database,
-  ExternalLink,
-  Leaf,
-  HeartHandshake,
-  Factory,
   BarChart3,
-  Waves,
-  Sparkles,
+  Building2,
+  Database,
+  Factory,
+  HeartHandshake,
+  Leaf,
+  MapPin,
+  Map,
+  MessageSquare,
+  Home,
+  ShieldCheck,
+  Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
-import { useAuth } from '@/lib/auth-context';
 import { KLogo } from '@/components/common/KLogo';
 
+const toneClasses = {
+  green: 'bg-emerald-100 text-emerald-700',
+  purple: 'bg-violet-100 text-violet-700',
+  orange: 'bg-orange-100 text-orange-600',
+  red: 'bg-red-100 text-red-600',
+  blue: 'bg-blue-100 text-blue-700',
+};
+
 export default function LandingPage() {
-  const { t, language } = useTranslation();
-  const { isAuthenticated, role } = useAuth();
-  const router = useRouter();
+  const { language, setLanguage } = useTranslation();
+  const isMalayalam = language === 'ml';
+  const copy = isMalayalam
+    ? {
+        search: 'വാർഡുകൾ, സേവനങ്ങൾ, ആസ്തികൾ, റിപ്പോർട്ടുകൾ തിരയുക...',
+        eyebrow: 'പ്രകൃതി · ജനങ്ങൾ · വ്യവസായം',
+        titleStart: 'വികേന്ദ്രീകൃത ഭരണസംവിധാനം',
+        titleEnd: 'പ്രകൃതി, ജനങ്ങൾ, വ്യവസായം എന്നിവയ്ക്കായി',
+        intro: 'തദ്ദേശ ഭരണത്തിനായുള്ള തീരുമാന സഹായവും പൗര സേവനങ്ങളും നൽകുന്ന AICM, തെക്കുംപുരം ഗ്രാമപഞ്ചായത്തിന്റെ ബുദ്ധിപരമായ ഡിജിറ്റൽ പ്രതിരൂപമാണ്.',
+        mla: 'എംഎൽഎ ആയി പ്രവേശിക്കുക',
+        mlaText: 'ഭരണം, വാർഡ് സമത്വം, സൈറ്റിംഗ്, ധനകാര്യ സാൻഡ്‌ബോക്സ്, ദുരന്ത നിയന്ത്രണം',
+        citizen: 'പൗരനായി പ്രവേശിക്കുക',
+        citizenText: 'കഡാസ്ട്രൽ പ്ലോട്ട് എക്സ്പ്ലോറർ, കെട്ടിട പരിശോധന, സമീപ സേവനങ്ങൾ, പരാതികൾ',
+        features: [
+          ['സംവേദനാത്മക ഭൂപടങ്ങൾ', 'ആസ്തികൾ, ഭൂമി, അപകട മേഖലകൾ, സൗകര്യങ്ങൾ എന്നിവ'],
+          ['വികസന ആസൂത്രണം', 'GPDP പദ്ധതികളും ബജറ്റ് നിരീക്ഷണവും'],
+          ['സേവന നിരീക്ഷണം', 'വിദ്യാഭ്യാസം, ആരോഗ്യം, ജലം, ക്ഷേമ സേവനങ്ങൾ'],
+          ['ദുരന്ത മുന്നൊരുക്കം', 'അപകട മേഖലകളും ഒഴിപ്പിക്കൽ പാതകളും'],
+          ['പരാതി പരിഹാരം', 'പ്രശ്നങ്ങൾ റിപ്പോർട്ട് ചെയ്ത് പിന്തുടരുക'],
+          ['സുസ്ഥിര വികസനം', 'PDI, SDG സൂചകങ്ങൾ'],
+        ],
+        cards: [['ഭൂമിയും ആസൂത്രണവും', 'ഭൂമി, സോണിംഗ്, അനുസരണ പരിശോധന കാണുക'], ['ആസ്തികളും സൗകര്യങ്ങളും', 'പൊതു ആസ്തികളും സേവന കേന്ദ്രങ്ങളും പരിശോധിക്കുക'], ['ദുരന്ത പ്രതിരോധം', 'അപകട ഭൂപടങ്ങളും സുരക്ഷിത ഒഴിപ്പിക്കൽ പാതകളും']],
+        philosophy: 'പ്രകൃതി, ജനങ്ങൾ, വ്യവസായം: പ്രവർത്തനത്തിലെ ESG',
+        philosophyText: 'തദ്ദേശ സ്വയംഭരണത്തിന് വികസനത്തെയും പരിസ്ഥിതി സംരക്ഷണത്തെയും വിരുദ്ധ ലക്ഷ്യങ്ങളായി കാണാനാവില്ല. AICM ESG അളവുകോലുകൾ പഞ്ചായത്തിന്റെ തീരുമാനങ്ങളുമായി സംയോജിപ്പിക്കുന്നു.',
+        report: 'പൊതു ഡാറ്റയും സ്ഥലപരമായ ശ്രേണിയും',
+      }
+    : {
+        search: 'Search wards, services, assets and reports...',
+        eyebrow: 'Nature · People · Industry',
+        titleStart: 'Decentralized Governance for',
+        titleEnd: 'Nature, People & Industry',
+        intro: 'AICM delivers an intelligent digital replica of Thekkumpuram Grama Panchayat, bridging cadastral spatial zoning, infrastructure asset management, disaster resilience, and citizen transparency.',
+        mla: 'Enter as MLA',
+        mlaText: 'Governance, Ward Equity, Siting, Fiscal Sandbox & Hazard Command',
+        citizen: 'Enter as Citizen',
+        citizenText: 'Cadastral Plot Explorer, Building Pre-Check, Nearby Services & Grievances',
+        features: [
+          ['Interactive Maps', 'Assets, land, hazards, facilities and more'],
+          ['Development Planning', 'GPDP projects and budget tracking'],
+          ['Service Monitoring', 'Education, health, water and welfare services'],
+          ['Disaster Preparedness', 'Hazard zones and evacuation routes'],
+          ['Grievance Redressal', 'Report and track issues'],
+          ['Sustainable Development', 'PDI and SDG indicators'],
+        ],
+        cards: [['Land & Planning', 'View land parcels, zoning and compliance'], ['Assets & Facilities', 'Explore public assets and service locations'], ['Disaster Resilience', 'Hazard maps and safe evacuation routes']],
+        philosophy: 'Nature, People, Industry: ESG in Action',
+        philosophyText: 'Local self-government cannot treat development and ecological stewardship as opposing goals. AICM integrates ESG metrics directly into Panchayat decisions.',
+        report: 'Public Data & Spatial Hierarchy',
+      };
+  const featureItems = [
+    { icon: Map, tone: 'green' }, { icon: BarChart3, tone: 'purple' }, { icon: Users, tone: 'orange' },
+    { icon: ShieldCheck, tone: 'red' }, { icon: MessageSquare, tone: 'blue' }, { icon: Leaf, tone: 'green' },
+  ];
+  const [locationState, setLocationState] = useState<'pending' | 'detected' | 'denied'>('pending');
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationState('denied');
+      return;
+    }
+
+    setLocationState('pending');
+    navigator.geolocation.getCurrentPosition(
+      () => setLocationState('detected'),
+      () => setLocationState('denied'),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+  };
+
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 animate-fade-in pb-12">
-      {/* Hero Section with Kerala Coconut Leaf Aesthetic & K Logo */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-coconut-950 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-coconut-900/60">
-        {/* Subtle decorative background glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-coconut-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative max-w-4xl space-y-6">
-          {/* Brand Mark & Philosophy Badge */}
-          <div className="flex flex-wrap items-center gap-3">
-            <KLogo size="md" showText textVariant="light" />
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-coconut-900/80 border border-coconut-500/40 text-coconut-300 text-xs font-bold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-coconut-400" />
-              <span>ESG-Anchored Grama Panchayat Digital Twin</span>
-            </div>
+    <div className="landing-page min-h-screen bg-white text-slate-900">
+      <header className="absolute inset-x-0 top-0 z-20 bg-white/25 backdrop-blur-[2px]">
+        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-10">
+          <div className="flex items-center gap-3">
+            <KLogo size="md" showText textVariant="dark" />
           </div>
 
-          {/* Main Title & Core Philosophy */}
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-              Decentralized Governance for{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-coconut-300 via-emerald-300 to-teal-200">
-                Nature, People &amp; Industry
-              </span>
-            </h1>
-            <p className="text-base sm:text-xl font-medium text-slate-300 leading-relaxed max-w-3xl">
-              AICM delivers an intelligent digital replica of Thekkumpuram Grama Panchayat, bridging cadastral spatial zoning, infrastructure asset management, disaster resilience, and citizen transparency.
-            </p>
+          <div className="hidden w-full max-w-[520px] md:block">
+            <label className="relative block">
+              <span className="sr-only">Search the digital twin</span>
+              <input
+                type="search"
+                placeholder={copy.search}
+                className="w-full rounded-full bg-slate-100 px-5 py-3 text-xs text-slate-700 outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-emerald-300"
+              />
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">⌕</span>
+            </label>
           </div>
 
-          {/* Demographic Fast Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs text-slate-300">
-            <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Jurisdiction</span>
-              <strong className="text-sm font-bold text-white">14 Wards (Kozhikode)</strong>
-            </div>
-            <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Population</span>
-              <strong className="text-sm font-bold text-white">28,450 Citizens</strong>
-            </div>
-            <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Households</span>
-              <strong className="text-sm font-bold text-white">6,820 Dwellings</strong>
-            </div>
-            <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Spatial Extent</span>
-              <strong className="text-sm font-bold text-white">32.4 sq km</strong>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => setLanguage(language === 'en' ? 'ml' : 'en')}
+            className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 p-1 text-[11px] font-bold"
+            aria-label="Toggle language"
+          >
+            <span className="rounded-full bg-emerald-800 px-3 py-1.5 text-white">{language === 'en' ? 'EN' : 'മ'}</span>
+            <span className="px-1 text-slate-700">{language === 'en' ? 'മലയാളം' : 'English'}</span>
+          </button>
+        </div>
+      </header>
 
-          {/* Two Primary Entry Points */}
-          <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Entry Point 1: Panchayat President */}
-            <Link
-              href="/auth/president"
-              className="flex items-center justify-between p-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 group"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="p-3 bg-blue-900/80 rounded-xl group-hover:scale-110 transition-transform">
-                  <Building2 className="w-6 h-6 text-blue-200" />
-                </div>
-                <div className="text-left">
-                  <div className="text-base font-extrabold flex items-center gap-1.5">
-                    <span>Enter as Panchayat President</span>
-                  </div>
-                  <div className="text-xs font-normal text-blue-200/90 mt-0.5">
-                    Governance, Ward Equity, Siting, Fiscal Sandbox &amp; Hazard Command
-                  </div>
-                </div>
+      <main id="home">
+        <section
+          className="relative min-h-screen overflow-hidden bg-cover bg-center"
+          style={{ backgroundImage: "url('/assets/bgimage01.png')" }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.94) 25%, rgba(255,255,255,0.42) 48%, rgba(255,255,255,0.08) 68%, rgba(255,255,255,0) 84%)',
+            }}
+          />
+
+          <div className="relative mx-auto grid min-h-screen max-w-[1440px] items-center gap-10 px-5 pb-12 pt-28 sm:px-10 sm:pt-32 lg:grid-cols-[1fr_340px] lg:pb-16">
+            <div className="max-w-[600px]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">{copy.eyebrow}</p>
+              <h1 className="mt-3 text-[42px] font-extrabold leading-[1.03] tracking-[-0.045em] text-slate-950 sm:text-[50px]">
+                {copy.titleStart}{' '}
+                <span className="text-emerald-700">{copy.titleEnd}</span>
+              </h1>
+              <p className="mt-4 max-w-[500px] text-sm leading-5 text-slate-600">
+                {copy.intro}
+              </p>
+
+              <div className="mt-6 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
+                <RoleCard href="/auth/president" icon={Building2} title={copy.mla} text={copy.mlaText} tone="blue" />
+                <RoleCard href="/auth/citizen" icon={Users} title={copy.citizen} text={copy.citizenText} tone="green" />
               </div>
-              <ArrowRight className="w-5 h-5 ml-2 text-blue-300 group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            {/* Entry Point 2: Citizen */}
-            <Link
-              href="/auth/citizen"
-              className="flex items-center justify-between p-5 bg-gradient-to-r from-coconut-700 to-emerald-800 hover:from-coconut-600 hover:to-emerald-700 text-white font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-coconut-400 group"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="p-3 bg-coconut-900/80 rounded-xl group-hover:scale-110 transition-transform">
-                  <Users className="w-6 h-6 text-coconut-200" />
-                </div>
-                <div className="text-left">
-                  <div className="text-base font-extrabold flex items-center gap-1.5">
-                    <span>Enter as Citizen</span>
-                  </div>
-                  <div className="text-xs font-normal text-emerald-200/90 mt-0.5">
-                    Cadastral Plot Explorer, Building Pre-Check, Nearby Services &amp; Grievances
-                  </div>
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 ml-2 text-coconut-300 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Philosophy: Nature, People, Industry (ESG Foundation) */}
-      <section className="space-y-4">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-coconut-100 text-coconut-800 text-xs font-bold uppercase tracking-wider">
-            <span>Guiding Philosophy</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Nature, People, Industry: ESG in Action
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Local self-government cannot treat development and ecological stewardship as opposing goals. AICM integrates ESG metrics directly into Panchayat decisions.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-          {/* Pillar 1: Nature (Environmental) */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 hover:border-coconut-400 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-coconut-100 text-coconut-700 flex items-center justify-center">
-              <Leaf className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Environmental Resilience (E)
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Statutory enforcement of the <em>Kerala Conservation of Paddy Land &amp; Wetland Act</em> to protect natural flood sinks. Real-time Chaliyar river basin inundation mapping, drought indicators, and slope hazard containment.
-            </p>
-            <div className="pt-2 text-[11px] font-semibold text-coconut-800 flex items-center gap-1">
-              <span>KSDMA Flood Zones · Water Balance Indicators</span>
-            </div>
-          </div>
 
-          {/* Pillar 2: People (Social) */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 hover:border-blue-400 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
-              <HeartHandshake className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Social Equity &amp; Inclusion (S)
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Equal access to primary healthcare (FHC/PHC) and schools across all 14 wards. Automated grievance routing with zero-Aadhaar privacy protections and plain-language citizen service accessibility.
-            </p>
-            <div className="pt-2 text-[11px] font-semibold text-blue-800 flex items-center gap-1">
-              <span>UDISE+ Education · e-Health Coverage · Civic Feedback</span>
-            </div>
+            <LocationCard locationState={locationState} onRequestLocation={requestLocation} isMalayalam={isMalayalam} />
           </div>
+        </section>
 
-          {/* Pillar 3: Industry (Governance) */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 hover:border-emerald-400 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <Factory className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Responsible Industry &amp; Governance (G)
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Transparent spatial planning for commercial enterprises with setback and ecological clearance. 100% fiscal conservation in ward budget reallocation, verified through Panchayat Development Index (PDI) themes.
-            </p>
-            <div className="pt-2 text-[11px] font-semibold text-emerald-800 flex items-center gap-1">
-              <span>Fiscal Neutrality · GPDP Lifecycle · PDI 9 Themes</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Reviewer Scripted Walkthrough Pathway */}
-      <section className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-200 pb-3">
-          <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-coconut-700" />
-            <h2 className="text-lg font-bold text-slate-900">{t('walkthrough_title')}</h2>
-          </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded bg-coconut-50 text-coconut-800 border border-coconut-200">
-            Scripted Verification Path
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-          {[
-            t('walkthrough_step_1'),
-            t('walkthrough_step_2'),
-            t('walkthrough_step_3'),
-            t('walkthrough_step_4'),
-            t('walkthrough_step_5'),
-            t('walkthrough_step_6'),
-            t('walkthrough_step_7'),
-            t('walkthrough_step_8'),
-          ].map((step, idx) => (
-            <div
-              key={idx}
-              className="flex items-start gap-3 p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition-colors"
-            >
-              <span className="w-6 h-6 rounded-full bg-coconut-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
-                {idx + 1}
-              </span>
-              <p className="text-xs text-slate-700 leading-relaxed font-medium">{step}</p>
+        <section id="services" className="mx-auto grid max-w-[1440px] grid-cols-2 overflow-hidden rounded-xl bg-slate-50 px-0 sm:grid-cols-3 lg:grid-cols-6">
+          {featureItems.map(({ icon: Icon, tone }, index) => (
+            <div key={copy.features[index][0]} className="bg-transparent px-6 py-7">
+              <div className={`mb-3 flex h-11 w-11 items-center justify-center rounded-full ${toneClasses[tone as keyof typeof toneClasses]}`}><Icon className="h-5 w-5" /></div>
+              <h3 className="text-sm font-extrabold text-slate-800">{copy.features[index][0]}</h3>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{copy.features[index][1]}</p>
             </div>
           ))}
-        </div>
-      </section>
+        </section>
 
-      {/* Public Data Hierarchy */}
-      <section className="bg-slate-900 text-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <section id="maps" className="mx-auto grid max-w-[1440px] gap-4 px-5 py-4 sm:px-10 md:grid-cols-3">
+          {copy.cards.map((card, index) => (
+            <div
+              key={card[0]}
+              className="relative flex h-[180px] items-end overflow-hidden rounded-xl bg-cover bg-center p-4"
+              style={{ backgroundImage: `url('/assets/bgimage0${index + 2}.png')` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent" />
+              <div className="relative z-10 w-full rounded-lg bg-slate-950/75 px-3 py-2 text-white">
+                <h3 className="text-xs font-bold">{card[0]}</h3>
+                <p className="mt-0.5 text-[10px] text-white/80">{card[1]}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section id="about" className="mx-auto max-w-[1440px] px-5 py-10 sm:px-10">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-700">Guiding Philosophy</p>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight">{copy.philosophy}</h2>
+            <p className="mt-2 text-xs leading-5 text-slate-600">{copy.philosophyText}</p>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <EsgCard icon={Leaf} title={isMalayalam ? 'പരിസ്ഥിതി പ്രതിരോധം (E)' : 'Environmental Resilience (E)'} text={isMalayalam ? 'പ്രകൃതിദത്ത വെള്ളപ്പൊക്ക സംഭരണ മേഖലകൾ സംരക്ഷിക്കുന്നതിനുള്ള നിയമപരമായ പരിരക്ഷ. ചാലിയാർ നദീതടത്തിലെ വെള്ളപ്പൊക്ക ഭൂപടം, വരൾച്ചാ സൂചകങ്ങൾ, ചരിവ് അപകട നിയന്ത്രണം.' : 'Statutory enforcement of the Kerala Conservation of Paddy Land & Wetland Act to protect natural flood sinks. Real-time Chaliyar river basin inundation mapping, drought indicators, and slope hazard containment.'} source={isMalayalam ? 'KSDMA വെള്ളപ്പൊക്ക മേഖലകൾ · ജല ബാലൻസ് സൂചകങ്ങൾ' : 'KSDMA Flood Zones · Water Balance Indicators'} />
+            <EsgCard icon={HeartHandshake} title={isMalayalam ? 'സാമൂഹിക സമത്വവും ഉൾക്കൊള്ളലും (S)' : 'Social Equity & Inclusion (S)'} text={isMalayalam ? '14 വാർഡുകളിലും പ്രാഥമിക ആരോഗ്യ സേവനങ്ങളിലേക്കും സ്കൂളുകളിലേക്കും തുല്യ പ്രവേശനം. സ്വകാര്യത സംരക്ഷിച്ചുള്ള പരാതിപരിഹാരവും ലളിതമായ പൗര സേവനങ്ങളും.' : 'Equal access to primary healthcare (FHC/PHC) and schools across all 14 wards. Automated grievance routing with zero-Aadhaar privacy protections and plain-language citizen service accessibility.'} source={isMalayalam ? 'UDISE+ വിദ്യാഭ്യാസം · ഇ-ഹെൽത്ത് · പൗര പ്രതികരണം' : 'UDISE+ Education · e-Health Coverage · Civic Feedback'} />
+            <EsgCard icon={Factory} title={isMalayalam ? 'ഉത്തരവാദിത്തമുള്ള വ്യവസായവും ഭരണവും (G)' : 'Responsible Industry & Governance (G)'} text={isMalayalam ? 'സെറ്റ്ബാക്കും പരിസ്ഥിതി അനുമതിയും ഉൾപ്പെടുത്തിയ സുതാര്യമായ സ്ഥല ആസൂത്രണം. PDI വിഷയങ്ങൾ ഉപയോഗിച്ച് വാർഡ് ബജറ്റ് പുനർവിന്യാസത്തിലെ ധന സംരക്ഷണം പരിശോധിക്കുന്നു.' : 'Transparent spatial planning for commercial enterprises with setback and ecological clearance. 100% fiscal conservation in ward budget reallocation, verified through Panchayat Development Index (PDI) themes.'} source={isMalayalam ? 'ധന നിഷ്പക്ഷത · GPDP ചക്രം · PDI വിഷയങ്ങൾ' : 'Fiscal Neutrality · GPDP Lifecycle · PDI 9 Themes'} />
+          </div>
+        </section>
+
+        <section id="reports" className="mx-auto max-w-[1440px] px-5 pb-10 sm:px-10">
+          <div className="rounded-2xl bg-slate-50 p-5 text-slate-700">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3">
+              <div className="flex items-center gap-2"><Database className="h-4 w-4 text-emerald-700" /><h2 className="text-sm font-bold text-slate-900">{copy.report}</h2></div>
+              <span className="text-[10px] text-slate-500">Baseline Verified: 2026-10-30</span>
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                isMalayalam ? ['L1 സ്ഥല അടിസ്ഥാനം', 'KSDI ഭരണ അതിർത്തികൾ, നദി ഇടനാഴികൾ, WFS വെക്റ്റർ ലെയറുകൾ.'] : ['L1 Spatial Base', 'KSDI administrative boundaries, river corridors, WFS vector layers.'],
+                isMalayalam ? ['L2 കഡാസ്ട്രൽ', 'Ente Bhoomi, ReLIS ഭൂമി വർഗ്ഗീകരണങ്ങൾ.'] : ['L2 Cadastral', 'Ente Bhoomi & ReLIS parcel classifications (Nilam vs Purayidom).'],
+                isMalayalam ? ['L3 നിർമ്മിത ആസ്തികൾ', 'Sanchaya IKM രജിസ്റ്ററുകൾ, ജല ശൃംഖലകൾ, റോഡുകൾ, തെരുവ് വിളക്കുകൾ.'] : ['L3 Built Assets', 'Sanchaya IKM registers, water networks, PWD roads, streetlights.'],
+                isMalayalam ? ['L6 പദ്ധതി, ധനകാര്യം', 'eGramSwaraj GPDP പദ്ധതികൾ, PDI വിഷയങ്ങൾ, ധന കൈമാറ്റ രേഖ.'] : ['L6 Plan & Finance', 'eGramSwaraj GPDP projects, PDI 9 themes, fiscal transfer ledger.'],
+              ].map(([title, text]) => <div key={title} className="rounded-lg bg-white p-3"><h3 className="text-[10px] font-bold text-emerald-700">{title}</h3><p className="mt-1 text-[10px] leading-4 text-slate-500">{text}</p></div>)}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer id="contact" className="bg-slate-100 text-slate-700">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-10">
           <div className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-coconut-400" />
-            <h3 className="text-base font-bold text-white">Public Data &amp; Spatial Hierarchy</h3>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50"><Leaf className="h-5 w-5 text-emerald-700" /></div>
+            <div className="text-[10px] font-semibold">AICM TWIN<br /><span className="text-emerald-700">Nature · People · Industry</span></div>
           </div>
-          <span className="text-xs text-slate-400">Baseline Verified: 2026-10-30</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700">
-            <div className="text-coconut-400 font-bold mb-1">L1 Spatial Base</div>
-            <p className="text-slate-400">KSDI administrative boundaries, river corridors, WFS vector layers.</p>
-          </div>
-          <div className="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700">
-            <div className="text-coconut-400 font-bold mb-1">L2 Cadastral</div>
-            <p className="text-slate-400">Ente Bhoomi &amp; ReLIS parcel classifications (Nilam vs Purayidom).</p>
-          </div>
-          <div className="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700">
-            <div className="text-coconut-400 font-bold mb-1">L3 Built Assets</div>
-            <p className="text-slate-400">Sanchaya IKM registers, water networks, PWD roads, streetlights.</p>
-          </div>
-          <div className="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700">
-            <div className="text-coconut-400 font-bold mb-1">L6 Plan &amp; Finance</div>
-            <p className="text-slate-400">eGramSwaraj GPDP projects, PDI 9 themes, fiscal transfer ledger.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Statutory Footer */}
-      <footer className="border-t border-slate-200 pt-6 text-xs text-slate-500 space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-4 text-xs">
-            <span className="font-semibold text-slate-700">{t('statutory_links')}:</span>
-            <span className="hover:text-coconut-700 cursor-pointer">{t('statutory_kerala_pr')}</span>
-            <span>·</span>
-            <span className="hover:text-coconut-700 cursor-pointer">{t('statutory_ksdi')}</span>
-            <span>·</span>
-            <span className="hover:text-coconut-700 cursor-pointer">{t('statutory_pdi')}</span>
-          </div>
-
-          <div className="font-semibold text-slate-700">{t('last_verified')}</div>
-        </div>
-
-        <div className="text-center text-[11px] text-slate-400">
-          AICM Grama Panchayat Digital Twin Demo · Nature, People, Industry · Privacy by Design
+          <div className="text-[10px] text-slate-500">Statutory Links: Kerala Panchayat Raj Act 1994 &nbsp;|&nbsp; KSDI &nbsp;|&nbsp; Panchayat Development Index</div>
+          <div className="text-[10px] font-semibold text-slate-500">Last verified: 2026-10-30</div>
         </div>
       </footer>
     </div>
   );
+}
+
+function RoleCard({ href, icon: Icon, title, text, tone }: { href: string; icon: React.ElementType; title: string; text: string; tone: 'blue' | 'green' }) {
+  const colors = tone === 'blue' ? 'border-blue-200/70 bg-blue-50/55 text-blue-800' : 'border-emerald-200/70 bg-emerald-50/55 text-emerald-800';
+  return <Link href={href} className={`group flex min-h-[105px] items-center justify-between rounded-xl border p-3 shadow-sm backdrop-blur-sm transition-transform hover:-translate-y-1 ${colors}`}><span className="flex items-center gap-2.5"><span className="rounded-xl bg-white/65 p-2.5"><Icon className="h-7 w-7" /></span><span><strong className="block text-base">{title}</strong><small className="mt-0.5 block max-w-[190px] text-[11px] leading-4 opacity-80">{text}</small></span></span><span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/75 text-current"><ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span></Link>;
+}
+
+function LocationCard({ locationState, onRequestLocation, isMalayalam }: { locationState: 'pending' | 'detected' | 'denied'; onRequestLocation: () => void; isMalayalam: boolean }) {
+  const isDetected = locationState === 'detected';
+  const labels = isMalayalam
+    ? { detected: 'നിങ്ങളുടെ നിലവിലെ സ്ഥലം', detectedSub: 'നിങ്ങളുടെ ബ്രൗസറിൽ സ്ഥലം കണ്ടെത്തി', fallback: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', fallbackSub: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', granted: 'സ്ഥല അനുമതി ലഭിച്ചു', demo: 'ഡെമോ ഡാറ്റ — സാങ്കൽപ്പിക പഞ്ചായത്ത്', district: 'ജില്ല', constituency: 'നിയമസഭാ മണ്ഡലം', population: 'ജനസംഖ്യ', households: 'കുടുംബങ്ങൾ', area: 'വിസ്തീർണ്ണം', wards: 'വാർഡുകൾ', retry: 'എന്റെ സ്ഥലം ഉപയോഗിക്കുക' }
+    : { detected: 'Your current location', detectedSub: 'Location detected in your browser', fallback: 'Thekkumpuram Grama Panchayat', fallbackSub: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', granted: 'Location permission granted', demo: 'Demo data — fictional panchayat', district: 'District', constituency: 'Assembly Constituency', population: 'Population', households: 'Households', area: 'Area', wards: 'Wards', retry: 'Use my location' };
+  return (
+    <div className="relative hidden min-h-[340px] rounded-2xl border border-white/70 bg-white/60 p-5 shadow-xl backdrop-blur-md lg:block">
+      <h2 className="text-lg font-extrabold leading-tight text-slate-950">
+        {isDetected ? labels.detected : labels.fallback}
+      </h2>
+      <p className="mt-0.5 text-xs text-slate-600">{isDetected ? labels.detectedSub : labels.fallbackSub}</p>
+      <div className="mt-3 inline-flex rounded-md bg-amber-100 px-3 py-1.5 text-[10px] font-medium text-amber-900">
+        {isDetected ? labels.granted : labels.demo}
+      </div>
+
+      <div className="mt-4 border-t border-white/70 pt-4">
+        <LocationRow icon={MapPin} label={labels.district} value="Kozhikode" />
+        <LocationRow icon={Building2} label={labels.constituency} value="Kunnamangalam" />
+      </div>
+      <div className="my-3 border-t border-white/70" />
+      <div className="space-y-2.5">
+        <LocationRow icon={Users} label={labels.population} value="28,450" />
+        <LocationRow icon={Home} label={labels.households} value="6,820" />
+        <LocationRow icon={Map} label={labels.area} value="32.4 ച. കി.മീ." />
+        <LocationRow icon={MapPin} label={labels.wards} value="14" />
+      </div>
+
+      {locationState === 'denied' && (
+        <button type="button" onClick={onRequestLocation} className="mt-4 text-[10px] font-bold text-emerald-800 underline underline-offset-2">
+          {labels.retry}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LocationRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <Icon className="h-6 w-6 flex-shrink-0 text-emerald-800" strokeWidth={2.2} />
+      <div className="leading-tight">
+        <span className="block text-xs text-slate-500">{label}</span>
+        <strong className="block text-sm text-slate-900">{value}</strong>
+      </div>
+    </div>
+  );
+}
+
+function EsgCard({ icon: Icon, title, text, source }: { icon: React.ElementType; title: string; text: string; source: string }) {
+  return <article className="rounded-xl bg-slate-50 p-5"><div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700"><Icon className="h-4 w-4" /></div><h3 className="text-sm font-bold">{title}</h3><p className="mt-2 text-[11px] leading-5 text-slate-600">{text}</p><p className="mt-3 text-[10px] font-semibold text-emerald-800">{source}</p></article>;
 }

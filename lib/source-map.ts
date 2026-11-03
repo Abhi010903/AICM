@@ -13,7 +13,7 @@ export const SCREEN_SOURCE_MAP: Record<string, SourceMapping> = {
   // President Screens
   overview: {
     feature_id: 'P0',
-    feature_name: 'President Executive Dashboard',
+    feature_name: 'MLA Executive Dashboard',
     source_name: 'PDI Portal / eGramSwaraj / KSDI',
     twin_layer: 'L1/L6',
     layer_name: 'Spatial Base & Plan/Finance',

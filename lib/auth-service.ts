@@ -5,7 +5,7 @@
  * secure session tokens, rate limiting, and explicit separation between
  * development demonstration mode and production SMS gateway integration.
  *
- * Privacy Note: Strictly adheres to data minimization. Never collects Aadhaar numbers.
+ * Privacy Note: Aadhaar numbers are validated only for the request and are never stored.
  */
 
 import { UserRole } from './types';
@@ -31,6 +31,17 @@ export interface OtpRequestResult {
   devOtpNotice?: string;
   devOtpCode?: string; // Provided ONLY in development demonstration mode with explicit disclaimer
   error?: string;
+}
+
+export function validateAadhaarNumber(aadhaar: string): { isValid: boolean; error?: string } {
+  const cleaned = aadhaar.replace(/\D/g, '');
+  if (cleaned.length !== 12) {
+    return { isValid: false, error: 'Aadhaar number must be exactly 12 digits.' };
+  }
+  if (/^(\d)\1{11}$/.test(cleaned)) {
+    return { isValid: false, error: 'Please enter a valid Aadhaar number.' };
+  }
+  return { isValid: true };
 }
 
 export interface OtpVerificationResult {
@@ -149,8 +160,8 @@ export async function requestOtp(
     return {
       success: false,
       error: isDemoMode
-        ? `Mobile number +91 ${cleanedPhone} is not authorized for Panchayat President administrative access. Use registered President demo number (9447100001 or 9847012345), or authenticate as Citizen.`
-        : 'This mobile number is not registered for Panchayat President administrative access.',
+        ? `Mobile number +91 ${cleanedPhone} is not authorized for MLA administrative access. Use a registered MLA number (9447100001 or 9847012345), or authenticate as Citizen.`
+        : 'This mobile number is not registered for MLA administrative access.',
     };
   }
 
@@ -204,6 +215,26 @@ export async function requestOtp(
       devOtpCode: code,
     }),
   };
+}
+
+/**
+ * Initiates Aadhaar-based OTP authentication without retaining the Aadhaar number.
+ * The linked mobile is represented by the existing demo identity for this prototype.
+ */
+export async function requestAadhaarOtp(
+  aadhaar: string,
+  role: UserRole,
+  state: string,
+  district: string,
+  pinCode: string
+): Promise<OtpRequestResult> {
+  const aadhaarValidation = validateAadhaarNumber(aadhaar);
+  if (!aadhaarValidation.isValid) {
+    return { success: false, error: aadhaarValidation.error };
+  }
+
+  const linkedMobile = role === 'president' ? AUTHORIZED_PRESIDENT_NUMBERS[0] : '9847654321';
+  return requestOtp(linkedMobile, role, state, district, pinCode);
 }
 
 /**

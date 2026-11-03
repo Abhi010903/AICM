@@ -325,7 +325,7 @@ describe('4. Advanced Platform Evolution Tests', () => {
     // President authorization allowlist check: unauthorized number is rejected
     const unauthPresident = await requestOtp('9876543210', 'president', 'Kerala', 'Kozhikode', '673014');
     expect(unauthPresident.success).toBe(false);
-    expect(unauthPresident.error).toContain('not authorized for Panchayat President');
+    expect(unauthPresident.error).toContain('not authorized for MLA');
 
     // Authorized president number succeeds
     const authPresident = await requestOtp('9447100001', 'president', 'Kerala', 'Kozhikode', '673014');

@@ -253,7 +253,7 @@ export default function PresidentOverviewPage() {
         </div>
       </div>
 
-      {/* Quick Navigation Cards to 7 President Modules */}
+      {/* Quick Navigation Cards to 7 MLA Modules */}
       <div className="space-y-3">
         <h3 className="text-sm font-bold text-slate-900">{t('quick_modules')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -474,7 +474,7 @@ export default function PresidentOverviewPage() {
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-coconut-500/20 text-coconut-300 text-xs font-bold border border-coconut-400/30">
             <Eye className="w-3.5 h-3.5 text-coconut-400" />
-            <span>Presidential Delegation &amp; Audit Tool</span>
+            <span>MLA Delegation &amp; Audit Tool</span>
           </div>
           <h3 className="text-xl font-black tracking-tight">
             Explore Citizen Services in Real-Time Preview

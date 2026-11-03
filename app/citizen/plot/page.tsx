@@ -124,7 +124,7 @@ function MyPlotContent() {
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
           <span className="font-bold">Reviewer Script (Step 6):</span> Search for survey number{' '}
-          <strong>412/2</strong> to view the plain-language cadastral rights for the same parcel evaluated in President Siting.
+          <strong>412/2</strong> to view the plain-language cadastral rights for the same parcel evaluated in MLA Siting.
         </div>
         <button
           onClick={() => handleSelectDemoParcel('412/2')}

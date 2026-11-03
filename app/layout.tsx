@@ -6,7 +6,6 @@ import { RoleProvider } from '@/lib/role-context';
 import { AuthProvider } from '@/lib/auth-context';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Header } from '@/components/navigation/Header';
-import { DemoBanner } from '@/components/common/DemoBanner';
 import { Sidebar } from '@/components/navigation/Sidebar';
 import { MobileTabBar } from '@/components/navigation/MobileTabBar';
 import { ServiceWorkerRegister } from '@/components/common/ServiceWorkerRegister';
@@ -44,7 +43,6 @@ export default function RootLayout({
           <AuthProvider>
             <RoleProvider>
               <ServiceWorkerRegister />
-              <DemoBanner />
               <Header />
               <AuthGuard>
                 <div className="flex-1 flex flex-row w-full max-w-full">

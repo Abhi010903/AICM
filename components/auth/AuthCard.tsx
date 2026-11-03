@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Building2,
   Users,
-  Smartphone,
   MapPin,
   Lock,
   ArrowRight,
@@ -20,9 +19,9 @@ import {
 import { KLogo } from '@/components/common/KLogo';
 import { lookupPinCode } from '@/lib/pincode-directory';
 import {
-  requestOtp,
+  requestAadhaarOtp,
   verifyOtp,
-  validatePhoneNumber,
+  validateAadhaarNumber,
   isDemoMode,
   OtpRequestResult,
 } from '@/lib/auth-service';
@@ -38,9 +37,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
   const { login } = useAuth();
 
   // Form State
-  const [mobileNumber, setMobileNumber] = useState(
-    targetRole === 'president' ? (isDemoMode ? '9847012345' : '') : '9847654321'
-  );
+  const [aadhaarNumber, setAadhaarNumber] = useState(isDemoMode ? '234567890123' : '');
   const [pinCode, setPinCode] = useState('673014');
   const [state, setState] = useState('Kerala');
   const [district, setDistrict] = useState('Kozhikode');
@@ -57,7 +54,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
   const [devOtpCode, setDevOtpCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [cooldown, setCooldown] = useState(0);
+  const [verified, setVerified] = useState(false);
 
   // Handle PIN Code auto-lookup & validation
   const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,10 +84,9 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    // Validate phone
-    const phoneVal = validatePhoneNumber(mobileNumber);
-    if (!phoneVal.isValid) {
-      setErrorMessage(phoneVal.error || 'Please enter a valid mobile number.');
+    const aadhaarVal = validateAadhaarNumber(aadhaarNumber);
+    if (!aadhaarVal.isValid) {
+      setErrorMessage(aadhaarVal.error || 'Please enter a valid Aadhaar number.');
       return;
     }
 
@@ -102,8 +98,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
 
     setLoading(true);
     try {
-      const res: OtpRequestResult = await requestOtp(
-        mobileNumber,
+      const res: OtpRequestResult = await requestAadhaarOtp(
+        aadhaarNumber,
         targetRole,
         state,
         district,
@@ -143,7 +139,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
     try {
       const res = await verifyOtp(challengeId, otpCode);
       if (res.success && res.session) {
-        login(res.session);
+        setVerified(true);
+        window.setTimeout(() => login(res.session!), 900);
       } else {
         setErrorMessage(res.error || 'Verification failed.');
       }
@@ -176,13 +173,13 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
             }`}
           >
             {isPresident ? <Building2 className="w-3.5 h-3.5" /> : <Users className="w-3.5 h-3.5" />}
-            <span>{isPresident ? 'President Auth' : 'Citizen Verification'}</span>
+            <span>{isPresident ? 'MLA Auth' : 'Citizen Verification'}</span>
           </div>
         </div>
 
         <h2 className="text-xl font-black tracking-tight">
           {isPresident
-            ? 'Panchayat President Authentication'
+            ? 'MLA Authentication'
             : 'Citizen Digital Service Access'}
         </h2>
         <p className="text-xs text-slate-300 mt-1 leading-relaxed">
@@ -192,11 +189,11 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
         </p>
       </div>
 
-      {/* Zero-Aadhaar Privacy Guarantee Banner */}
+      {/* Aadhaar privacy notice */}
       <div className="bg-emerald-50/90 border-b border-emerald-100 px-4 py-2 text-[11px] text-emerald-900 flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
         <span>
-          <strong>Privacy by Design:</strong> Zero-Aadhaar architecture. We never request or store Aadhaar numbers.
+          <strong>Privacy by Design:</strong> Your Aadhaar number is used only for verification and is not stored.
         </span>
       </div>
 
@@ -208,30 +205,39 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
           </div>
         )}
 
-        {step === 'input' ? (
+        {verified ? (
+          <div className="py-10 text-center animate-fade-in" role="status" aria-live="polite">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <CheckCircle2 className="h-10 w-10 animate-pulse text-emerald-600" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">Identity verified</h3>
+            <p className="mt-1 text-xs text-slate-600">Your verification was successful. Redirecting to your dashboard…</p>
+          </div>
+        ) : step === 'input' ? (
           /* Step 1: Input Fields */
           <form onSubmit={handleRequestOtp} className="space-y-4 text-xs">
-            {/* Mobile Number */}
+            {/* Aadhaar Number */}
             <div className="space-y-1">
               <label className="font-bold text-slate-700 flex items-center justify-between">
-                <span>Registered Mobile Number</span>
-                <span className="text-[10px] text-slate-400 font-normal">10 Digits</span>
+                <span>Aadhaar Number</span>
+                <span className="text-[10px] text-slate-400 font-normal">12 Digits</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-slate-500 font-semibold">+91</span>
+                <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
-                  type="tel"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder={isDemoMode ? 'e.g. 9847012345' : 'e.g. 10-digit mobile number'}
-                  className="w-full pl-12 pr-3 py-2 bg-slate-50 rounded-lg border border-slate-300 font-semibold focus:ring-2 focus:ring-coconut-500 focus:outline-none"
+                  type="text"
+                  inputMode="numeric"
+                  value={aadhaarNumber}
+                  onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                  placeholder="Enter 12-digit Aadhaar number"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-lg border border-slate-300 font-semibold tracking-wider focus:ring-2 focus:ring-coconut-500 focus:outline-none"
                   required
                 />
               </div>
               {isPresident && isDemoMode && (
                 <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-1">
                   <Info className="w-3 h-3 text-coconut-600 flex-shrink-0" />
-                  <span>Authorized President Demo Mobile: <strong>9847012345</strong> or <strong>9447100001</strong></span>
+                  <span>Use any valid 12-digit Aadhaar number in this environment.</span>
                 </div>
               )}
             </div>
@@ -295,7 +301,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
                   <span>Generating Challenge...</span>
                 ) : (
                   <>
-                    <span>Request OTP Verification</span>
+                    <span>Next</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -318,8 +324,11 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
               <div className="flex items-center justify-between text-slate-600">
                 <span>Verification Code Sent To:</span>
-                <strong className="text-slate-900">+91 ••••• ••{mobileNumber.slice(-4)}</strong>
+                <strong className="text-slate-900">mobile number linked to your Aadhaar</strong>
               </div>
+              <p className="text-[11px] leading-relaxed text-slate-600">
+                An OTP has been sent to the mobile number registered with your Aadhaar. Please enter the OTP to continue.
+              </p>
               <div className="text-[11px] text-slate-500">
                 Jurisdiction: {district}, {state} ({pinCode})
               </div>
@@ -394,7 +403,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ targetRole }) => {
                 className="hover:text-slate-800 flex items-center gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Edit Mobile / PIN</span>
+                <span>Edit Aadhaar / PIN</span>
               </button>
               <button
                 type="button"

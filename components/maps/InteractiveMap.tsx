@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, Navigation, Info, WifiOff, Layers, Globe, Eye } from 'lucide-react';
-import { useTranslation } from '@/lib/i18n';
+import { MapPin, Navigation, Info, Layers, Globe, Eye } from 'lucide-react';
 
 export interface MapMarker {
   id: string | number;
@@ -69,14 +68,14 @@ interface BasemapDef {
 
 const BASEMAP_TILES: Record<BasemapStyle, BasemapDef> = {
   positron: {
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
-    maxZoom: 19,
-    subdomains: ['a', 'b', 'c', 'd'],
-  },
-  osm: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19,
+    subdomains: ['a', 'b', 'c'],
+  },
+  osm: {
+    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
     maxZoom: 18,
     subdomains: ['a', 'b', 'c'],
   },
@@ -102,9 +101,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const mapInstanceRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
   const layersRef = useRef<any[]>([]);
-  const { t } = useTranslation();
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [tileError, setTileError] = useState(false);
   const [currentBasemap, setCurrentBasemap] = useState<BasemapStyle>('positron');
 
   const centerLat = center[0];
@@ -137,10 +134,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         attribution: basemapConfig.attribution,
         maxZoom: basemapConfig.maxZoom,
         subdomains: basemapConfig.subdomains || 'abc',
-      });
-
-      tileLayer.on('tileerror', () => {
-        if (isMounted) setTileError(true);
       });
 
       tileLayer.addTo(map);
@@ -186,13 +179,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         subdomains: basemapConfig.subdomains || 'abc',
       });
 
-      newTileLayer.on('tileerror', () => {
-        setTileError(true);
-      });
-
       newTileLayer.addTo(map);
       tileLayerRef.current = newTileLayer;
-      setTileError(false);
     });
   }, [currentBasemap, mapLoaded]);
 
@@ -352,14 +340,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           Satellite
         </button>
       </div>
-
-      {/* Offline Alert Fallback Banner if tile error occurs */}
-      {tileError && (
-        <div className="absolute top-2 left-2 right-28 z-[500] bg-amber-50 border border-amber-300 text-amber-900 text-xs px-3 py-1.5 rounded-lg shadow flex items-center gap-2">
-          <WifiOff className="w-4 h-4 text-amber-700 flex-shrink-0" />
-          <span>{t('offline_fallback')}</span>
-        </div>
-      )}
 
       {/* Map Container */}
       <div ref={mapContainerRef} style={{ height, width: '100%' }} className="bg-slate-100" />

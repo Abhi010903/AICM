@@ -119,7 +119,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar Bottom Controls */}
       <div className="space-y-3 pt-4 border-t border-slate-800">
-        {/* VIEW AS CITIZEN button (Panchayat President Only) */}
+        {/* VIEW AS CITIZEN button (MLA Only) */}
         {isPresident && !isPreviewMode && (
           <button
             onClick={enterPreviewMode}
@@ -137,7 +137,7 @@ export const Sidebar: React.FC = () => {
             className="w-full p-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return to President</span>
+            <span>Return to MLA</span>
           </button>
         )}
 

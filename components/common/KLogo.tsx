@@ -21,20 +21,19 @@ export const KLogo: React.FC<KLogoProps> = ({
   className = '',
 }) => {
   const sizeMap = {
-    sm: { box: 28, svg: 24, text: 'text-sm', sub: 'text-[9px]' },
-    md: { box: 36, svg: 30, text: 'text-base', sub: 'text-[10px]' },
-    lg: { box: 48, svg: 40, text: 'text-xl', sub: 'text-xs' },
-    xl: { box: 64, svg: 56, text: 'text-2xl', sub: 'text-sm' },
+    sm: { box: 40, svg: 40, text: 'text-sm', sub: 'text-[9px]' },
+    md: { box: 52, svg: 52, text: 'text-base', sub: 'text-[10px]' },
+    lg: { box: 64, svg: 64, text: 'text-xl', sub: 'text-xs' },
+    xl: { box: 78, svg: 78, text: 'text-2xl', sub: 'text-sm' },
   };
 
   const dim = sizeMap[size];
 
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
-      {/* K Brand Mnemonic Mark */}
       <div
         style={{ width: dim.box, height: dim.box }}
-        className="relative flex items-center justify-center rounded-xl bg-gradient-to-br from-coconut-600 via-coconut-700 to-emerald-900 shadow-md shadow-coconut-900/20 border border-coconut-400/30 flex-shrink-0"
+        className="relative flex items-center justify-center flex-shrink-0"
       >
         <svg
           width={dim.svg}
@@ -42,32 +41,15 @@ export const KLogo: React.FC<KLogoProps> = ({
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="transform -translate-y-[0.5px]"
           aria-hidden="true"
         >
-          {/* Vertical Stem - Governance Pillar */}
-          <rect
-            x="18"
-            y="14"
-            width="18"
-            height="72"
-            rx="9"
-            fill="white"
-            fillOpacity="0.95"
-          />
-          {/* Upper Diagonal Leaf Wing - Nature & Environment */}
-          <path
-            d="M44 48 C 44 48, 52 38, 64 26 C 72 18, 82 20, 84 28 C 86 36, 76 44, 58 56 Z"
-            fill="#a7f3d0"
-          />
-          {/* Lower Diagonal Growth Branch - People & Industry */}
-          <path
-            d="M42 52 C 48 58, 60 72, 70 82 C 76 88, 86 86, 84 76 C 82 66, 70 58, 54 48 Z"
-            fill="white"
-            fillOpacity="0.95"
-          />
-          {/* Center Leaf Vein Accent */}
-          <circle cx="48" cy="50" r="5" fill="#34d399" />
+          <circle cx="50" cy="50" r="46" fill="#f8fafc" stroke="#087443" strokeWidth="5" />
+          <path d="M13 68C28 54 42 53 53 59C63 64 75 67 87 59V87H13Z" fill="#075b3a" />
+          <path d="M15 61C28 48 39 48 51 55C62 62 74 61 85 51V68C72 76 61 73 50 67C38 61 27 62 15 73Z" fill="#22a35a" />
+          <path d="M28 66L48 18L72 66H59L54 54H40L35 66H28ZM44 44H51L48 35Z" fill="#087443" />
+          <path d="M40 54H55L60 66H35Z" fill="#f8fafc" />
+          <path d="M22 39C26 31 33 27 40 25C35 32 31 38 29 46Z" fill="#34a853" />
+          <path d="M73 40C78 35 82 34 85 35C81 39 78 44 77 49Z" fill="#34a853" />
         </svg>
       </div>
 
@@ -75,14 +57,14 @@ export const KLogo: React.FC<KLogoProps> = ({
         <div className="flex flex-col justify-center leading-none">
           <div
             className={`font-black tracking-tight ${dim.text} ${
-              textVariant === 'light' ? 'text-white' : 'text-slate-900'
+              textVariant === 'light' ? 'text-white' : 'text-[#102542]'
             }`}
           >
-            AICM <span className="text-coconut-400 font-extrabold font-sans">TWIN</span>
+            AICM <span className={`${textVariant === 'light' ? 'text-coconut-400' : 'text-emerald-700'} font-extrabold font-sans`}>TWIN</span>
           </div>
           <div
             className={`font-semibold tracking-wider uppercase mt-1 ${dim.sub} ${
-              textVariant === 'light' ? 'text-coconut-200/80' : 'text-slate-600'
+              textVariant === 'light' ? 'text-coconut-200/80' : 'text-[#102542]'
             }`}
           >
             Nature · People · Industry

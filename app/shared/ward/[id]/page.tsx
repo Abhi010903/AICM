@@ -179,7 +179,7 @@ export default function SharedWardDashboardPage() {
               <span>Administrative Capital & Spend Efficiency Metrics</span>
             </h3>
             <span className="text-[10px] uppercase font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
-              President Role Active
+              MLA Role Active
             </span>
           </div>
 
