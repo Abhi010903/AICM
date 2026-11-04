@@ -428,11 +428,11 @@ export default function VulnerabilityEvacuationPage() {
       )}
 
       {/* Main Grid: Left Map & Exposure, Right Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
         {/* Left 2 Cols: Interactive Map & Ward Exposure Ledger */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 min-w-0">
           {/* Leaflet Hazard Map */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 min-w-0 overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-red-600" />

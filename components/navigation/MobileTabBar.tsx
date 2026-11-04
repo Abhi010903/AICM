@@ -29,10 +29,10 @@ export const MobileTabBar: React.FC = () => {
       ]
     : [
         { href: '/citizen', label: t('tab_home'), icon: Home },
-        { href: '/citizen/plot', label: t('tab_plot'), icon: Compass },
-        { href: '/citizen/build-check', label: t('tab_build'), icon: BarChart3 },
-        { href: '/citizen/facilities', label: t('tab_services'), icon: Building },
         { href: '/citizen/grievance', label: t('tab_report'), icon: AlertCircle },
+        { href: '/citizen/facilities', label: t('tab_services'), icon: Building },
+        { href: '/citizen/plot', label: t('tab_plot'), icon: Compass },
+        { href: '/citizen/complaints', label: t('nav_track_complaints'), icon: BarChart3 },
       ];
 
   return (

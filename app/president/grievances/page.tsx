@@ -7,9 +7,16 @@ import { SourceChip } from '@/components/common/SourceChip';
 import { useTranslation } from '@/lib/i18n';
 
 const statusStyles: Record<GrievanceStatus, string> = {
-  open: 'bg-amber-100 text-amber-800',
+  submitted: 'bg-slate-100 text-slate-800',
+  received: 'bg-slate-100 text-slate-800',
+  under_review: 'bg-amber-100 text-amber-800',
   in_progress: 'bg-blue-100 text-blue-800',
   resolved: 'bg-emerald-100 text-emerald-800',
+  closed: 'bg-emerald-100 text-emerald-800',
+  delayed: 'bg-orange-100 text-orange-800',
+  rejected: 'bg-red-100 text-red-800',
+  reopened: 'bg-amber-100 text-amber-800',
+  open: 'bg-amber-100 text-amber-800',
 };
 
 export default function PresidentGrievancesPage() {

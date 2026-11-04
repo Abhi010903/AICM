@@ -93,9 +93,13 @@ export type AssetType =
   | 'drainage'
   | 'anganwadi'
   | 'school'
-  | 'phc';
+  | 'phc'
+  | 'well'
+  | 'community_hall'
+  | 'toilet'
+  | 'park';
 
-export type AssetCondition = 'good' | 'fair' | 'poor';
+export type AssetCondition = 'good' | 'fair' | 'poor' | 'damaged';
 export type AssetTaxStatus = 'assessed' | 'unassessed' | 'exempt';
 
 export interface Asset {
@@ -108,9 +112,31 @@ export interface Asset {
   lng: number;
   condition: AssetCondition;
   last_maintained: string;
+  last_inspected?: string;
   tax_status: AssetTaxStatus;
   owner: string;
   source: string;
+}
+
+// Community Asset Condition Reporting (Part 12)
+export type CommunityReportStatus = 'new_report' | 'under_review' | 'verified_update' | 'rejected_update';
+
+export interface AssetConditionReport {
+  id: string;
+  asset_id: number;
+  asset_name: string;
+  reporter_name: string;
+  reporter_phone: string;
+  reported_condition: AssetCondition;
+  description: string;
+  photo_name?: string;
+  lat: number;
+  lng: number;
+  submitted_at: string;
+  status: CommunityReportStatus;
+  reviewer_name?: string;
+  reviewer_decision_at?: string;
+  reviewer_public_notes?: string;
 }
 
 export type LandClassification = 'nilam' | 'purayidom' | 'wetland';
@@ -138,14 +164,79 @@ export interface LandParcel {
   source: string;
 }
 
+// Citizen Land & Property Records (Part 6)
+export type PropertyVerificationStatus =
+  | 'citizen_submitted'
+  | 'documents_uploaded'
+  | 'verification_pending'
+  | 'document_supported'
+  | 'officially_verified'
+  | 'rejected';
+
+export interface PropertyDocument {
+  id: string;
+  name: string;
+  doc_type: 'land_deed' | 'tax_receipt' | 'possession_cert' | 'survey_sketch' | 'other';
+  size_kb: number;
+  uploaded_at: string;
+  file_url?: string;
+}
+
+export interface PropertyPhoto {
+  id: string;
+  name: string;
+  caption?: string;
+  uploaded_at: string;
+  photo_url?: string;
+}
+
+export interface CitizenProperty {
+  id: string;
+  owner_phone: string;
+  owner_name: string;
+  survey_number: string;
+  subdivision_number?: string;
+  village_en: string;
+  village_ml: string;
+  taluk_en: string;
+  taluk_ml: string;
+  district_en: string;
+  district_ml: string;
+  ward_id: number;
+  area_cents: number;
+  property_type: 'residential' | 'agricultural' | 'commercial';
+  has_house: boolean;
+  address_en: string;
+  address_ml?: string;
+  classification: LandClassification;
+  hazard_zone: HazardZoneType;
+  verification_status: PropertyVerificationStatus;
+  documents: PropertyDocument[];
+  photos: PropertyPhoto[];
+  geometry: GeoJSONPolygon;
+  created_at: string;
+  updated_at: string;
+  source: string;
+}
+
 export type FacilityType =
   | 'school'
+  | 'college'
   | 'phc'
   | 'fhc'
+  | 'hospital'
+  | 'clinic'
+  | 'pharmacy'
+  | 'police'
+  | 'fire_station'
+  | 'gov_office'
+  | 'bank'
   | 'anganwadi'
   | 'akshaya'
   | 'krishi'
-  | 'vet';
+  | 'vet'
+  | 'restaurant'
+  | 'public_facility';
 
 export interface Facility {
   id: number;
@@ -161,17 +252,53 @@ export interface Facility {
   source: string;
 }
 
-export type GrievanceCategory = 'road' | 'water' | 'lighting' | 'sanitation' | 'other';
-export type GrievanceStatus = 'open' | 'in_progress' | 'resolved';
+export type GrievanceCategory =
+  | 'road'
+  | 'water'
+  | 'lighting'
+  | 'sanitation'
+  | 'pothole'
+  | 'drainage'
+  | 'waste'
+  | 'public_facility'
+  | 'waterlogging'
+  | 'infrastructure'
+  | 'other';
+
+export type GrievanceStatus =
+  | 'submitted'
+  | 'received'
+  | 'under_review'
+  | 'in_progress'
+  | 'delayed'
+  | 'resolved'
+  | 'reopened'
+  | 'rejected'
+  | 'closed'
+  | 'open';
+
+export interface GrievanceTimelineEntry {
+  status: GrievanceStatus;
+  timestamp: string;
+  actor: string;
+  public_message_en: string;
+  public_message_ml: string;
+  reason?: string;
+}
+
+export type GrievanceSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Grievance {
   id: string;
   ward_id: number;
   category: GrievanceCategory;
+  category_other_desc?: string;
   description_en: string;
   description_ml: string;
   lat: number;
   lng: number;
+  landmark?: string;
+  severity?: GrievanceSeverity;
   status: GrievanceStatus;
   filed_date: string;
   assigned_dept: string;
@@ -179,9 +306,14 @@ export interface Grievance {
   reporter_phone?: string;
   reporter_block?: string;
   resolution_note?: string;
+  rejection_reason?: string;
+  delay_reason?: string;
+  expected_completion_date?: string;
+  timeline?: GrievanceTimelineEntry[];
   updated_at?: string;
   source?: string;
   local_photo_name?: string;
+  attachments?: { name: string; size_kb: number; type: string }[];
 }
 
 export interface HazardZoneFeature {

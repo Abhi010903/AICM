@@ -21,6 +21,7 @@ import {
   Eye,
   ArrowLeft,
   ShieldCheck,
+  User,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth-context';
@@ -52,13 +53,15 @@ export const Sidebar: React.FC = () => {
   ];
 
   const citizenLinks = [
-    { href: '/citizen', label: t('nav_citizen_home'), icon: LayoutDashboard },
-    { href: '/citizen/plot', label: t('nav_my_plot'), icon: MapPin },
-    { href: '/citizen/build-check', label: t('nav_can_i_build'), icon: CheckSquare },
+    { href: '/citizen/profile', label: t('nav_citizen_profile'), icon: User },
+    { href: '/citizen/grievance', label: t('nav_report_problem'), icon: FileQuestion },
     { href: '/citizen/facilities', label: t('nav_facilities'), icon: Hospital },
     { href: '/citizen/ward', label: t('nav_ward_works'), icon: FolderGit2 },
     { href: '/citizen/hazard', label: t('nav_citizen_hazard'), icon: AlertTriangle },
-    { href: '/citizen/grievance', label: t('nav_report_problem'), icon: FileQuestion },
+    { href: '/citizen/plot', label: t('nav_my_plot'), icon: MapPin },
+    { href: '/citizen/build-check', label: t('nav_can_i_build'), icon: CheckSquare },
+    { href: '/citizen/assets', label: t('nav_shared_assets'), icon: Building },
+    { href: '/citizen/complaints', label: t('nav_track_complaints'), icon: Clock },
   ];
 
   const activeLinks = viewingCitizenView ? citizenLinks : presidentLinks;

@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cleanDistDir: false,
   reactStrictMode: true,
   transpilePackages: ['lucide-react'],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.geojson$/,

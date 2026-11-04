@@ -361,7 +361,7 @@ export default function CitizenHazardPage() {
       </div>
 
       {/* Map with House Pin, Hazard Polygon, Shelter, and Route */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 min-w-0 overflow-hidden">
         <div className="flex items-center justify-between text-xs">
           <h3 className="font-bold text-slate-900 flex items-center gap-1.5">
             <Navigation className="w-4 h-4 text-emerald-600" />

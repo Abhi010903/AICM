@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, Navigation, Info, Layers, Globe, Eye } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 
 export interface MapMarker {
@@ -42,12 +41,15 @@ interface InteractiveMapProps {
   polygons?: MapPolygon[];
   lines?: MapLine[];
   onMapClick?: (lat: number, lng: number) => void;
+  onMarkerClick?: (markerId: string | number) => void;
+  selectedMarkerId?: string | number | null;
   selectedPoint?: [number, number] | null;
+  fitBoundsToLines?: boolean;
   height?: string;
   className?: string;
 }
 
-// Pure HTML escaping helper to prevent XSS in Leaflet popup bindings (security.md)
+// Pure HTML escaping helper to prevent XSS in Leaflet popup bindings (security invariant)
 function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return '';
   return str
@@ -94,7 +96,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   polygons = [],
   lines = [],
   onMapClick,
+  onMarkerClick,
+  selectedMarkerId,
   selectedPoint,
+  fitBoundsToLines = false,
   height = '420px',
   className = '',
 }) => {
@@ -163,6 +168,30 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Invalidate map dimensions whenever container size changes or when modal becomes visible
+  useEffect(() => {
+    if (!mapLoaded || !mapInstanceRef.current || !mapContainerRef.current) return;
+    const map = mapInstanceRef.current;
+
+    // Small delay ensures DOM container has resolved its layout
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, [mapLoaded, height]);
+
   // Update Basemap Tiles when currentBasemap changes
   useEffect(() => {
     if (!mapLoaded || !mapInstanceRef.current) return;
@@ -226,13 +255,16 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       });
 
       // Render Lines (Evacuation Routes & Road Corridors)
+      const allLineLatLngs: [number, number][] = [];
       lines.forEach((line) => {
         try {
-          const latLngs = line.coordinates.map(([lng, lat]) => [lat, lng]);
+          const latLngs = line.coordinates.map(([lng, lat]) => [lat, lng] as [number, number]);
+          latLngs.forEach((pt) => allLineLatLngs.push(pt));
+
           const lineLayer = L.polyline(latLngs as any, {
-            color: line.color || '#16a34a',
-            weight: 4,
-            dashArray: '6, 8',
+            color: line.color || '#2563eb',
+            weight: 5,
+            opacity: 0.85,
           }).addTo(map);
 
           if (line.label) {
@@ -244,18 +276,48 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
       });
 
-      // Render Markers with Data Freshness & Provenance
+      // Auto-fit bounds to route polyline if requested
+      if (fitBoundsToLines && allLineLatLngs.length > 1) {
+        try {
+          const bounds = L.latLngBounds(allLineLatLngs as any);
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+        } catch {
+          // Keep current view if fitBounds encounters invalid coordinates
+        }
+      }
+
+      // Render Markers with Data Freshness, Provenance & Selection Highlighting
       markers.forEach((m) => {
         try {
+          const isSelected = selectedMarkerId && String(m.id) === String(selectedMarkerId);
           const markerColor = m.color || '#2563eb';
+
+          // Selected markers receive a larger, glowing, pulsing highlight
+          const markerHtml = isSelected
+            ? `<div style="position: relative; width: 22px; height: 22px;">
+                 <div style="position: absolute; inset: -4px; border-radius: 50%; background: ${markerColor}; opacity: 0.35; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+                 <div style="background-color: ${markerColor}; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 0 3px #1d4ed8, 0 3px 8px rgba(0,0,0,0.6); position: relative; z-index: 2;"></div>
+               </div>`
+            : `<div style="background-color: ${markerColor}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.4);"></div>`;
+
           const customIcon = L.divIcon({
-            className: 'custom-leaflet-marker',
-            html: `<div style="background-color: ${markerColor}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.4);"></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
+            className: isSelected ? 'custom-leaflet-marker-selected' : 'custom-leaflet-marker',
+            html: markerHtml,
+            iconSize: isSelected ? [22, 22] : [14, 14],
+            iconAnchor: isSelected ? [11, 11] : [7, 7],
           });
 
-          const markerLayer = L.marker([m.lat, m.lng], { icon: customIcon }).addTo(map);
+          const markerLayer = L.marker([m.lat, m.lng], {
+            icon: customIcon,
+            zIndexOffset: isSelected ? 40 : 0,
+          }).addTo(map);
+
+          // Centralized Marker Click Handler
+          markerLayer.on('click', () => {
+            if (onMarkerClick) {
+              onMarkerClick(m.id);
+            }
+          });
 
           // Build rich provenance popup
           const statusBadge =
@@ -268,7 +330,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               : '';
 
           const popupHtml = `
-            <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; min-width: 170px;">
+            <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; min-width: 180px;">
               <strong style="font-size: 13px; color: #0f172a; display:block;">${escapeHtml(m.title)}</strong>
               ${m.category ? `<div style="color: #64748b; font-size: 11px; margin-top: 1px;">${escapeHtml(t('map_label_type', 'Type:'))} ${escapeHtml(m.category)}</div>` : ''}
               ${m.details ? `<div style="margin-top: 4px; color: #334155; font-size: 11px;">${escapeHtml(m.details)}</div>` : ''}
@@ -276,10 +338,24 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               ${m.lastInspected ? `<div style="margin-top: 3px; color: #475569; font-size: 10px;">${escapeHtml(t('map_label_inspected', 'Inspected:'))} <strong>${escapeHtml(m.lastInspected)}</strong></div>` : ''}
               ${statusBadge ? `<div style="margin-top: 2px;">${statusBadge}</div>` : ''}
               <div style="margin-top: 4px; font-size: 9px; color: #94a3b8; font-family: monospace;">${escapeHtml(t('map_label_coords', 'Coords:'))} ${m.lat.toFixed(4)}° N, ${m.lng.toFixed(4)}° E</div>
+              <button id="popup-select-${m.id}" style="margin-top: 6px; width: 100%; padding: 4px 8px; font-size: 11px; font-weight: bold; background: #0f766e; color: white; border: none; border-radius: 6px; cursor: pointer; text-align: center;">
+                ${escapeHtml(t('services_select_destination', 'Select Destination & Route'))}
+              </button>
             </div>
           `;
 
           markerLayer.bindPopup(popupHtml);
+          markerLayer.on('popupopen', () => {
+            const btn = document.getElementById(`popup-select-${m.id}`);
+            if (btn) {
+              btn.onclick = (e) => {
+                e.stopPropagation();
+                if (onMarkerClick) onMarkerClick(m.id);
+                markerLayer.closePopup();
+              };
+            }
+          });
+
           layersRef.current.push(markerLayer);
         } catch (e) {
           console.warn('Failed to render marker', e);
@@ -299,12 +375,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         layersRef.current.push(pinLayer);
       }
     });
-  }, [mapLoaded, markers, polygons, lines, selectedPoint, t]);
+  }, [mapLoaded, markers, polygons, lines, selectedPoint, selectedMarkerId, fitBoundsToLines, onMarkerClick, t]);
 
   return (
-    <div className={`relative rounded-xl overflow-hidden border border-slate-300 shadow-sm ${className}`}>
-      {/* Basemap Switcher Control in Top Right */}
-      <div className="absolute top-2.5 right-2.5 z-[500] bg-white/95 backdrop-blur-xs rounded-lg p-1 shadow-md border border-slate-200 flex items-center gap-1 text-[11px] font-bold">
+    <div
+      className={`relative w-full max-w-full min-w-0 rounded-xl overflow-hidden border border-slate-300 shadow-sm isolate [transform:translateZ(0)] z-0 ${className}`}
+      style={{ height: height || '420px', width: '100%' }}
+    >
+      {/* Basemap Switcher Control in Top Right (sealed within map stacking context) */}
+      <div className="absolute top-2.5 right-2.5 z-[450] bg-white/95 backdrop-blur-xs rounded-lg p-1 shadow-md border border-slate-200 flex items-center gap-1 text-[11px] font-bold pointer-events-auto">
         <button
           type="button"
           onClick={() => setCurrentBasemap('positron')}
@@ -343,8 +422,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         </button>
       </div>
 
-      {/* Map Container */}
-      <div ref={mapContainerRef} style={{ height, width: '100%' }} className="bg-slate-100" />
+      {/* Map Mount Node */}
+      <div
+        ref={mapContainerRef}
+        style={{ height: '100%', width: '100%' }}
+        className="w-full h-full min-w-0 min-h-0 bg-slate-100 relative"
+      />
     </div>
   );
 };

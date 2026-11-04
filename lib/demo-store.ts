@@ -118,6 +118,9 @@ export async function resetDemoState(): Promise<void> {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(ROLE_KEY);
+    localStorage.removeItem('aicm-citizen-properties-v1');
+    localStorage.removeItem('aicm-asset-reports-v1');
+    localStorage.removeItem('aicm-profile-extensions-v1');
     sessionStorage.removeItem(BANNER_KEY);
     // User language preference (LANG_KEY) is preserved so resetting demo does not
     // disrupt the user's selected language.

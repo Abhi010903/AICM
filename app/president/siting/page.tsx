@@ -321,7 +321,7 @@ export default function SitingCompliancePage() {
           )}
 
           {/* Interactive Map with Parcel Boundary & Hazard Overlays */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 min-w-0 overflow-hidden">
             <div className="flex items-center justify-between text-xs">
               <h4 className="font-bold text-slate-900 flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-blue-600" />

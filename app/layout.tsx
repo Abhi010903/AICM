@@ -4,6 +4,7 @@ import './globals.css';
 import { I18nProvider } from '@/lib/i18n';
 import { RoleProvider } from '@/lib/role-context';
 import { AuthProvider } from '@/lib/auth-context';
+import { LocationProvider } from '@/lib/location-context';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Header } from '@/components/navigation/Header';
 import { Sidebar } from '@/components/navigation/Sidebar';
@@ -42,20 +43,22 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden">
         <I18nProvider>
           <AuthProvider>
-            <RoleProvider>
-              <ServiceWorkerRegister />
-              <Header />
-              <AuthGuard>
-                <div className="flex-1 flex flex-row w-full max-w-full">
-                  <Sidebar />
-                  <main className="flex-1 w-full min-w-0 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
-                    {children}
-                  </main>
-                </div>
-              </AuthGuard>
-              <MobileTabBar />
-              <MlaAssistantAccess />
-            </RoleProvider>
+            <LocationProvider>
+              <RoleProvider>
+                <ServiceWorkerRegister />
+                <Header />
+                <AuthGuard>
+                  <div className="flex-1 flex flex-row w-full max-w-full">
+                    <Sidebar />
+                    <main className="flex-1 w-full min-w-0 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
+                      {children}
+                    </main>
+                  </div>
+                </AuthGuard>
+                <MobileTabBar />
+                <MlaAssistantAccess />
+              </RoleProvider>
+            </LocationProvider>
           </AuthProvider>
         </I18nProvider>
       </body>

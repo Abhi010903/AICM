@@ -402,7 +402,7 @@ function AssetRegisterContent() {
               </div>
 
               {/* Map Pin Location */}
-              <div className="space-y-2">
+              <div className="space-y-2 min-w-0 overflow-hidden">
                 <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-blue-600" />
                   <span>{t('geotagged_location')}</span>
