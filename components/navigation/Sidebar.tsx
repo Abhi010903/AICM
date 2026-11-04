@@ -46,7 +46,7 @@ export const Sidebar: React.FC = () => {
     { href: '/president/siting', label: t('nav_siting'), icon: Compass },
     { href: '/president/assets', label: t('nav_assets'), icon: Building },
     { href: '/president/hazard', label: t('nav_hazard'), icon: AlertTriangle },
-    { href: '/president/grievances', label: 'Grievance Inbox', icon: FileQuestion },
+    { href: '/president/grievances', label: t('nav_grievances'), icon: FileQuestion },
     { href: '/president/promises', label: t('nav_promises'), icon: Clock },
     { href: '/president/budget', label: t('nav_budget'), icon: Sliders },
   ];
@@ -69,7 +69,7 @@ export const Sidebar: React.FC = () => {
         {/* Role Header Badge */}
         <div>
           <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2 flex items-center justify-between">
-            <span>{viewingCitizenView ? (isPreviewMode ? 'Citizen (Preview)' : t('role_citizen')) : t('role_president')}</span>
+            <span>{viewingCitizenView ? (isPreviewMode ? t('role_citizen_preview') : t('role_citizen')) : t('role_president')}</span>
             <span
               className={`w-2 h-2 rounded-full ${
                 viewingCitizenView ? 'bg-coconut-500' : 'bg-blue-500'
@@ -113,7 +113,7 @@ export const Sidebar: React.FC = () => {
             }`}
           >
             <Layers className="w-4 h-4 text-slate-400" />
-            <span>Shared Asset Registry</span>
+            <span>{t('nav_shared_assets')}</span>
           </Link>
         </div>
       </div>
@@ -127,7 +127,7 @@ export const Sidebar: React.FC = () => {
             className="w-full p-2.5 rounded-xl bg-gradient-to-r from-coconut-700 to-emerald-800 hover:from-coconut-600 hover:to-emerald-700 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 group"
           >
             <Eye className="w-4 h-4 text-coconut-300 group-hover:scale-110 transition-transform" />
-            <span>VIEW AS CITIZEN</span>
+            <span>{t('nav_view_as_citizen')}</span>
           </button>
         )}
 
@@ -138,19 +138,19 @@ export const Sidebar: React.FC = () => {
             className="w-full p-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return to MLA</span>
+            <span>{t('nav_return_president')}</span>
           </button>
         )}
 
         {/* Jurisdiction & Security Footer */}
         <div className="px-2 text-[11px] text-slate-500 space-y-1">
           <div className="flex items-center justify-between text-slate-400 font-semibold">
-            <span>Thekkumpuram Twin</span>
+            <span>{t('app_brand')}</span>
             <span>v2.0</span>
           </div>
           <div className="flex items-center gap-1 text-[10px] text-coconut-400/80">
             <ShieldCheck className="w-3 h-3" />
-            <span>Zero-Aadhaar · ESG Compliant</span>
+            <span>{t('security_footer_badge')}</span>
           </div>
         </div>
       </div>

@@ -17,14 +17,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'AICM Digital Twin — Thekkumpuram Grama Panchayat',
+  title: 'Constituency Digital Twin — Kunnamangalam Constituency',
   description:
     'Grama Panchayat Digital Twin portal connecting decentralized local governance data, spatial zoning, asset registers, PDI metrics, and disaster risk resilience under the Nature, People, Industry ESG framework.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'AICM Twin',
+    title: 'Constituency Digital Twin',
   },
 };
 

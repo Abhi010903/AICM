@@ -18,10 +18,12 @@ import {
   CornerDownLeft,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { useTranslation } from '@/lib/i18n';
 import { searchSystem, SearchResultItem, SearchCategory } from '@/lib/search-engine';
 
 export const DashboardSearch: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { session, role } = useAuth();
+  const { language, t } = useTranslation();
   const router = useRouter();
 
   const [query, setQuery] = useState('');
@@ -41,13 +43,13 @@ export const DashboardSearch: React.FC<{ className?: string }> = ({ className = 
 
     const timer = setTimeout(() => {
       const activeRole = role || 'citizen';
-      const hits = searchSystem(query, activeRole);
+      const hits = searchSystem(query, activeRole, language);
       setResults(hits);
       setSelectedIndex(hits.length > 0 ? 0 : -1);
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [query, role]);
+  }, [query, role, language]);
 
   // Handle outside click to close dropdown
   useEffect(() => {
@@ -131,7 +133,11 @@ export const DashboardSearch: React.FC<{ className?: string }> = ({ className = 
           onKeyDown={handleKeyDown}
           placeholder={
             isPresident
-              ? 'Search wards, assets, facilities, projects, budget, hazard...'
+              ? language === 'ml'
+                ? 'വാർഡുകൾ, ആസ്തികൾ, പദ്ധതികൾ, ബജറ്റ്, ദുരന്തം...'
+                : 'Search wards, assets, facilities, projects, budget, hazard...'
+              : language === 'ml'
+              ? 'സേവന കേന്ദ്രങ്ങൾ, ഭൂമി പരിശോധന, ക്യാമ്പുകൾ, പദ്ധതികൾ...'
               : 'Search facilities, land check, hazard shelters, ward works...'
           }
           className="w-full pl-9 pr-8 py-2 bg-slate-800/90 text-white placeholder-slate-400 text-xs rounded-xl border border-slate-700/80 focus:bg-slate-800 focus:border-coconut-500 focus:ring-2 focus:ring-coconut-500/20 focus:outline-none transition-all shadow-inner"
@@ -157,10 +163,12 @@ export const DashboardSearch: React.FC<{ className?: string }> = ({ className = 
           {/* Header */}
           <div className="px-3.5 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
             <span className="font-semibold">
-              {results.length} result{results.length === 1 ? '' : 's'} for &ldquo;{query}&rdquo;
+              {language === 'ml'
+                ? `&ldquo;${query}&rdquo; — ${results.length} ഫലങ്ങൾ`
+                : `${results.length} result${results.length === 1 ? '' : 's'} for \u201c${query}\u201d`}
             </span>
             <span className="flex items-center gap-1 text-[10px] text-slate-400">
-              <CornerDownLeft className="w-3 h-3" /> to navigate
+              <CornerDownLeft className="w-3 h-3" /> {language === 'ml' ? 'തുറക്കാൻ' : 'to navigate'}
             </span>
           </div>
 

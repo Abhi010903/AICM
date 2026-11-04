@@ -18,7 +18,7 @@ import { getProjects, getWards } from '@/lib/api';
 import { GPDPProject, Ward } from '@/lib/types';
 
 export default function CitizenWardWorksPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, getLocalizedStatus, getLocalizedCategory } = useTranslation();
   const [projects, setProjects] = useState<GPDPProject[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [showAllWards, setShowAllWards] = useState<boolean>(false);
@@ -58,7 +58,7 @@ export default function CitizenWardWorksPage() {
               {t('nav_ward_works')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              C4 Public Works Ledger · eGramSwaraj Gram Panchayat Development Plan (GPDP)
+              {t('ward_works_subtitle')}
             </p>
           </div>
         </div>
@@ -69,10 +69,10 @@ export default function CitizenWardWorksPage() {
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold text-slate-900 block">
-            {showAllWards ? 'Displaying All Panchayat Projects' : 'Active Ward: Ward 7 (Cheruvannur)'}
+            {showAllWards ? t('displaying_all_projects') : t('active_ward_7')}
           </span>
           <span className="text-[11px] text-slate-500">
-            {displayedProjects.length} infrastructure & welfare development works listed
+            {displayedProjects.length} {t('works_listed')}
           </span>
         </div>
 
@@ -85,7 +85,7 @@ export default function CitizenWardWorksPage() {
               : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
           }`}
         >
-          {showAllWards ? 'Show Only Ward 7 (Default)' : 'Toggle: Show All Wards (Read-only)'}
+          {showAllWards ? t('show_only_ward_7') : t('toggle_all_wards')}
         </button>
       </div>
 
@@ -103,7 +103,7 @@ export default function CitizenWardWorksPage() {
               <div className="h-36 bg-gradient-to-r from-slate-200 to-slate-100 relative flex items-center justify-center border-b border-slate-200">
                 <div className="text-center text-slate-400">
                   <ImageIcon className="w-8 h-8 mx-auto opacity-40 mb-1" />
-                  <span className="text-[10px] font-mono">Site Work Photo Verification</span>
+                  <span className="text-[10px] font-mono">{t('site_work_photo_verification')}</span>
                 </div>
 
                 {/* Status Badge */}
@@ -117,13 +117,13 @@ export default function CitizenWardWorksPage() {
                         : 'bg-amber-500 text-slate-950'
                     }`}
                   >
-                    {proj.status}
+                    {getLocalizedStatus(proj.status)}
                   </span>
                 </div>
 
                 {/* Ward Badge */}
                 <div className="absolute bottom-2 left-2 bg-slate-900/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded backdrop-blur-xs">
-                  Ward {proj.ward_id}: {ward ? getLocalizedName(ward) : ''}
+                  {t('ward_col_ward')} {proj.ward_id}: {ward ? getLocalizedName(ward) : ''}
                 </div>
               </div>
 
@@ -131,7 +131,7 @@ export default function CitizenWardWorksPage() {
               <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                 <div className="space-y-1">
                   <div className="text-[10px] uppercase font-bold text-blue-700 font-mono">
-                    Category: {proj.category}
+                    {t('category')} {getLocalizedCategory(proj.category)}
                   </div>
                   <h3 className="font-bold text-sm text-slate-900 leading-snug">
                     {getLocalizedName(proj)}
@@ -140,25 +140,25 @@ export default function CitizenWardWorksPage() {
 
                 <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div className="flex items-center justify-between text-slate-700">
-                    <span>Approved Budget:</span>
-                    <strong className="text-slate-900 font-bold">₹{proj.budget_lakhs} Lakhs</strong>
+                    <span>{t('approved_budget')}</span>
+                    <strong className="text-slate-900 font-bold">₹{proj.budget_lakhs} {t('lakhs')}</strong>
                   </div>
 
                   <div className="flex items-center justify-between text-slate-700">
-                    <span>Spent So Far:</span>
+                    <span>{t('spent_so_far')}</span>
                     <strong className="text-emerald-700 font-bold">
-                      ₹{proj.spent_lakhs} Lakhs
+                      ₹{proj.spent_lakhs} {t('lakhs')}
                     </strong>
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-slate-400" />
-                      <span>Timeline: {proj.start_date} to {proj.end_date}</span>
+                      <span>{t('timeline')} {proj.start_date} – {proj.end_date}</span>
                     </span>
                     {proj.days_overdue > 0 && (
                       <span className="text-red-600 font-bold">
-                        {proj.days_overdue}d overdue
+                        {proj.days_overdue} {t('days_overdue')}
                       </span>
                     )}
                   </div>

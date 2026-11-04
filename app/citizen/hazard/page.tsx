@@ -20,17 +20,23 @@ import { HazardZoneCollection, EvacuationRouteCollection, EvacuationRouteFeature
 import { calculateDistanceKm, isPointInPolygon } from '@/lib/calculations';
 
 export default function CitizenHazardPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const isMl = language === 'ml';
+
   const [hazardZones, setHazardZones] = useState<HazardZoneCollection | null>(null);
   const [evacRoutes, setEvacRoutes] = useState<EvacuationRouteCollection | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Citizen address & pin state (default Ward 7 near river)
-  const [addressInput, setAddressInput] = useState('Chaliyar Riverside, Ward 7, Cheruvannur');
+  const [addressInput, setAddressInput] = useState(
+    isMl ? 'ചാലിയാർ പുഴയോരം, വാർഡ് 7, ചെറുവണ്ണൂർ' : 'Chaliyar Riverside, Ward 7, Cheruvannur'
+  );
   const [userLocation, setUserLocation] = useState<[number, number]>([11.3038, 75.8835]);
   const [riskLevel, setRiskLevel] = useState<'HIGH' | 'MEDIUM' | 'LOW' | 'UNAVAILABLE'>('HIGH');
   const [riskReason, setRiskReason] = useState(
-    'Location falls directly inside the Chaliyar River Basin High Flood Zone (KSDMA Category 1). Annual monsoon inundation risk exceeds 1.5m.'
+    isMl
+      ? 'സ്ഥലം ചാലിയാർ റിവർ ബേസിൻ അതിതീവ്ര വെള്ളപ്പൊക്ക മേഖലയിൽ (KSDMA കാറ്റഗറി 1) നേരിട്ട് ഉൾപ്പെടുന്നു. കാലവർഷത്തിൽ 1.5 മീറ്ററിലധികം വെള്ളപ്പൊക്ക സാധ്യത.'
+      : 'Location falls directly inside the Chaliyar River Basin High Flood Zone (KSDMA Category 1). Annual monsoon inundation risk exceeds 1.5m.'
   );
 
   useEffect(() => {
@@ -54,29 +60,41 @@ export default function CitizenHazardPage() {
 
     if (!hazardZones || !hazardZones.features) {
       setRiskLevel('UNAVAILABLE');
-      setRiskReason('Hazard zone spatial data is temporarily unavailable. Unable to determine exposure.');
+      setRiskReason(
+        isMl
+          ? 'ദുരന്ത സാധ്യതാ വിവരങ്ങൾ താൽക്കാലികമായി ലഭ്യമല്ല.'
+          : 'Hazard zone spatial data is temporarily unavailable. Unable to determine exposure.'
+      );
       return;
     }
 
     // Derive deterministic hazard risk using isPointInPolygon on bundled KSDMA hazard polygons
     let matchedRisk: 'HIGH' | 'MEDIUM' | 'LOW' = 'LOW';
-    let matchedReason =
-      'Elevated dry land terrace outside active flood inundation contours and steep slopes. Minimal historic flood exposure.';
+    let matchedReason = isMl
+      ? 'വെള്ളപ്പൊക്ക സാധ്യതാ മേഖലയ്ക്ക് പുറത്തുള്ള ഉയർന്ന പ്രദേശം. ചരിത്രപരമായി പ്രളയ സാധ്യത കുറവ്.'
+      : 'Elevated dry land terrace outside active flood inundation contours and steep slopes. Minimal historic flood exposure.';
 
     for (const hz of hazardZones.features) {
       const polyCoords = hz.geometry.coordinates[0];
       if (isPointInPolygon([lng, lat], polyCoords)) {
+        const zoneName = isMl ? hz.properties.name_ml : hz.properties.name_en;
         if (hz.properties.hazard_type === 'flood_high') {
           matchedRisk = 'HIGH';
-          matchedReason = `Location falls directly inside ${hz.properties.name_en} (${hz.properties.severity}). Annual monsoon inundation risk exceeds 1.5m.`;
+          matchedReason = isMl
+            ? `സ്ഥലം ${zoneName} (${hz.properties.severity}) മേഖലയിൽ നേരിട്ട് ഉൾപ്പെടുന്നു. 1.5 മീറ്ററിലധികം വെള്ളപ്പൊക്ക സാധ്യത.`
+            : `Location falls directly inside ${zoneName} (${hz.properties.severity}). Annual monsoon inundation risk exceeds 1.5m.`;
           break;
         } else if (hz.properties.hazard_type === 'landslide') {
           matchedRisk = 'MEDIUM';
-          matchedReason = `Location lies in ${hz.properties.name_en} (${hz.properties.severity}). Moderate landslide runoff warning during orange alert rainfall.`;
+          matchedReason = isMl
+            ? `സ്ഥലം ${zoneName} (${hz.properties.severity}) മേഖലയിലാണ്. ശക്തമായ മഴയിൽ ഉരുൾപൊട്ടൽ സാധ്യത.`
+            : `Location lies in ${zoneName} (${hz.properties.severity}). Moderate landslide runoff warning during orange alert rainfall.`;
           break;
         } else if (hz.properties.hazard_type === 'flood_med') {
           matchedRisk = 'MEDIUM';
-          matchedReason = `Location lies in ${hz.properties.name_en} (${hz.properties.severity}). Waterlogging risk during heavy rainfall events.`;
+          matchedReason = isMl
+            ? `സ്ഥലം ${zoneName} (${hz.properties.severity}) മേഖലയിലാണ്. കനത്ത മഴയിൽ വെള്ളക്കെട്ടിന് സാധ്യത.`
+            : `Location lies in ${zoneName} (${hz.properties.severity}). Waterlogging risk during heavy rainfall events.`;
         }
       }
     }
@@ -112,6 +130,7 @@ export default function CitizenHazardPage() {
   const primaryRoute = nearestRoute;
   const shelter = primaryRoute?.properties;
   const shelterDistance = shelter?.distance_km ?? 0;
+  const shelterName = shelter ? (isMl ? shelter.shelter_name_ml : shelter.shelter_name_en) : '';
 
   // Map elements
   const mapPolygons =
@@ -119,7 +138,7 @@ export default function CitizenHazardPage() {
       id: hz.properties.id,
       coordinates: hz.geometry.coordinates,
       color: hz.properties.color,
-      label: `${hz.properties.name_en} (${hz.properties.severity})`,
+      label: `${isMl ? hz.properties.name_ml : hz.properties.name_en} (${hz.properties.severity})`,
       fillOpacity: 0.3,
     })) || [];
 
@@ -129,7 +148,7 @@ export default function CitizenHazardPage() {
           id: primaryRoute.properties.id,
           coordinates: primaryRoute.geometry.coordinates,
           color: '#16a34a',
-          label: `Evacuation Route: ${primaryRoute.properties.name_en}`,
+          label: `${t('evac_corridor')}: ${isMl ? primaryRoute.properties.name_ml : primaryRoute.properties.name_en}`,
         },
       ]
     : [];
@@ -139,8 +158,8 @@ export default function CitizenHazardPage() {
       id: 'citizen_house',
       lat: userLocation[0],
       lng: userLocation[1],
-      title: 'Your Location',
-      category: `Risk: ${riskLevel}`,
+      title: t('your_location'),
+      category: `${t('hazard_exposure')}: ${riskLevel}`,
       color:
         riskLevel === 'HIGH'
           ? '#dc2626'
@@ -157,10 +176,10 @@ export default function CitizenHazardPage() {
             id: 'shelter_pin',
             lat: shelter.shelter_lat,
             lng: shelter.shelter_lng,
-            title: shelter.shelter_name_en,
-            category: 'Designated Relief Camp',
+            title: shelterName,
+            category: t('designated_relief_camp'),
             color: '#16a34a',
-            details: `Capacity: ${shelter.shelter_capacity} persons · Contact: ${shelter.shelter_contact}`,
+            details: `${t('capacity_persons')}: ${shelter.shelter_capacity} · ${t('helpdesk_contact')}: ${shelter.shelter_contact}`,
           },
         ]
       : []),
@@ -176,7 +195,7 @@ export default function CitizenHazardPage() {
               {t('nav_citizen_hazard')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              C5/C6 Citizen Flood Vulnerability & Nearest Emergency Relief Shelter
+              {t('citizen_hazard_subtitle')}
             </p>
           </div>
         </div>
@@ -198,7 +217,7 @@ export default function CitizenHazardPage() {
               type="text"
               value={addressInput}
               onChange={(e) => setAddressInput(e.target.value)}
-              placeholder="Enter residence address or landmark..."
+              placeholder={t('enter_residence_address')}
               className="w-full pl-9 p-2.5 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
@@ -206,35 +225,47 @@ export default function CitizenHazardPage() {
             type="submit"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5"
           >
-            <span>Evaluate Location</span>
+            <span>{t('evaluate_location')}</span>
           </button>
         </form>
 
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
-          <span className="text-slate-500 font-semibold">Test Sample Locations:</span>
+          <span className="text-slate-500 font-semibold">{t('test_sample_locations')}</span>
           <button
             onClick={() =>
-              handleEvaluateLocation(11.3038, 75.8835, 'Chaliyar Riverside, Ward 7 (Cheruvannur)')
+              handleEvaluateLocation(
+                11.3038,
+                75.8835,
+                isMl ? 'ചാലിയാർ പുഴയോരം, വാർഡ് 7 (ചെറുവണ്ണൂർ)' : 'Chaliyar Riverside, Ward 7 (Cheruvannur)'
+              )
             }
             className="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-900 font-bold"
           >
-            Ward 7 Riverbank (High Risk)
+            {t('sample_ward7_riverbank')}
           </button>
           <button
             onClick={() =>
-              handleEvaluateLocation(11.332, 75.879, 'Kottakkunnu Hill Slopes, Ward 8')
+              handleEvaluateLocation(
+                11.332,
+                75.879,
+                isMl ? 'കോട്ടക്കുന്ന് കുന്നിൻചെരിവ്, വാർഡ് 8' : 'Kottakkunnu Hill Slopes, Ward 8'
+              )
             }
             className="px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold"
           >
-            Ward 8 Hill Slope (Medium Risk)
+            {t('sample_ward8_hillslope')}
           </button>
           <button
             onClick={() =>
-              handleEvaluateLocation(11.285, 75.862, 'Velliparamba Elevated Terrace, Ward 11')
+              handleEvaluateLocation(
+                11.285,
+                75.862,
+                isMl ? 'വെള്ളിപറമ്പ് ഉയർന്ന പ്രദേശം, വാർഡ് 11' : 'Velliparamba Elevated Terrace, Ward 11'
+              )
             }
             className="px-2.5 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold"
           >
-            Ward 11 Highland (Low Risk)
+            {t('sample_ward11_highland')}
           </button>
         </div>
       </div>
@@ -267,10 +298,10 @@ export default function CitizenHazardPage() {
             />
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                KSDMA Hazard Exposure Status
+                {t('ksdma_exposure_status')}
               </span>
               <h2 className="text-2xl font-black">
-                {riskLevel === 'UNAVAILABLE' ? 'DATA UNAVAILABLE' : `${riskLevel} RISK ZONE`}
+                {riskLevel === 'UNAVAILABLE' ? t('data_unavailable_title') : `${riskLevel} ${t('risk_zone_suffix')}`}
               </h2>
             </div>
           </div>
@@ -282,24 +313,24 @@ export default function CitizenHazardPage() {
           <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
             <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                Nearest Designated Shelter
+                {t('nearest_shelter_label')}
               </span>
               <h3 className="text-base font-bold text-slate-900 leading-snug">
-                {shelter.shelter_name_en}
+                {shelterName}
               </h3>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
               <div>
-                <span className="text-[11px] text-slate-400 block">Route Length</span>
+                <span className="text-[11px] text-slate-400 block">{t('route_length')}</span>
                 <strong className="text-slate-900 font-bold">{shelterDistance} km</strong>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block">Capacity</span>
+                <span className="text-[11px] text-slate-400 block">{t('capacity_persons')}</span>
                 <strong className="text-slate-900 font-bold">{shelter.shelter_capacity}</strong>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block">Helpdesk</span>
+                <span className="text-[11px] text-slate-400 block">{t('helpdesk_contact')}</span>
                 <strong className="text-blue-700 font-mono font-bold">2884101</strong>
               </div>
             </div>
@@ -308,21 +339,21 @@ export default function CitizenHazardPage() {
           <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-center text-center">
             <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                Evacuation Corridor
+                {t('evac_corridor')}
               </span>
               <h3 className="text-base font-bold text-slate-800">
                 {riskLevel === 'LOW'
-                  ? 'No Designated Evacuation Corridor Needed'
+                  ? t('no_evac_corridor_needed')
                   : riskLevel === 'UNAVAILABLE'
-                  ? 'Evacuation Guidance Unavailable'
-                  : 'No Designated Evacuation Corridor Available'}
+                  ? t('evac_guidance_unavailable')
+                  : t('no_evac_corridor_available')}
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 {riskLevel === 'LOW'
-                  ? 'This location is on elevated terrain outside active hazard inundation routes. For emergency inquiries, contact the Grama Panchayat Control Cell.'
+                  ? t('evac_low_risk_msg')
                   : riskLevel === 'UNAVAILABLE'
-                  ? 'Hazard-zone data is unavailable, so evacuation guidance cannot be determined. For emergency inquiries, contact the Grama Panchayat Control Cell.'
-                  : 'No designated evacuation corridor is within 1.5 km of this location. Follow local emergency guidance and contact the Grama Panchayat Control Cell.'}
+                  ? t('evac_unavail_msg')
+                  : t('evac_no_route_msg')}
               </p>
             </div>
           </div>
@@ -334,10 +365,10 @@ export default function CitizenHazardPage() {
         <div className="flex items-center justify-between text-xs">
           <h3 className="font-bold text-slate-900 flex items-center gap-1.5">
             <Navigation className="w-4 h-4 text-emerald-600" />
-            <span>Evacuation Map & Route Navigation</span>
+            <span>{t('evac_nav_title')}</span>
           </h3>
           <span className="text-slate-500 font-mono">
-            KSDMA Flood Model & Evacuation Route
+            {t('ksdma_flood_model_sub')}
           </span>
         </div>
 
@@ -348,15 +379,15 @@ export default function CitizenHazardPage() {
           lines={mapLines}
           markers={mapMarkers}
           onMapClick={(lat, lng) =>
-            handleEvaluateLocation(lat, lng, `Pinned Coordinate (${lat.toFixed(4)}, ${lng.toFixed(4)})`)
+            handleEvaluateLocation(lat, lng, `${t('map_selected_location')} (${lat.toFixed(4)}, ${lng.toFixed(4)})`)
           }
           height="420px"
         />
 
         <div className="text-[11px] text-slate-500 text-center">
           {primaryRoute
-            ? `Green polyline marks the safest designated higher-ground route: ${primaryRoute.properties.name_en}.`
-            : 'No active evacuation route line designated for this location.'}
+            ? `${t('green_route_info')} ${isMl ? primaryRoute.properties.name_ml : primaryRoute.properties.name_en}.`
+            : t('no_active_route_info')}
         </div>
       </div>
     </div>

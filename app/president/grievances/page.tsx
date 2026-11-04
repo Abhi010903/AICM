@@ -4,12 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Clock3, RefreshCw, UserRound } from 'lucide-react';
 import { Grievance, GrievanceStatus } from '@/lib/types';
 import { SourceChip } from '@/components/common/SourceChip';
-
-const statusLabels: Record<GrievanceStatus, string> = {
-  open: 'Open',
-  in_progress: 'In progress',
-  resolved: 'Resolved',
-};
+import { useTranslation } from '@/lib/i18n';
 
 const statusStyles: Record<GrievanceStatus, string> = {
   open: 'bg-amber-100 text-amber-800',
@@ -18,6 +13,7 @@ const statusStyles: Record<GrievanceStatus, string> = {
 };
 
 export default function PresidentGrievancesPage() {
+  const { t, language, getLocalizedStatus, getLocalizedCategory } = useTranslation();
   const [grievances, setGrievances] = useState<Grievance[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -97,16 +93,20 @@ export default function PresidentGrievancesPage() {
     }
   }
 
+  const isMl = language === 'ml';
+
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       <div className="space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Grievance Inbox
+              {t('nav_grievances')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              Live complaints raised by citizens, with identity and resolution tracking.
+              {isMl
+                ? 'പൗരന്മാർ ഉന്നയിച്ച തത്സമയ പരാതികളും പരിഹാര വിവരങ്ങളും.'
+                : 'Live complaints raised by citizens, with identity and resolution tracking.'}
             </p>
           </div>
           <button
@@ -115,29 +115,42 @@ export default function PresidentGrievancesPage() {
             disabled={refreshing}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} /> {refreshing ? 'Loading...' : 'Refresh now'}
+            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />{' '}
+            {refreshing ? t('loading') : isMl ? 'ഇപ്പോൾ പുതുക്കുക' : 'Refresh now'}
           </button>
         </div>
-        {lastUpdated && <p className="text-right text-[11px] text-slate-500">Last loaded from JSON: {lastUpdated}</p>}
+        {lastUpdated && (
+          <p className="text-right text-[11px] text-slate-500">
+            {isMl ? `അവസാനം പുതുക്കിയത്: ${lastUpdated}` : `Last loaded: ${lastUpdated}`}
+          </p>
+        )}
         <SourceChip screenKey="grievance" />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <span className="text-[11px] font-semibold text-slate-500">Total complaints</span>
+          <span className="text-[11px] font-semibold text-slate-500">
+            {isMl ? 'ആകെ പരാതികൾ' : 'Total complaints'}
+          </span>
           <strong className="mt-1 block text-2xl text-slate-900">{grievances.length}</strong>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <span className="text-[11px] font-semibold text-slate-500">New live submissions</span>
+          <span className="text-[11px] font-semibold text-slate-500">
+            {isMl ? 'പുതിയ പരാതികൾ' : 'New live submissions'}
+          </span>
           <strong className="mt-1 block text-2xl text-blue-700">{liveCount}</strong>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <span className="text-[11px] font-semibold text-slate-500">Open</span>
-          <strong className="mt-1 block text-2xl text-amber-700">{grievances.filter((g) => g.status === 'open').length}</strong>
+          <span className="text-[11px] font-semibold text-slate-500">{t('status_open')}</span>
+          <strong className="mt-1 block text-2xl text-amber-700">
+            {grievances.filter((g) => g.status === 'open').length}
+          </strong>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <span className="text-[11px] font-semibold text-slate-500">Resolved</span>
-          <strong className="mt-1 block text-2xl text-emerald-700">{grievances.filter((g) => g.status === 'resolved').length}</strong>
+          <span className="text-[11px] font-semibold text-slate-500">{t('status_resolved')}</span>
+          <strong className="mt-1 block text-2xl text-emerald-700">
+            {grievances.filter((g) => g.status === 'resolved').length}
+          </strong>
         </div>
       </div>
 
@@ -149,7 +162,7 @@ export default function PresidentGrievancesPage() {
 
       {loading ? (
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          Loading live grievances...
+          {t('loading')}
         </div>
       ) : (
         <div className="space-y-4">
@@ -160,25 +173,37 @@ export default function PresidentGrievancesPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-sm font-black text-slate-900">{grievance.id}</span>
                     <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${statusStyles[grievance.status]}`}>
-                      {statusLabels[grievance.status]}
+                      {getLocalizedStatus(grievance.status)}
                     </span>
-                    <span className="text-[11px] text-slate-500">Ward {grievance.ward_id} · {grievance.category}</span>
+                    <span className="text-[11px] text-slate-500">
+                      {isMl ? `വാർഡ് ${grievance.ward_id}` : `Ward ${grievance.ward_id}`} · {getLocalizedCategory(grievance.category)}
+                    </span>
                   </div>
-                  <p className="max-w-3xl text-sm leading-6 text-slate-700">{grievance.description_en}</p>
+                  <p className="max-w-3xl text-sm leading-6 text-slate-700">
+                    {isMl ? grievance.description_ml || grievance.description_en : grievance.description_en}
+                  </p>
                   <div className="flex flex-wrap gap-4 text-xs text-slate-600">
-                    <span><UserRound className="mr-1 inline h-3.5 w-3.5 text-blue-600" />{grievance.reporter_name || 'Legacy record: reporter details unavailable'}</span>
+                    <span>
+                      <UserRound className="mr-1 inline h-3.5 w-3.5 text-blue-600" />
+                      {grievance.reporter_name || (isMl ? 'പൗരൻ' : 'Legacy record: reporter details unavailable')}
+                    </span>
                     {grievance.reporter_phone && <span>{grievance.reporter_phone}</span>}
                     {grievance.reporter_block && <span>{grievance.reporter_block}</span>}
-                    <span><Clock3 className="mr-1 inline h-3.5 w-3.5 text-slate-400" />Filed {grievance.filed_date}</span>
+                    <span>
+                      <Clock3 className="mr-1 inline h-3.5 w-3.5 text-slate-400" />
+                      {isMl ? `രേഖപ്പെടുത്തിയത്: ${grievance.filed_date}` : `Filed ${grievance.filed_date}`}
+                    </span>
                   </div>
                 </div>
                 <div className="w-full space-y-2 lg:max-w-xs">
-                  <label className="block text-[11px] font-bold text-slate-600">Resolution note</label>
+                  <label className="block text-[11px] font-bold text-slate-600">
+                    {isMl ? 'നടപടി കുറിപ്പ്' : 'Resolution note'}
+                  </label>
                   <textarea
                     rows={2}
                     value={notes[grievance.id] ?? grievance.resolution_note ?? ''}
                     onChange={(event) => setNotes((current) => ({ ...current, [grievance.id]: event.target.value }))}
-                    placeholder="Add action taken or next step"
+                    placeholder={isMl ? 'സ്വീകരിച്ച നടപടി ചേർക്കുക' : 'Add action taken or next step'}
                     className="w-full rounded-lg border border-slate-300 bg-slate-50 p-2 text-xs outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <div className="flex flex-wrap gap-2">
@@ -193,7 +218,7 @@ export default function PresidentGrievancesPage() {
                         }`}
                       >
                         {status === 'resolved' && <CheckCircle2 className="mr-1 inline h-3 w-3" />}
-                        {statusLabels[status]}
+                        {getLocalizedStatus(status)}
                       </button>
                     ))}
                   </div>
@@ -201,7 +226,7 @@ export default function PresidentGrievancesPage() {
               </div>
               {grievance.resolution_note && (
                 <div className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
-                  <strong>Latest action:</strong> {grievance.resolution_note}
+                  <strong>{isMl ? 'ഏറ്റവും പുതിയ നടപടി:' : 'Latest action:'}</strong> {grievance.resolution_note}
                 </div>
               )}
             </article>

@@ -23,8 +23,6 @@ export const SourceChip: React.FC<SourceChipProps> = ({
   const mapping = screenKey ? SCREEN_SOURCE_MAP[screenKey] : null;
 
   const displaySource = sourceName || mapping?.source_name || 'KSDI / Open Govt Data';
-  const displayLayer = mapping ? `${mapping.twin_layer} (${mapping.layer_name})` : 'L1–L8 Twin Layer';
-  const displayModule = mapping ? `${mapping.module} (${mapping.module_name})` : 'AICM Delivery Module';
   const displayFeature = mapping ? mapping.feature_id : null;
 
   return (
@@ -35,7 +33,7 @@ export const SourceChip: React.FC<SourceChipProps> = ({
         <div className="absolute bottom-full right-0 mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-700 shadow-xl">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <span className="font-bold text-slate-900">{t('public_source')}</span>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Close source details">
+            <button type="button" onClick={() => setOpen(false)} aria-label={t('source_chip_close')}>
               <X className="h-4 w-4 text-slate-400" />
             </button>
           </div>
@@ -67,7 +65,7 @@ export const SourceChip: React.FC<SourceChipProps> = ({
         className="flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-lg transition-colors hover:border-blue-400 hover:text-blue-800"
       >
         <Database className="h-3.5 w-3.5 text-blue-600" />
-        <span>{open ? 'Hide source' : 'Verified source'}</span>
+        <span>{open ? t('source_chip_hide') : t('source_chip_verified')}</span>
       </button>
     </div>
   );

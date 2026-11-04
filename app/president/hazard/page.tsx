@@ -35,7 +35,9 @@ import {
 } from '@/lib/hazard-engine';
 
 export default function VulnerabilityEvacuationPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, language } = useTranslation();
+  const isMl = language === 'ml';
+
   const [assets, setAssets] = useState<Asset[]>([]);
   const [hazardZones, setHazardZones] = useState<HazardZoneCollection | null>(null);
   const [evacRoutes, setEvacRoutes] = useState<EvacuationRouteCollection | null>(null);
@@ -48,16 +50,56 @@ export default function VulnerabilityEvacuationPage() {
   const [activeTab, setActiveTab] = useState<'flood' | 'drought'>('flood');
   const [broadcastSent, setBroadcastSent] = useState(false);
 
-  // Orange Book Checklist (8 items, 5 checked by default)
+  // Orange Book Checklist (8 items, 5 checked by default) - bilingual
   const [checklist, setChecklist] = useState([
-    { id: 1, text: '24/7 Taluk & Panchayat Emergency Operation Centre (EOC) Activated', checked: true },
-    { id: 2, text: 'Ward Rapid Response Team (RRT) Staff Mobilisation Completed', checked: true },
-    { id: 3, text: 'Chaliyar River Basin Flood Warning Telemetry Operational', checked: true },
-    { id: 4, text: 'Designated School & Community Hall Relief Camps Stocked (Rations/Bedding)', checked: true },
-    { id: 5, text: 'Emergency Generator & Potable Water Tanker Contracts Confirmed', checked: true },
-    { id: 6, text: 'Rescue Inflatable Boats Stationed at Cheruvannur Outpost', checked: false },
-    { id: 7, text: 'Satellite Phone Backup Battery Health Verified', checked: false },
-    { id: 8, text: 'Pre-monsoon Drainage Desilting Certificate Signed Off', checked: false },
+    {
+      id: 1,
+      text_en: '24/7 Taluk & Panchayat Emergency Operation Centre (EOC) Activated',
+      text_ml: 'താലൂക്ക്-പഞ്ചായത്ത് എമർജൻസി ഓപ്പറേഷൻ സെന്റർ (EOC) 24 മണിക്കൂറും സജീവം',
+      checked: true,
+    },
+    {
+      id: 2,
+      text_en: 'Ward Rapid Response Team (RRT) Staff Mobilisation Completed',
+      text_ml: 'വാർഡ് റാപ്പിഡ് റെസ്‌പോൺസ് ടീം (RRT) ജീവനക്കാരുടെ വിന്യാസം പൂർത്തിയായി',
+      checked: true,
+    },
+    {
+      id: 3,
+      text_en: 'Chaliyar River Basin Flood Warning Telemetry Operational',
+      text_ml: 'ചാലിയാർ നദീതട പ്രളയ മുന്നറിയിപ്പ് ടെലിമെട്രി പ്രവർത്തനക്ഷമം',
+      checked: true,
+    },
+    {
+      id: 4,
+      text_en: 'Designated School & Community Hall Relief Camps Stocked (Rations/Bedding)',
+      text_ml: 'ദുരിതാശ്വാസ ക്യാമ്പുകളിൽ ഭക്ഷണവും മറ്റ് അവശ്യ സാധനങ്ങളും സജ്ജീകരിച്ചു',
+      checked: true,
+    },
+    {
+      id: 5,
+      text_en: 'Emergency Generator & Potable Water Tanker Contracts Confirmed',
+      text_ml: 'ജനറേറ്റർ, ശുദ്ധജല ടാങ്കർ അടിയന്തര വിതരണ കരാറുകൾ ഉറപ്പാക്കി',
+      checked: true,
+    },
+    {
+      id: 6,
+      text_en: 'Rescue Inflatable Boats Stationed at Cheruvannur Outpost',
+      text_ml: 'റബ്ബർ രക്ഷാ ബോട്ടുകൾ ചെറുവണ്ണൂർ ഔട്ട്‌പോസ്റ്റിൽ വിന്യസിച്ചു',
+      checked: false,
+    },
+    {
+      id: 7,
+      text_en: 'Satellite Phone Backup Battery Health Verified',
+      text_ml: 'സാറ്റലൈറ്റ് ഫോൺ ബാക്കപ്പ് ബാറ്ററി പ്രവർത്തനക്ഷമത പരിശോധിച്ചു',
+      checked: false,
+    },
+    {
+      id: 8,
+      text_en: 'Pre-monsoon Drainage Desilting Certificate Signed Off',
+      text_ml: 'മഴക്കാലപൂർവ്വ ഓവുചാൽ ശുചീകരണ സാക്ഷ്യപത്രം അംഗീകരിച്ചു',
+      checked: false,
+    },
   ]);
 
   useEffect(() => {
@@ -150,7 +192,7 @@ export default function VulnerabilityEvacuationPage() {
       id: hz.properties.id,
       coordinates: hz.geometry.coordinates,
       color: hz.properties.color,
-      label: `${hz.properties.name_en} (${hz.properties.severity})`,
+      label: `${isMl ? hz.properties.name_ml : hz.properties.name_en} (${hz.properties.severity})`,
       fillOpacity: 0.35,
     })) || [];
 
@@ -160,7 +202,7 @@ export default function VulnerabilityEvacuationPage() {
           id: r.properties.id,
           coordinates: r.geometry.coordinates,
           color: '#16a34a',
-          label: `Evacuation Route: ${r.properties.name_en} (${r.properties.distance_km} km)`,
+          label: `${t('evac_corridor')}: ${isMl ? r.properties.name_ml : r.properties.name_en} (${r.properties.distance_km} km)`,
         }))
       : [];
 
@@ -179,8 +221,6 @@ export default function VulnerabilityEvacuationPage() {
     };
   });
 
-  const openGrievances = grievances.filter((g) => g.status === 'open');
-
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Title & Source Chip */}
@@ -191,7 +231,7 @@ export default function VulnerabilityEvacuationPage() {
               {t('hazard_title')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P5 Disaster Management Digital Twin · Multi-Factor Early Warning &amp; Response Engine
+              {t('hazard_twin_sub')}
             </p>
           </div>
         </div>
@@ -202,32 +242,32 @@ export default function VulnerabilityEvacuationPage() {
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
           <Sliders className="w-4 h-4 text-coconut-700" />
-          <span className="font-bold text-slate-800">Telemetry Scenario Simulator:</span>
+          <span className="font-bold text-slate-800">{t('telemetry_simulator_title')}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => applyPreset('normal')}
             className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition-colors"
           >
-            Seasonal Normal
+            {t('preset_normal')}
           </button>
           <button
             onClick={() => applyPreset('monsoon_orange')}
             className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold transition-colors"
           >
-            Heavy Monsoon (Orange)
+            {t('preset_monsoon_orange')}
           </button>
           <button
             onClick={() => applyPreset('critical_cloudburst')}
             className="px-2.5 py-1 rounded-lg bg-red-100 hover:bg-red-200 text-red-900 font-bold transition-colors"
           >
-            Simulate Cloudburst (Red Danger)
+            {t('preset_cloudburst_red')}
           </button>
           <button
             onClick={() => applyPreset('drought')}
             className="px-2.5 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-900 font-bold transition-colors"
           >
-            Drought &amp; Water Deficit
+            {t('preset_drought')}
           </button>
         </div>
       </div>
@@ -261,21 +301,31 @@ export default function VulnerabilityEvacuationPage() {
             </div>
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                Automated Disaster Evaluation Verdict
+                {t('automated_verdict_label')}
               </span>
-              <h2 className="text-xl sm:text-2xl font-black">{evaluation.verdict_title}</h2>
+              <h2 className="text-xl sm:text-2xl font-black">
+                {isMl
+                  ? evaluation.risk_level === 'CRITICAL'
+                    ? 'ഗുരുതര റെഡ് അലർട്ട്'
+                    : evaluation.risk_level === 'WARNING'
+                    ? 'ഓറഞ്ച് മുന്നറിയിപ്പ്: അതിതീവ്ര വെള്ളപ്പൊക്ക സാധ്യത'
+                    : evaluation.risk_level === 'WATCH'
+                    ? 'മഞ്ഞ ജാഗ്രത: ഉയർന്ന ജലനിരപ്പ്'
+                    : 'സാധാരണ നില: ഹരിത നിരീക്ഷണം'
+                  : evaluation.verdict_title}
+              </h2>
               <p className="text-xs font-semibold opacity-80 mt-0.5">
-                Composite Risk Index: {evaluation.score} / 100 · IMD {telemetry.imd_alert} Alert
+                {t('composite_risk_index')} {evaluation.score} / 100 · IMD {telemetry.imd_alert}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="px-3 py-1.5 rounded-xl bg-white/90 border border-black/10 text-xs font-black shadow-2xs font-mono">
-              Chaliyar Gauge: {telemetry.river_level_meters}m
+              {t('chaliyar_gauge')} {telemetry.river_level_meters}m
             </span>
             <span className="px-3 py-1.5 rounded-xl bg-white/90 border border-black/10 text-xs font-black shadow-2xs font-mono">
-              Rainfall: {telemetry.rainfall_mm_24h}mm/24h
+              {t('rainfall_label')} {telemetry.rainfall_mm_24h}mm/24h
             </span>
           </div>
         </div>
@@ -283,10 +333,10 @@ export default function VulnerabilityEvacuationPage() {
         {/* Transparent Reason Factors */}
         <div className="space-y-1.5 text-xs">
           <span className="font-bold uppercase text-[10px] tracking-wider opacity-70">
-            Explainable Decision Factors:
+            {t('explainable_factors')}
           </span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {evaluation.explanation.map((fact, idx) => (
+            {(isMl && evaluation.explanation_ml ? evaluation.explanation_ml : evaluation.explanation).map((fact, idx) => (
               <div
                 key={idx}
                 className="p-2.5 bg-white/80 rounded-lg border border-black/5 text-[11px] leading-relaxed"
@@ -312,7 +362,7 @@ export default function VulnerabilityEvacuationPage() {
               </div>
             </div>
             <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-wider">
-              Immediate Action Required
+              {t('immediate_action_required')}
             </span>
           </div>
 
@@ -320,7 +370,7 @@ export default function VulnerabilityEvacuationPage() {
             {/* Action Checklist */}
             <div className="space-y-3">
               <h4 className="font-bold text-red-200 uppercase tracking-wide text-[11px]">
-                Administrative Standard Operating Procedures (SOP)
+                {t('admin_sops')}
               </h4>
               <ul className="space-y-2">
                 {evaluation.admin_alert.action_checklist.map((step, i) => (
@@ -334,21 +384,18 @@ export default function VulnerabilityEvacuationPage() {
               </ul>
             </div>
 
-            {/* Public Emergency Broadcast Notification Draft */}
+            {/* Public Emergency Broadcast Notification Draft in Single Language */}
             <div className="space-y-3 flex flex-col justify-between">
               <div>
                 <h4 className="font-bold text-red-200 uppercase tracking-wide text-[11px] mb-2">
-                  Emergency Broadcast Dispatch (SMS &amp; Public Warning Gateway)
+                  {t('broadcast_dispatch_title')}
                 </h4>
                 <div className="p-3 bg-slate-950/80 rounded-xl border border-red-800/60 space-y-2 font-mono text-[11px]">
-                  <div className="text-red-300 font-bold border-b border-red-900/60 pb-1">
-                    English Broadcast:
-                  </div>
-                  <p className="text-slate-300">{evaluation.admin_alert.broadcast_sms_template_en}</p>
-                  <div className="text-red-300 font-bold border-b border-red-900/60 pb-1 pt-1 font-sans">
-                    മലയാളം സന്ദേശം:
-                  </div>
-                  <p className="text-slate-300 font-sans">{evaluation.admin_alert.broadcast_sms_template_ml}</p>
+                  <p className="text-slate-300 font-sans leading-relaxed">
+                    {isMl
+                      ? evaluation.admin_alert.broadcast_sms_template_ml
+                      : evaluation.admin_alert.broadcast_sms_template_en}
+                  </p>
                 </div>
               </div>
 
@@ -365,12 +412,12 @@ export default function VulnerabilityEvacuationPage() {
                   {broadcastSent ? (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Simulated Public Warning Broadcast Dispatched</span>
+                      <span>{t('broadcast_dispatched')}</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Dispatch Simulated Broadcast to Ward RRT Cells</span>
+                      <span>{t('dispatch_broadcast_btn')}</span>
                     </>
                   )}
                 </button>
@@ -390,7 +437,7 @@ export default function VulnerabilityEvacuationPage() {
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-red-600" />
                 <h3 className="font-bold text-slate-900">
-                  KSDMA Hazard Atlas &amp; Infrastructure Assets ({assets.length} Assets Mapped)
+                  {t('ksdma_hazard_atlas')} ({assets.length} {t('assets_count_suffix')})
                 </h3>
               </div>
               <div className="flex items-center gap-2">
@@ -402,7 +449,7 @@ export default function VulnerabilityEvacuationPage() {
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                   }`}
                 >
-                  {showEvacRoute ? '✓ Evacuation Lines Active' : 'Show Evacuation Lines'}
+                  {showEvacRoute ? t('evac_lines_active') : t('show_evac_lines')}
                 </button>
               </div>
             </div>
@@ -417,9 +464,9 @@ export default function VulnerabilityEvacuationPage() {
             />
 
             <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
-              <span>Red Polygons: KSDMA Flood Plain · Amber Polygons: Kottakkunnu Landslide Zone</span>
+              <span>{t('hazard_legend_desc')}</span>
               <span className="font-bold text-red-700">
-                {assetsAtRisk.length} Assets inside hazard contours
+                {assetsAtRisk.length} {t('assets_inside_contours')}
               </span>
             </div>
           </div>
@@ -429,10 +476,10 @@ export default function VulnerabilityEvacuationPage() {
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                 <Activity className="w-4 h-4 text-red-600" />
-                <span>Aggregated Ward Population Exposure (Demographic Census GIS Overlay)</span>
+                <span>{t('ward_exposure_title')}</span>
               </h3>
               <span className="text-[11px] text-slate-500 font-mono">
-                No Individual Location Tracking
+                {t('no_individual_tracking')}
               </span>
             </div>
 
@@ -441,26 +488,26 @@ export default function VulnerabilityEvacuationPage() {
                 <table className="w-full text-xs text-left">
                   <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
-                      <th className="py-2 px-3">Ward</th>
-                      <th className="py-2 px-3">Primary Hazard</th>
-                      <th className="py-2 px-3">Exposed Population</th>
-                      <th className="py-2 px-3">Exposed Dwellings</th>
-                      <th className="py-2 px-3">Severity</th>
-                      <th className="py-2 px-3">Mandated Protocol</th>
+                      <th className="py-2 px-3">{t('ward_col_ward')}</th>
+                      <th className="py-2 px-3">{t('col_primary_hazard')}</th>
+                      <th className="py-2 px-3">{t('col_exposed_pop')}</th>
+                      <th className="py-2 px-3">{t('col_exposed_dwellings')}</th>
+                      <th className="py-2 px-3">{t('col_severity')}</th>
+                      <th className="py-2 px-3">{t('col_mandated_protocol')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {evaluation.vulnerable_wards.map((w) => (
                       <tr key={w.ward_id} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-3 font-bold text-slate-900">{w.ward_name}</td>
+                        <td className="py-2.5 px-3 font-bold text-slate-900">{isMl ? (w.ward_name_ml || w.ward_name) : w.ward_name}</td>
                         <td className="py-2.5 px-3 uppercase text-[11px] font-semibold text-slate-700">
                           {w.hazard_type}
                         </td>
                         <td className="py-2.5 px-3 font-bold text-slate-900">
-                          {w.exposed_population.toLocaleString()} citizens
+                          {w.exposed_population.toLocaleString()} {t('citizens')}
                         </td>
                         <td className="py-2.5 px-3 text-slate-600">
-                          {w.exposed_households} households
+                          {w.exposed_households} {t('households')}
                         </td>
                         <td className="py-2.5 px-3">
                           <span
@@ -474,7 +521,7 @@ export default function VulnerabilityEvacuationPage() {
                           </span>
                         </td>
                         <td className="py-2.5 px-3 text-slate-600 text-[11px]">
-                          {w.recommended_action}
+                          {isMl ? (w.recommended_action_ml || w.recommended_action) : w.recommended_action}
                         </td>
                       </tr>
                     ))}
@@ -483,7 +530,7 @@ export default function VulnerabilityEvacuationPage() {
               </div>
             ) : (
               <p className="text-xs text-slate-500 py-3 text-center">
-                All wards currently within normal safety buffers. No population evacuation mandated.
+                {t('all_wards_safe_msg')}
               </p>
             )}
           </div>
@@ -493,7 +540,7 @@ export default function VulnerabilityEvacuationPage() {
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                 <Sun className="w-4 h-4 text-amber-600" />
-                <span>Agricultural Drought &amp; Water Balance Tracking</span>
+                <span>{t('drought_tracking_title')}</span>
               </h3>
               <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                 evaluation.drought_status === 'SEVERE_DROUGHT'
@@ -507,26 +554,26 @@ export default function VulnerabilityEvacuationPage() {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed">
-              {evaluation.drought_summary}
+              {isMl ? (evaluation.drought_summary_ml || evaluation.drought_summary) : evaluation.drought_summary}
             </p>
 
             <div className="grid grid-cols-3 gap-3 text-xs pt-1">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-500 block text-[11px]">Monsoon Deficit</span>
+                <span className="text-slate-500 block text-[11px]">{t('monsoon_deficit')}</span>
                 <strong className="text-sm text-slate-900 font-mono">
                   {telemetry.monsoon_deficit_percent > 0 ? `-${telemetry.monsoon_deficit_percent}%` : 'Normal'}
                 </strong>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-500 block text-[11px]">Reservoir Storage</span>
+                <span className="text-slate-500 block text-[11px]">{t('reservoir_storage')}</span>
                 <strong className="text-sm text-slate-900 font-mono">
-                  {telemetry.reservoir_storage_percent}% Available
+                  {telemetry.reservoir_storage_percent}% {t('available_suffix')}
                 </strong>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-500 block text-[11px]">Water Table Drop</span>
+                <span className="text-slate-500 block text-[11px]">{t('water_table_drop')}</span>
                 <strong className="text-sm text-slate-900 font-mono">
-                  {telemetry.groundwater_depletion_meters}m below norm
+                  {telemetry.groundwater_depletion_meters}m {t('below_norm_suffix')}
                 </strong>
               </div>
             </div>
@@ -539,14 +586,14 @@ export default function VulnerabilityEvacuationPage() {
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 border-b border-slate-200 pb-2">
               <Home className="w-4 h-4 text-emerald-600" />
-              <span>Designated Relief Shelters ({evaluation.active_shelters.length})</span>
+              <span>{t('hazard_shelters')} ({evaluation.active_shelters.length})</span>
             </h3>
 
             <div className="space-y-2 text-xs">
               {evaluation.active_shelters.map((s) => (
                 <div key={s.id} className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 space-y-1">
-                  <div className="font-bold text-emerald-950">{s.name}</div>
-                  <div className="text-slate-600">Capacity: <strong>{s.capacity} evacuees</strong></div>
+                  <div className="font-bold text-emerald-950">{isMl ? (s.name_ml || s.name) : s.name}</div>
+                  <div className="text-slate-600">{t('capacity_persons')}: <strong>{s.capacity} {t('citizens')}</strong></div>
                   <div className="text-slate-600 flex items-center gap-1">
                     <Phone className="w-3 h-3 text-slate-500" />
                     <span>{s.contact}</span>
@@ -561,7 +608,7 @@ export default function VulnerabilityEvacuationPage() {
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-red-700 flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
-                <span>Assets at Hazard Risk ({assetsAtRisk.length})</span>
+                <span>{t('hazard_assets_at_risk')} ({assetsAtRisk.length})</span>
               </h3>
             </div>
 
@@ -570,10 +617,10 @@ export default function VulnerabilityEvacuationPage() {
                 <div key={idx} className="p-2.5 bg-red-50/60 rounded-lg border border-red-200 space-y-0.5">
                   <div className="font-bold text-slate-900">{getLocalizedName(item.asset)}</div>
                   <div className="text-[11px] text-red-700">
-                    Zone: {item.zoneName} ({item.severity})
+                    {t('hazard_exposure')}: {isMl ? (item.zoneName_ml || item.zoneName) : (item.zoneName_en || item.zoneName)} ({item.severity})
                   </div>
                   <div className="text-[10px] text-slate-500">
-                    Type: {item.asset.type.toUpperCase()} · Ward {item.asset.ward_id}
+                    {t('asset_type')}: {item.asset.type.toUpperCase()} · {t('ward_col_ward')} {item.asset.ward_id}
                   </div>
                 </div>
               ))}
@@ -585,10 +632,10 @@ export default function VulnerabilityEvacuationPage() {
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                <span>KSDMA Orange Book Preparedness</span>
+                <span>{t('orange_book_title')}</span>
               </h3>
               <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                {checklist.filter((c) => c.checked).length} / 8 Ready
+                {checklist.filter((c) => c.checked).length} / 8 {t('ready_count')}
               </span>
             </div>
 
@@ -609,7 +656,7 @@ export default function VulnerabilityEvacuationPage() {
                     <Square className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
                   )}
                   <span className={`text-[11px] leading-snug ${item.checked ? 'font-medium' : ''}`}>
-                    {item.text}
+                    {isMl ? item.text_ml : item.text_en}
                   </span>
                 </div>
               ))}

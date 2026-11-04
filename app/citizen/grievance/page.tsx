@@ -8,9 +8,7 @@ import {
   Camera,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck,
   AlertCircle,
-  RotateCcw,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth-context';
@@ -21,10 +19,11 @@ import { getGrievances } from '@/lib/api';
 import { Grievance, GrievanceCategory } from '@/lib/types';
 
 export default function GrievanceTaggingPage() {
-  const { t, language } = useTranslation();
+  const { t, language, getLocalizedStatus, getLocalizedCategory } = useTranslation();
   const { session } = useAuth();
   const router = useRouter();
 
+  const isMl = language === 'ml';
   const [category, setCategory] = useState<GrievanceCategory>('road');
   const [description, setDescription] = useState<string>('');
   const [pinCoords, setPinCoords] = useState<[number, number]>([11.3055, 75.8852]); // Default in Ward 7
@@ -64,7 +63,6 @@ export default function GrievanceTaggingPage() {
     void loadMyGrievances();
   }, [loadMyGrievances]);
 
-  // Ponytail optimization: prevent browser memory leaks from transient photo object URLs
   useEffect(() => {
     return () => {
       if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -88,14 +86,21 @@ export default function GrievanceTaggingPage() {
         e.target.value = '';
       };
 
-      // Security check: validate MIME type and size limit (max 5MB) per security.md
       if (!file.type.startsWith('image/')) {
-        setFormError('Only valid image files (JPEG, PNG, WebP) are accepted.');
+        setFormError(
+          isMl
+            ? 'സാധുവായ ചിത്രങ്ങൾ (JPEG, PNG, WebP) മാത്രമേ സ്വീകരിക്കൂ.'
+            : 'Only valid image files (JPEG, PNG, WebP) are accepted.'
+        );
         clearAttachment();
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setFormError('Image size must be 5 MB or less.');
+        setFormError(
+          isMl
+            ? 'ഫയൽ വലുപ്പം 5 MB യിൽ കുറവായിരിക്കണം.'
+            : 'Image size must be 5 MB or less.'
+        );
         clearAttachment();
         return;
       }
@@ -114,20 +119,26 @@ export default function GrievanceTaggingPage() {
     e.preventDefault();
     const trimmed = description.trim();
     if (!trimmed) {
-      setFormError('Please enter a description for the grievance.');
+      setFormError(isMl ? 'ദയവായി പരാതിയുടെ വിശദാംശങ്ങൾ നൽകുക.' : 'Please enter a description for the grievance.');
       return;
     }
     if (!session?.profileName || !session.phone || !session.profileBlock) {
-      setFormError('Your verified citizen profile is missing. Please sign in again before filing a grievance.');
+      setFormError(
+        isMl
+          ? 'പൗര പ്രൊഫൈൽ വിവരങ്ങൾ അപൂർണ്ണമാണ്. ദയവായി വീണ്ടും ലോഗിൻ ചെയ്യുക.'
+          : 'Your verified citizen profile is missing. Please sign in again before filing a grievance.'
+      );
       return;
     }
-    // Security check: enforce 500-character description limit
     if (trimmed.length > 500) {
-      setFormError('Description cannot exceed 500 characters.');
+      setFormError(
+        isMl
+          ? 'വിശദാംശങ്ങൾ 500 അക്ഷരങ്ങളിൽ കൂടാൻ പാടില്ല.'
+          : 'Description cannot exceed 500 characters.'
+      );
       return;
     }
 
-    // Generate collision-free ticket ID checked against existing tickets
     const existingIds = new Set(getAllGrievances().map((g) => g.id));
     let randomSuffix = Math.floor(1000 + Math.random() * 9000);
     while (existingIds.has(`TK-2026-${randomSuffix}`)) {
@@ -187,7 +198,9 @@ export default function GrievanceTaggingPage() {
               {t('nav_report_problem')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              C11 Spatial Grievance Geo-Tagging · CMO Grievance & Citizen Interface
+              {isMl
+                ? 'C11 പരാതി ജിയോ-ടാഗിംഗ് · സി.എം.ഒ പരാതി പരിഹാര സംവിധാനം'
+                : 'C11 Spatial Grievance Geo-Tagging · CMO Grievance & Citizen Interface'}
             </p>
           </div>
         </div>
@@ -197,7 +210,16 @@ export default function GrievanceTaggingPage() {
       {/* Walkthrough Tip */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 7):</span> Tap on the map to drop a pin, describe the issue, and submit. The generated ticket will immediately appear in the <strong>MLA Hazard Hotspot view</strong> (continuity verified).
+          <span className="font-bold">{isMl ? 'ഡെമോ പാത (ഘട്ടം 7):' : 'Reviewer Script (Step 7):'}</span>{' '}
+          {isMl ? (
+            <>
+              മാപ്പിൽ തൊട്ട് ലൊക്കേഷൻ പിൻ രേഖപ്പെടുത്തി പരാതി സമർപ്പിക്കുക. ഇത് ഉടനടി <strong>എംഎൽഎ ഹസാർഡ് വ്യൂവിൽ</strong> പ്രതിഫലിക്കും.
+            </>
+          ) : (
+            <>
+              Tap on the map to drop a pin, describe the issue, and submit. The generated ticket will immediately appear in the <strong>MLA Hazard Hotspot view</strong> (continuity verified).
+            </>
+          )}
         </div>
       </div>
 
@@ -216,7 +238,9 @@ export default function GrievanceTaggingPage() {
               {t('grievance_ticket_no')}: {submittedTicket.id}
             </div>
             <p className="text-xs text-emerald-800 max-w-md mx-auto">
-              Your grievance has been geotagged at coordinate ({submittedTicket.lat}, {submittedTicket.lng}) and assigned to the <strong>{submittedTicket.assigned_dept}</strong>.
+              {isMl
+                ? `നിങ്ങളുടെ പരാതി (${submittedTicket.lat}, ${submittedTicket.lng}) സ്ഥാനത്ത് രേഖപ്പെടുത്തുകയും ${submittedTicket.assigned_dept} ലേക്ക് അയക്കുകയും ചെയ്തു.`
+                : `Your grievance has been geotagged at coordinate (${submittedTicket.lat}, ${submittedTicket.lng}) and assigned to the ${submittedTicket.assigned_dept}.`}
             </p>
           </div>
 
@@ -238,7 +262,7 @@ export default function GrievanceTaggingPage() {
               }}
               className="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs rounded-xl transition-colors"
             >
-              File Another Grievance
+              {isMl ? 'മറ്റൊരു പരാതി നൽകുക' : 'File Another Grievance'}
             </button>
           </div>
         </div>
@@ -262,16 +286,18 @@ export default function GrievanceTaggingPage() {
                   onChange={(e) => setCategory(e.target.value as GrievanceCategory)}
                   className="w-full p-2.5 bg-slate-50 rounded-lg border border-slate-300 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
-                  <option value="road">Road Damage / Potholes</option>
-                  <option value="water">Drinking Water Supply / Pipeline Leak</option>
-                  <option value="lighting">Streetlight Non-functional</option>
-                  <option value="sanitation">Drainage Blockage / Waste Accumulation</option>
-                  <option value="other">Public Infrastructure / Other</option>
+                  <option value="road">{isMl ? 'റോഡിലെ കുഴികൾ / തകരാർ' : 'Road Damage / Potholes'}</option>
+                  <option value="water">{isMl ? 'കുടിവെള്ള വിതരണം / പൈപ്പ് ചോർച്ച' : 'Drinking Water Supply / Pipeline Leak'}</option>
+                  <option value="lighting">{isMl ? 'തെരുവ് വിളക്ക് തകരാർ' : 'Streetlight Non-functional'}</option>
+                  <option value="sanitation">{isMl ? 'ഓവുചാൽ തടസ്സം / മാലിന്യക്കൂമ്പാരം' : 'Drainage Blockage / Waste Accumulation'}</option>
+                  <option value="other">{isMl ? 'പൊതു അടിസ്ഥാന സൗകര്യം / മറ്റുള്ളവ' : 'Public Infrastructure / Other'}</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Ward Number:</label>
+                <label className="font-bold text-slate-700">
+                  {isMl ? 'വാർഡ് നമ്പർ:' : 'Ward Number:'}
+                </label>
                 <select
                   value={wardId}
                   onChange={(e) => setWardId(Number(e.target.value))}
@@ -279,7 +305,7 @@ export default function GrievanceTaggingPage() {
                 >
                   {[...Array(14)].map((_, i) => (
                     <option key={i + 1} value={i + 1}>
-                      Ward {i + 1}
+                      {isMl ? `വാർഡ് ${i + 1}` : `Ward ${i + 1}`}
                     </option>
                   ))}
                 </select>
@@ -287,8 +313,7 @@ export default function GrievanceTaggingPage() {
             </div>
 
             <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs text-blue-900">
-              <strong>Verified profile:</strong> {session?.profileName || 'Loading profile'} · {session?.phone || '—'} · {session?.profileBlock || '—'}
-              <span className="ml-1 text-blue-700">This information is securely added from your Aadhaar-linked profile.</span>
+              <strong>{isMl ? 'സ്ഥിരീകരിച്ച പ്രൊഫൈൽ:' : 'Verified profile:'}</strong> {session?.profileName || (isMl ? 'പൗരൻ' : 'Citizen')} · {session?.phone || '—'} · {session?.profileBlock || '—'}
             </div>
 
             {/* Description */}
@@ -298,7 +323,11 @@ export default function GrievanceTaggingPage() {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain the issue, exact landmark, and how long it has been unresolved..."
+                placeholder={
+                  isMl
+                    ? 'പ്രശ്നത്തിന്റെ വിവരങ്ങളും സ്ഥലവും വ്യക്തമായി എഴുതുക...'
+                    : 'Explain the issue, exact landmark, and how long it has been unresolved...'
+                }
                 className="w-full p-3 bg-slate-50 rounded-lg border border-slate-300 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
@@ -331,7 +360,7 @@ export default function GrievanceTaggingPage() {
                   <span>{t('grievance_location_hint')}</span>
                 </label>
                 <span className="font-mono text-slate-500 text-[11px]">
-                  Pinned: {pinCoords[0].toFixed(5)}, {pinCoords[1].toFixed(5)}
+                  {isMl ? 'സ്ഥാനം:' : 'Pinned:'} {pinCoords[0].toFixed(5)}, {pinCoords[1].toFixed(5)}
                 </span>
               </div>
 
@@ -361,43 +390,57 @@ export default function GrievanceTaggingPage() {
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black text-slate-900">My filed grievances</h2>
-            <p className="text-xs text-slate-600">Status updates for complaints filed from your verified Aadhaar profile.</p>
+            <h2 className="text-lg font-black text-slate-900">
+              {isMl ? 'ഞാൻ നൽകിയ പരാതികൾ' : 'My filed grievances'}
+            </h2>
+            <p className="text-xs text-slate-600">
+              {isMl
+                ? 'നിങ്ങളുടെ പ്രൊഫൈലിൽ നിന്നുള്ള പരാതികളുടെ തത്സമയ വിവരങ്ങൾ.'
+                : 'Status updates for complaints filed from your verified Aadhaar profile.'}
+            </p>
           </div>
           <button
             type="button"
             onClick={() => void loadMyGrievances()}
             className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-500"
           >
-            Refresh status
+            {isMl ? 'വിവരങ്ങൾ പുതുക്കുക' : 'Refresh status'}
           </button>
         </div>
         {historyError && <p className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-800">{historyError}</p>}
         {historyLoading ? (
-          <p className="mt-4 text-xs text-slate-500">Loading your grievances...</p>
+          <p className="mt-4 text-xs text-slate-500">{t('loading')}</p>
         ) : myGrievances.length === 0 ? (
-          <p className="mt-4 text-xs text-slate-500">No grievances have been filed from this profile yet.</p>
+          <p className="mt-4 text-xs text-slate-500">
+            {isMl ? 'ഈ പ്രൊഫൈലിൽ നിന്ന് ഇതുവരെ പരാതികൾ സമർപ്പിച്ചിട്ടില്ല.' : 'No grievances have been filed from this profile yet.'}
+          </p>
         ) : (
           <div className="mt-4 space-y-3">
             {myGrievances.map((grievance) => (
               <div key={grievance.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-mono text-xs font-bold text-slate-900">{grievance.id}</span>
-                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
-                    grievance.status === 'resolved'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : grievance.status === 'in_progress'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {grievance.status.replace('_', ' ')}
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      grievance.status === 'resolved'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : grievance.status === 'in_progress'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
+                    {getLocalizedStatus(grievance.status)}
                   </span>
                 </div>
-                <p className="mt-2 text-xs text-slate-700">{grievance.description_en}</p>
-                <p className="mt-1 text-[11px] text-slate-500">Ward {grievance.ward_id} · {grievance.category} · {grievance.filed_date}</p>
+                <p className="mt-2 text-xs text-slate-700">
+                  {isMl ? grievance.description_ml || grievance.description_en : grievance.description_en}
+                </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  {isMl ? `വാർഡ് ${grievance.ward_id}` : `Ward ${grievance.ward_id}`} · {getLocalizedCategory(grievance.category)} · {grievance.filed_date}
+                </p>
                 {grievance.resolution_note && (
                   <p className="mt-2 rounded-lg bg-emerald-50 p-2 text-xs text-emerald-900">
-                    <strong>Latest update:</strong> {grievance.resolution_note}
+                    <strong>{isMl ? 'ഏറ്റവും പുതിയ വിവരങ്ങൾ:' : 'Latest update:'}</strong> {grievance.resolution_note}
                   </p>
                 )}
               </div>

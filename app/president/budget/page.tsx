@@ -19,7 +19,9 @@ import { Ward } from '@/lib/types';
 import { simulateBudgetShift, calculatePerCapitaSpend } from '@/lib/calculations';
 
 export default function BudgetSimulationPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, language } = useTranslation();
+  const isMl = language === 'ml';
+
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +75,7 @@ export default function BudgetSimulationPage() {
               {t('budget_title')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P17 Budget Simulation Sandbox · Real-time GPDP Fund Reallocation & PDI Impact
+              {t('budget_subtitle')}
             </p>
           </div>
         </div>
@@ -83,9 +85,7 @@ export default function BudgetSimulationPage() {
       {/* Walkthrough Script Banner */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 5):</span> Adjust the slider to shift{' '}
-          <strong>₹50 Lakhs</strong> from <strong>Ward 7 (Cheruvannur)</strong> to{' '}
-          <strong>Ward 2 (Padinjarekkara)</strong>. Observe the projected PDI increase in Ward 2 and the district average response.
+          {t('budget_walkthrough_banner')}
         </div>
         <button
           onClick={() => {
@@ -95,7 +95,7 @@ export default function BudgetSimulationPage() {
           }}
           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-[11px] ml-2 flex-shrink-0"
         >
-          Preset ₹50L Shift
+          {t('preset_50l_btn')}
         </button>
       </div>
 
@@ -104,7 +104,7 @@ export default function BudgetSimulationPage() {
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-blue-600" />
-            <h3 className="text-base font-bold text-slate-900">Capital Transfer Simulator</h3>
+            <h3 className="text-base font-bold text-slate-900">{t('capital_transfer_simulator')}</h3>
           </div>
           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
             {t('budget_conserved_badge')}
@@ -122,12 +122,12 @@ export default function BudgetSimulationPage() {
             >
               {wards.map((w) => (
                 <option key={w.id} value={w.id} disabled={w.id === toWardId}>
-                  Ward {w.number}: {getLocalizedName(w)} (Current: ₹{w.spend_lakhs}L)
+                  {t('ward_col_ward')} {w.number}: {getLocalizedName(w)} (₹{w.spend_lakhs}L)
                 </option>
               ))}
             </select>
             <div className="text-[11px] text-slate-500">
-              Allocated spend will be reduced by simulated amount.
+              {t('donor_spend_reduction_note')}
             </div>
           </div>
 
@@ -141,12 +141,12 @@ export default function BudgetSimulationPage() {
             >
               {wards.map((w) => (
                 <option key={w.id} value={w.id} disabled={w.id === fromWardId}>
-                  Ward {w.number}: {getLocalizedName(w)} (Current: ₹{w.spend_lakhs}L)
+                  {t('ward_col_ward')} {w.number}: {getLocalizedName(w)} (₹{w.spend_lakhs}L)
                 </option>
               ))}
             </select>
             <div className="text-[11px] text-slate-500">
-              Receives additional fund allocation to boost PDI themes.
+              {t('recipient_spend_boost_note')}
             </div>
           </div>
 
@@ -155,7 +155,7 @@ export default function BudgetSimulationPage() {
             <div className="flex items-center justify-between">
               <label className="font-bold text-slate-700">{t('shift_amount')}:</label>
               <strong className="text-sm font-extrabold text-blue-700">
-                ₹{amountLakhs} Lakhs
+                ₹{amountLakhs} {t('lakhs')}
               </strong>
             </div>
             <input
@@ -189,28 +189,28 @@ export default function BudgetSimulationPage() {
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div className="border-b border-slate-200 pb-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-red-600">
-                Funding Ward (Donor)
+                {t('donor_ward_label')}
               </span>
               <h4 className="text-base font-bold text-slate-900">
-                Ward {fromSim.ward.number}: {getLocalizedName(fromSim.ward)}
+                {t('ward_col_ward')} {fromSim.ward.number}: {getLocalizedName(fromSim.ward)}
               </h4>
             </div>
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Allocated Spend:</span>
+                <span className="text-slate-500">{t('allocated_spend')}</span>
                 <span className="font-bold">
                   ₹{fromSim.old_spend_lakhs}L → <span className="text-red-700">₹{fromSim.new_spend_lakhs}L</span>
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Per-Capita Spend:</span>
+                <span className="text-slate-500">{t('per_capita_spend_label')}</span>
                 <span className="font-bold">
                   ₹{fromSim.old_per_capita} → ₹{fromSim.new_per_capita}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Projected PDI Score:</span>
+                <span className="text-slate-500">{t('projected_pdi')}</span>
                 <span className="font-bold">
                   {fromSim.old_pdi} → <span className="text-slate-800">{fromSim.new_pdi}</span> ({fromSim.delta_pdi} pts)
                 </span>
@@ -224,28 +224,28 @@ export default function BudgetSimulationPage() {
           <div className="bg-white p-5 rounded-xl border border-blue-200 shadow-md space-y-4">
             <div className="border-b border-slate-200 pb-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
-                Receiving Ward (Recipient)
+                {t('recipient_ward_label')}
               </span>
               <h4 className="text-base font-bold text-slate-900">
-                Ward {toSim.ward.number}: {getLocalizedName(toSim.ward)}
+                {t('ward_col_ward')} {toSim.ward.number}: {getLocalizedName(toSim.ward)}
               </h4>
             </div>
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Allocated Spend:</span>
+                <span className="text-slate-500">{t('allocated_spend')}</span>
                 <span className="font-bold">
                   ₹{toSim.old_spend_lakhs}L → <span className="text-emerald-700 font-extrabold">₹{toSim.new_spend_lakhs}L</span>
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Per-Capita Spend:</span>
+                <span className="text-slate-500">{t('per_capita_spend_label')}</span>
                 <span className="font-bold">
                   ₹{toSim.old_per_capita} → ₹{toSim.new_per_capita}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Projected PDI Score:</span>
+                <span className="text-slate-500">{t('projected_pdi')}</span>
                 <span className="font-bold">
                   {toSim.old_pdi} → <span className="text-emerald-700 font-extrabold">{toSim.new_pdi}</span> (+{toSim.delta_pdi} pts)
                 </span>
@@ -258,30 +258,30 @@ export default function BudgetSimulationPage() {
         <div className="bg-slate-900 text-white p-5 rounded-xl border border-slate-800 shadow-sm space-y-4">
           <div className="border-b border-slate-800 pb-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">
-              Panchayat-Wide Impact
+              {t('panchayat_impact')}
             </span>
-            <h4 className="text-base font-bold">Panchayat Mean PDI Projection</h4>
+            <h4 className="text-base font-bold">{t('panchayat_mean_pdi')}</h4>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="text-slate-400 block">Projected Ward Mean PDI:</span>
+              <span className="text-slate-400 block">{t('projected_ward_mean')}</span>
               <div className="text-3xl font-black text-white mt-1">
                 {newWardMean}
                 <span className="text-xs font-semibold text-slate-400 ml-1">/ 100</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1">
-                Baseline Ward Mean: {originalWardMean} ({meanDelta >= 0 ? `+${meanDelta}` : meanDelta} pts shift)
+                {t('baseline_ward_mean')} {originalWardMean} ({meanDelta >= 0 ? `+${meanDelta}` : meanDelta} {t('pts_shift')})
               </div>
             </div>
 
             <div className="p-3 bg-slate-800 rounded border border-slate-700 text-[11px] text-slate-300">
               {simulationResult.is_conserved ? (
                 <>
-                  Total Budget Conserved: <strong>₹{simulationResult.total_panchayat_spend} Lakhs</strong> (Exact fiscal neutrality maintained).
+                  {t('budget_conserved_badge')}: <strong>₹{simulationResult.total_panchayat_spend} {t('lakhs')}</strong>
                   {fromSim && fromSim.old_spend_lakhs - fromSim.new_spend_lakhs < amountLakhs && (
                     <div className="mt-1 text-amber-300">
-                      Applied transfer capped at ₹{Math.round((fromSim.old_spend_lakhs - fromSim.new_spend_lakhs) * 10) / 10} Lakhs (donor ward spend ceiling).
+                      Applied transfer capped at ₹{Math.round((fromSim.old_spend_lakhs - fromSim.new_spend_lakhs) * 10) / 10} {t('lakhs')}.
                     </div>
                   )}
                 </>

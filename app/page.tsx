@@ -37,7 +37,7 @@ export default function LandingPage() {
         eyebrow: 'പ്രകൃതി · ജനങ്ങൾ · വ്യവസായം',
         titleStart: 'വികേന്ദ്രീകൃത ഭരണസംവിധാനം',
         titleEnd: 'പ്രകൃതി, ജനങ്ങൾ, വ്യവസായം എന്നിവയ്ക്കായി',
-        intro: 'തദ്ദേശ ഭരണത്തിനായുള്ള തീരുമാന സഹായവും പൗര സേവനങ്ങളും നൽകുന്ന AICM, തെക്കുംപുരം ഗ്രാമപഞ്ചായത്തിന്റെ ബുദ്ധിപരമായ ഡിജിറ്റൽ പ്രതിരൂപമാണ്.',
+        intro: 'തദ്ദേശ ഭരണത്തിനായുള്ള തീരുമാന സഹായവും പൗര സേവനങ്ങളും നൽകുന്ന AICM, കുന്നമംഗലം നിയോജകമണ്ഡലത്തിന്റെ ബുദ്ധിപരമായ ഡിജിറ്റൽ പ്രതിരൂപമാണ്.',
         mla: 'എംഎൽഎ ആയി പ്രവേശിക്കുക',
         mlaText: 'ഭരണം, വാർഡ് സമത്വം, സൈറ്റിംഗ്, ധനകാര്യ സാൻഡ്‌ബോക്സ്, ദുരന്ത നിയന്ത്രണം',
         citizen: 'പൗരനായി പ്രവേശിക്കുക',
@@ -60,7 +60,7 @@ export default function LandingPage() {
         eyebrow: 'Nature · People · Industry',
         titleStart: 'Decentralized Governance for',
         titleEnd: 'Nature, People & Industry',
-        intro: 'AICM delivers an intelligent digital replica of Thekkumpuram Grama Panchayat, bridging cadastral spatial zoning, infrastructure asset management, disaster resilience, and citizen transparency.',
+        intro: 'AICM delivers an intelligent digital replica of Kunnamangalam Constituency, bridging cadastral spatial zoning, infrastructure asset management, disaster resilience, and citizen transparency.',
         mla: 'Enter as MLA',
         mlaText: 'Governance, Ward Equity, Siting, Fiscal Sandbox & Hazard Command',
         citizen: 'Enter as Citizen',
@@ -196,7 +196,7 @@ export default function LandingPage() {
 
         <section id="about" className="mx-auto max-w-[1440px] px-5 py-10 sm:px-10">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-700">Guiding Philosophy</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-700">{isMalayalam ? 'മാർഗ്ഗനിർദ്ദേശ തത്വം' : 'Guiding Philosophy'}</p>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight">{copy.philosophy}</h2>
             <p className="mt-2 text-xs leading-5 text-slate-600">{copy.philosophyText}</p>
           </div>
@@ -211,7 +211,7 @@ export default function LandingPage() {
           <div className="rounded-2xl bg-slate-50 p-5 text-slate-700">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3">
               <div className="flex items-center gap-2"><Database className="h-4 w-4 text-emerald-700" /><h2 className="text-sm font-bold text-slate-900">{copy.report}</h2></div>
-              <span className="text-[10px] text-slate-500">Baseline Verified: 2026-10-30</span>
+              <span className="text-[10px] text-slate-500">{isMalayalam ? 'അവസാനം പരിശോധിച്ചത്: 2026-10-30' : 'Baseline Verified: 2026-10-30'}</span>
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {[
@@ -229,10 +229,19 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-10">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50"><Leaf className="h-5 w-5 text-emerald-700" /></div>
-            <div className="text-[10px] font-semibold">AICM TWIN<br /><span className="text-emerald-700">Nature · People · Industry</span></div>
+            <div className="text-[10px] font-semibold">
+              {isMalayalam ? 'നിയോജകമണ്ഡലം ഡിജിറ്റൽ ട്വിൻ' : 'Constituency Digital Twin'}<br />
+              <span className="text-emerald-700">{isMalayalam ? 'പ്രകൃതി · ജനങ്ങൾ · വ്യവസായം' : 'Nature · People · Industry'}</span>
+            </div>
           </div>
-          <div className="text-[10px] text-slate-500">Statutory Links: Kerala Panchayat Raj Act 1994 &nbsp;|&nbsp; KSDI &nbsp;|&nbsp; Panchayat Development Index</div>
-          <div className="text-[10px] font-semibold text-slate-500">Last verified: 2026-10-30</div>
+          <div className="text-[10px] text-slate-500">
+            {isMalayalam
+              ? 'നിയമപരമായ വിവരങ്ങൾ: കേരള പഞ്ചായത്ത് രാജ് ആക്ട് 1994 | KSDI | പഞ്ചായത്ത് വികസന സൂചിക (PDI)'
+              : 'Statutory Links: Kerala Panchayat Raj Act 1994 | KSDI | Panchayat Development Index'}
+          </div>
+          <div className="text-[10px] font-semibold text-slate-500">
+            {isMalayalam ? 'അവസാനം പരിശോധിച്ചത്: 2026-10-30' : 'Last verified: 2026-10-30'}
+          </div>
         </div>
       </footer>
     </div>
@@ -247,8 +256,36 @@ function RoleCard({ href, icon: Icon, title, text, tone }: { href: string; icon:
 function LocationCard({ locationState, onRequestLocation, isMalayalam }: { locationState: 'pending' | 'detected' | 'denied'; onRequestLocation: () => void; isMalayalam: boolean }) {
   const isDetected = locationState === 'detected';
   const labels = isMalayalam
-    ? { detected: 'നിങ്ങളുടെ നിലവിലെ സ്ഥലം', detectedSub: 'നിങ്ങളുടെ ബ്രൗസറിൽ സ്ഥലം കണ്ടെത്തി', fallback: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', fallbackSub: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', granted: 'സ്ഥല അനുമതി ലഭിച്ചു', demo: 'ഡെമോ ഡാറ്റ — സാങ്കൽപ്പിക പഞ്ചായത്ത്', district: 'ജില്ല', constituency: 'നിയമസഭാ മണ്ഡലം', population: 'ജനസംഖ്യ', households: 'കുടുംബങ്ങൾ', area: 'വിസ്തീർണ്ണം', wards: 'വാർഡുകൾ', retry: 'എന്റെ സ്ഥലം ഉപയോഗിക്കുക' }
-    : { detected: 'Your current location', detectedSub: 'Location detected in your browser', fallback: 'Thekkumpuram Grama Panchayat', fallbackSub: 'തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്', granted: 'Location permission granted', demo: 'Demo data — fictional panchayat', district: 'District', constituency: 'Assembly Constituency', population: 'Population', households: 'Households', area: 'Area', wards: 'Wards', retry: 'Use my location' };
+    ? {
+        detected: 'നിങ്ങളുടെ നിലവിലെ സ്ഥലം',
+        detectedSub: 'നിങ്ങളുടെ ബ്രൗസറിൽ സ്ഥലം കണ്ടെത്തി',
+        fallback: 'കുന്നമംഗലം നിയോജകമണ്ഡലം',
+        fallbackSub: 'കുന്നമംഗലം നിയോജകമണ്ഡലം',
+        granted: 'സ്ഥല അനുമതി ലഭിച്ചു',
+        demo: 'ഡെമോ ഡാറ്റ — സാങ്കൽപ്പിക പഞ്ചായത്ത്',
+        district: 'ജില്ല',
+        constituency: 'നിയമസഭാ മണ്ഡലം',
+        population: 'ജനസംഖ്യ',
+        households: 'കുടുംബങ്ങൾ',
+        area: 'വിസ്തീർണ്ണം',
+        wards: 'വാർഡുകൾ',
+        retry: 'എന്റെ സ്ഥലം ഉപയോഗിക്കുക',
+      }
+    : {
+        detected: 'Your current location',
+        detectedSub: 'Location detected in your browser',
+        fallback: 'Kunnamangalam Constituency',
+        fallbackSub: 'Kunnamangalam Constituency',
+        granted: 'Location permission granted',
+        demo: 'Demo data — fictional constituency',
+        district: 'District',
+        constituency: 'Assembly Constituency',
+        population: 'Population',
+        households: 'Households',
+        area: 'Area',
+        wards: 'Wards',
+        retry: 'Use my location',
+      };
   return (
     <div className="relative hidden min-h-[340px] rounded-2xl border border-white/70 bg-white/60 p-5 shadow-xl backdrop-blur-md lg:block">
       <h2 className="text-lg font-extrabold leading-tight text-slate-950">
@@ -260,14 +297,14 @@ function LocationCard({ locationState, onRequestLocation, isMalayalam }: { locat
       </div>
 
       <div className="mt-4 border-t border-white/70 pt-4">
-        <LocationRow icon={MapPin} label={labels.district} value="Kozhikode" />
-        <LocationRow icon={Building2} label={labels.constituency} value="Kunnamangalam" />
+        <LocationRow icon={MapPin} label={labels.district} value={isMalayalam ? 'കോഴിക്കോട്' : 'Kozhikode'} />
+        <LocationRow icon={Building2} label={labels.constituency} value={isMalayalam ? 'കുന്നമംഗലം' : 'Kunnamangalam'} />
       </div>
       <div className="my-3 border-t border-white/70" />
       <div className="space-y-2.5">
         <LocationRow icon={Users} label={labels.population} value="28,450" />
         <LocationRow icon={Home} label={labels.households} value="6,820" />
-        <LocationRow icon={Map} label={labels.area} value="32.4 ച. കി.മീ." />
+        <LocationRow icon={Map} label={labels.area} value={isMalayalam ? '32.4 ച. കി.മീ.' : '32.4 sq.km'} />
         <LocationRow icon={MapPin} label={labels.wards} value="14" />
       </div>
 

@@ -162,9 +162,9 @@ export function isPointInPolygon(point: [number, number], polygon: number[][]): 
 export function findAssetsInHazardZones(
   assets: Asset[],
   hazardZones: HazardZoneCollection | null
-): { asset: Asset; zoneName: string; severity: string }[] {
+): { asset: Asset; zoneName: string; zoneName_en: string; zoneName_ml: string; severity: string }[] {
   if (!assets || !hazardZones || !hazardZones.features) return [];
-  const results: { asset: Asset; zoneName: string; severity: string }[] = [];
+  const results: { asset: Asset; zoneName: string; zoneName_en: string; zoneName_ml: string; severity: string }[] = [];
 
   for (const asset of assets) {
     for (const hz of hazardZones.features) {
@@ -173,6 +173,8 @@ export function findAssetsInHazardZones(
         results.push({
           asset,
           zoneName: hz.properties.name_en,
+          zoneName_en: hz.properties.name_en,
+          zoneName_ml: hz.properties.name_ml || hz.properties.name_en,
           severity: hz.properties.severity,
         });
         break;

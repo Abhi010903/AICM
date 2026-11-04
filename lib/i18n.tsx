@@ -27,6 +27,11 @@ interface I18nContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string, fallback?: string) => string;
   getLocalizedName: (item: any) => string;
+  getLocalizedDescription: (item: any) => string;
+  getLocalizedStatus: (status?: string) => string;
+  getLocalizedCondition: (condition?: string) => string;
+  getLocalizedType: (type?: string) => string;
+  getLocalizedCategory: (category?: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType>({
@@ -34,6 +39,11 @@ const I18nContext = createContext<I18nContextType>({
   setLanguage: () => {},
   t: (key: string, fallback?: string) => fallback || key,
   getLocalizedName: (item: any) => (item ? item.name_en || item.title_en || '' : ''),
+  getLocalizedDescription: (item: any) => (item ? item.description_en || item.details_en || '' : ''),
+  getLocalizedStatus: (status?: string) => status || '',
+  getLocalizedCondition: (condition?: string) => condition || '',
+  getLocalizedType: (type?: string) => type || '',
+  getLocalizedCategory: (category?: string) => category || '',
 });
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -70,22 +80,55 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const t = (key: string, fallback?: string): string => {
-    if (i18n.exists(key)) {
-      return i18n.t(key);
-    }
     const dict = (translations[language] as Record<string, string>) || translations.en;
-    if (dict && dict[key]) {
+    if (dict && dict[key] !== undefined) {
       return dict[key];
     }
-    return fallback || key;
+    const enDict = translations.en as Record<string, string>;
+    if (enDict && enDict[key] !== undefined) {
+      return enDict[key];
+    }
+    return fallback !== undefined ? fallback : key;
   };
 
   const getLocalizedName = (item: any): string => {
     if (!item) return '';
     if (language === 'ml') {
-      return item.name_ml || item.title_ml || item.village_ml || item.name_en || item.title_en || '';
+      return item.name_ml || item.title_ml || item.village_ml || item.name_en || item.title_en || item.village_en || '';
     }
-    return item.name_en || item.title_en || item.village_en || '';
+    return item.name_en || item.title_en || item.village_en || item.name_ml || item.title_ml || '';
+  };
+
+  const getLocalizedDescription = (item: any): string => {
+    if (!item) return '';
+    if (language === 'ml') {
+      return item.description_ml || item.details_ml || item.description_en || item.details_en || '';
+    }
+    return item.description_en || item.details_en || item.description_ml || '';
+  };
+
+  const getLocalizedStatus = (status?: string): string => {
+    if (!status) return '';
+    const key = `status_${status.toLowerCase().replace(/\s+/g, '_')}`;
+    return t(key, status);
+  };
+
+  const getLocalizedCondition = (condition?: string): string => {
+    if (!condition) return '';
+    const key = `cond_${condition.toLowerCase()}`;
+    return t(key, condition);
+  };
+
+  const getLocalizedType = (type?: string): string => {
+    if (!type) return '';
+    const key = `type_${type.toLowerCase().replace(/\s+/g, '_')}`;
+    return t(key, type);
+  };
+
+  const getLocalizedCategory = (cat?: string): string => {
+    if (!cat) return '';
+    const key = `cat_${cat.toLowerCase().replace(/\s+/g, '_')}`;
+    return t(key, cat);
   };
 
   return (
@@ -96,6 +139,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLanguage: handleSetLanguage,
           t,
           getLocalizedName,
+          getLocalizedDescription,
+          getLocalizedStatus,
+          getLocalizedCondition,
+          getLocalizedType,
+          getLocalizedCategory,
         }}
       >
         {children}

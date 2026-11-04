@@ -4,9 +4,10 @@
  * Implements genuine debounced, ranked, categorized search across all Digital Twin datasets.
  * Strictly enforces role-based filtering so Citizens cannot discover administrative,
  * budget-simulation, or private records through search queries.
+ * Fully supports English and Malayalam search results.
  */
 
-import { UserRole } from './types';
+import { UserRole, Language } from './types';
 import wardsData from '../data/wards.json';
 import assetsData from '../data/assets.json';
 import facilitiesData from '../data/facilities.json';
@@ -38,7 +39,7 @@ export interface SearchResultItem {
   score?: number;
 }
 
-// Category display labels
+// Category display labels in English
 export const CATEGORY_LABELS: Record<SearchCategory, string> = {
   ward: 'Wards & Governance',
   asset: 'Infrastructure Assets',
@@ -52,13 +53,33 @@ export const CATEGORY_LABELS: Record<SearchCategory, string> = {
   service: 'Citizen Public Services',
 };
 
+// Category display labels in Malayalam
+export const CATEGORY_LABELS_ML: Record<SearchCategory, string> = {
+  ward: 'വാർഡുകളും ഭരണവും',
+  asset: 'പൊതു ആസ്തികൾ',
+  facility: 'പൊതു സേവന കേന്ദ്രങ്ങൾ',
+  project: 'GPDP വികസന പദ്ധതികൾ',
+  budget: 'ബജറ്റ് സിമുലേഷൻ',
+  hazard: 'ദുരന്ത നിവാരണ സുരക്ഷ',
+  grievance: 'പൗര പരാതികൾ',
+  evacuation: 'ക്യാമ്പുകളും ഒഴിപ്പിക്കൽ പാതകളും',
+  parcel: 'കഡാസ്ട്രൽ ഭൂമി വിവരങ്ങൾ',
+  service: 'പൊതുജന സേവനങ്ങൾ',
+};
+
 /**
- * Searches system records with role-aware security filtering
+ * Searches system records with role-aware security filtering and multilingual presentation
  */
-export function searchSystem(query: string, role: UserRole): SearchResultItem[] {
+export function searchSystem(
+  query: string,
+  role: UserRole,
+  language: Language = 'en'
+): SearchResultItem[] {
   const clean = query.trim().toLowerCase();
   if (!clean || clean.length < 2) return [];
 
+  const isMl = language === 'ml';
+  const catLabels = isMl ? CATEGORY_LABELS_ML : CATEGORY_LABELS;
   const results: SearchResultItem[] = [];
 
   // 1. Wards (Both roles, different target links)
@@ -68,14 +89,19 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
       w.name_en.toLowerCase().includes(clean) ||
       w.name_ml.toLowerCase().includes(clean) ||
       `ward ${w.number}`.includes(clean) ||
-      `ward ${w.id}`.includes(clean)
+      `ward ${w.id}`.includes(clean) ||
+      `വാർഡ് ${w.number}`.includes(clean)
     ) {
       results.push({
         id: `ward_${w.id}`,
-        title: `Ward ${w.number}: ${w.name_en} (${w.name_ml})`,
+        title: isMl
+          ? `വാർഡ് ${w.number}: ${w.name_ml} (${w.name_en})`
+          : `Ward ${w.number}: ${w.name_en} (${w.name_ml})`,
         category: 'ward',
-        categoryLabel: CATEGORY_LABELS.ward,
-        description: `Population: ${w.population.toLocaleString()} · PDI Score: ${w.pdi_score} · Spend: ₹${w.spend_lakhs}L`,
+        categoryLabel: catLabels.ward,
+        description: isMl
+          ? `ജനസംഖ്യ: ${w.population.toLocaleString()} · PDI സ്കോർ: ${w.pdi_score} · ചെലവ്: ₹${w.spend_lakhs}L`
+          : `Population: ${w.population.toLocaleString()} · PDI Score: ${w.pdi_score} · Spend: ₹${w.spend_lakhs}L`,
         href: targetLink,
         badge: `PDI ${w.pdi_score}`,
         isPresidentOnly: false,
@@ -103,10 +129,12 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
     ) {
       results.push({
         id: `fac_${f.id}`,
-        title: f.name_en,
+        title: isMl ? f.name_ml || f.name_en : f.name_en,
         category: 'facility',
-        categoryLabel: CATEGORY_LABELS.facility,
-        description: `Type: ${f.type.toUpperCase()} · Staffing: ${f.staff_filled}/${f.staff_sanctioned} · Phone: ${f.contact_phone}`,
+        categoryLabel: catLabels.facility,
+        description: isMl
+          ? `തരം: ${f.type.toUpperCase()} · ജീവനക്കാർ: ${f.staff_filled}/${f.staff_sanctioned} · ഫോൺ: ${f.contact_phone}`
+          : `Type: ${f.type.toUpperCase()} · Staffing: ${f.staff_filled}/${f.staff_sanctioned} · Phone: ${f.contact_phone}`,
         href: `/citizen/facilities`,
         badge: f.type.toUpperCase(),
         isPresidentOnly: false,
@@ -119,14 +147,19 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
     if (
       p.survey_number.toLowerCase().includes(clean) ||
       p.classification.toLowerCase().includes(clean) ||
-      `survey ${p.survey_number}`.toLowerCase().includes(clean)
+      `survey ${p.survey_number}`.toLowerCase().includes(clean) ||
+      `സർവേ ${p.survey_number}`.toLowerCase().includes(clean)
     ) {
       results.push({
         id: `parcel_${p.survey_number}`,
-        title: `Survey Parcel ${p.survey_number}`,
+        title: isMl
+          ? `സർവേ നമ്പർ ${p.survey_number}`
+          : `Survey Parcel ${p.survey_number}`,
         category: 'parcel',
-        categoryLabel: CATEGORY_LABELS.parcel,
-        description: `Classification: ${p.classification.toUpperCase()} · Area: ${p.area_cents} Cents · Ward ${p.ward_id} (${p.hazard_zone})`,
+        categoryLabel: catLabels.parcel,
+        description: isMl
+          ? `വർഗ്ഗീകരണം: ${p.classification.toUpperCase()} · വിസ്തീർണ്ണം: ${p.area_cents} സെന്റ് · വാർഡ് ${p.ward_id}`
+          : `Classification: ${p.classification.toUpperCase()} · Area: ${p.area_cents} Cents · Ward ${p.ward_id} (${p.hazard_zone})`,
         href: role === 'president' ? `/president/siting` : `/citizen/plot?survey=${p.survey_number}`,
         badge: p.classification.toUpperCase(),
         isPresidentOnly: false,
@@ -138,39 +171,55 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
   const citizenServices: SearchResultItem[] = [
     {
       id: 'srv_build_check',
-      title: 'Automated Building Suitability Check',
+      title: isMl
+        ? 'സ്വയംപ്രേരിത നിർമ്മാണ അനുമതി പരിശോധന'
+        : 'Automated Building Suitability Check',
       category: 'service',
-      categoryLabel: CATEGORY_LABELS.service,
-      description: 'Check building permissions under Kerala Conservation of Paddy Land Act & KMBR setback rules.',
+      categoryLabel: catLabels.service,
+      description: isMl
+        ? 'നെൽവയൽ തണ്ണീർത്തട സംരക്ഷണ നിയമവും കെട്ടിട നിർമ്മാണ ചട്ടങ്ങളും പ്രകാരമുള്ള പരിശോധന.'
+        : 'Check building permissions under Kerala Conservation of Paddy Land Act & KMBR setback rules.',
       href: '/citizen/build-check',
-      badge: 'Planning Tool',
+      badge: isMl ? 'ആസൂത്രണ ഉപകരണം' : 'Planning Tool',
     },
     {
       id: 'srv_my_plot',
-      title: 'Cadastral Plot Explorer (Ente Bhoomi & ReLIS)',
+      title: isMl
+        ? 'എന്റെ ഭൂമി കഡാസ്ട്രൽ ഭൂപടം (Ente Bhoomi & ReLIS)'
+        : 'Cadastral Plot Explorer (Ente Bhoomi & ReLIS)',
       category: 'service',
-      categoryLabel: CATEGORY_LABELS.service,
-      description: 'Inspect property boundaries, survey rights, and hazard constraints.',
+      categoryLabel: catLabels.service,
+      description: isMl
+        ? 'സർവേ അതിർത്തികൾ, അവകാശങ്ങൾ, ദുരന്ത സാധ്യതാ വിവരങ്ങൾ എന്നിവ കാണുക.'
+        : 'Inspect property boundaries, survey rights, and hazard constraints.',
       href: '/citizen/plot',
-      badge: 'Cadastral',
+      badge: isMl ? 'കഡാസ്ട്രൽ' : 'Cadastral',
     },
     {
       id: 'srv_grievance',
-      title: 'Geotag Citizen Issue / Report a Problem',
+      title: isMl
+        ? 'പരാതി അറിയിക്കുക / പ്രശ്നങ്ങൾ റിപ്പോർട്ട് ചെയ്യുക'
+        : 'Geotag Citizen Issue / Report a Problem',
       category: 'service',
-      categoryLabel: CATEGORY_LABELS.service,
-      description: 'Submit geo-located civic problem with photograph directly to Grama Panchayat.',
+      categoryLabel: catLabels.service,
+      description: isMl
+        ? 'ഫോട്ടോ സഹിതം മാപ്പിൽ രേഖപ്പെടുത്തി തദ്ദേശ സ്ഥാപനത്തിന് പരാതി അയക്കുക.'
+        : 'Submit geo-located civic problem with photograph directly to Grama Panchayat.',
       href: '/citizen/grievance',
-      badge: 'Public Helpdesk',
+      badge: isMl ? 'പൗര സഹായം' : 'Public Helpdesk',
     },
     {
       id: 'srv_shelter',
-      title: 'Emergency Flood Relief Shelters & Routes',
+      title: isMl
+        ? 'അടിയന്തര ദുരിതാശ്വാസ ക്യാമ്പുകളും ഒഴിപ്പിക്കൽ പാതകളും'
+        : 'Emergency Flood Relief Shelters & Routes',
       category: 'evacuation',
-      categoryLabel: CATEGORY_LABELS.evacuation,
-      description: 'Find nearest designated KSDMA emergency shelter and high-ground evacuation path.',
+      categoryLabel: catLabels.evacuation,
+      description: isMl
+        ? 'ഏറ്റവും അടുത്തുള്ള KSDMA ദുരിതാശ്വാസ ക്യാമ്പും സുരക്ഷിത പാതയും കണ്ടെത്തുക.'
+        : 'Find nearest designated KSDMA emergency shelter and high-ground evacuation path.',
       href: '/citizen/hazard',
-      badge: 'Disaster Safety',
+      badge: isMl ? 'ദുരന്ത സുരക്ഷ' : 'Disaster Safety',
     },
   ];
 
@@ -193,10 +242,12 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
     ) {
       results.push({
         id: `asset_${a.id}`,
-        title: a.name_en,
+        title: isMl ? a.name_ml || a.name_en : a.name_en,
         category: 'asset',
-        categoryLabel: CATEGORY_LABELS.asset,
-        description: `Condition: ${a.condition.toUpperCase()} · Ward ${a.ward_id} · Maintained: ${a.last_maintained}`,
+        categoryLabel: catLabels.asset,
+        description: isMl
+          ? `അവസ്ഥ: ${a.condition.toUpperCase()} · വാർഡ് ${a.ward_id} · പരിശോധിച്ചത്: ${a.last_maintained}`
+          : `Condition: ${a.condition.toUpperCase()} · Ward ${a.ward_id} · Maintained: ${a.last_maintained}`,
         href: role === 'president' ? `/president/assets` : `/shared/assets`,
         badge: a.condition.toUpperCase(),
         isPresidentOnly: false,
@@ -214,10 +265,12 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
     ) {
       results.push({
         id: `proj_${p.id}`,
-        title: p.title_en,
+        title: isMl ? p.title_ml || p.title_en : p.title_en,
         category: 'project',
-        categoryLabel: CATEGORY_LABELS.project,
-        description: `Category: ${p.category.toUpperCase()} · Budget: ₹${p.budget_lakhs}L · Status: ${p.status.toUpperCase()} (Ward ${p.ward_id})`,
+        categoryLabel: catLabels.project,
+        description: isMl
+          ? `വിഭാഗം: ${p.category.toUpperCase()} · ബജറ്റ്: ₹${p.budget_lakhs}L · അവസ്ഥ: ${p.status.toUpperCase()} (വാർഡ് ${p.ward_id})`
+          : `Category: ${p.category.toUpperCase()} · Budget: ₹${p.budget_lakhs}L · Status: ${p.status.toUpperCase()} (Ward ${p.ward_id})`,
         href: role === 'president' ? `/president/promises` : `/citizen/ward`,
         badge: p.status.toUpperCase(),
         isPresidentOnly: false,
@@ -228,25 +281,33 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
   // 7. PRESIDENT-ONLY SEARCH ITEMS (Strictly filtered out for Citizens)
   if (role === 'president') {
     // Budget Simulations & Fiscal Scenarios
-    const budgetMatches = [
+    const budgetMatches: SearchResultItem[] = [
       {
         id: 'budget_shift',
-        title: 'Fiscal Equity Budget Simulation Sandbox',
-        category: 'budget' as SearchCategory,
-        categoryLabel: CATEGORY_LABELS.budget,
-        description: 'Simulate reallocating developmental funds between wards to optimize Panchayat PDI.',
+        title: isMl
+          ? 'ബജറ്റ് പുനർവിന്യാസ സിമുലേഷൻ സാൻഡ്‌ബോക്സ്'
+          : 'Fiscal Equity Budget Simulation Sandbox',
+        category: 'budget',
+        categoryLabel: catLabels.budget,
+        description: isMl
+          ? 'പി.ഡി.ഐ വർദ്ധിപ്പിക്കുന്നതിനായി വാർഡുകൾക്കിടയിൽ ഫണ്ട് പുനർവിഭജനം ചെയ്യുക.'
+          : 'Simulate reallocating developmental funds between wards to optimize Panchayat PDI.',
         href: '/president/budget',
-        badge: 'Fiscal Admin',
+        badge: isMl ? 'ധനകാര്യം' : 'Fiscal Admin',
         isPresidentOnly: true,
       },
       {
         id: 'equity_matrix',
-        title: 'Ward Equity 4-Quadrant Priority Matrix',
-        category: 'budget' as SearchCategory,
-        categoryLabel: CATEGORY_LABELS.budget,
-        description: 'PDI vs per-capita expenditure correlation identifying high-need intervention wards.',
+        title: isMl
+          ? 'വാർഡ് വികസന സമത്വ 4-ക്വാഡ്രന്റ് മുൻഗണനാ മാട്രിക്സ്'
+          : 'Ward Equity 4-Quadrant Priority Matrix',
+        category: 'budget',
+        categoryLabel: catLabels.budget,
+        description: isMl
+          ? 'പി.ഡി.ഐയും ആളോഹരി ചെലവും താരതമ്യം ചെയ്ത് കൂടുതൽ ഇടപെടൽ ആവശ്യമുള്ള വാർഡുകൾ കണ്ടെത്തുക.'
+          : 'PDI vs per-capita expenditure correlation identifying high-need intervention wards.',
         href: '/president/equity',
-        badge: 'Analytics',
+        badge: isMl ? 'അനലിറ്റിക്സ്' : 'Analytics',
         isPresidentOnly: true,
       },
     ];
@@ -261,16 +322,21 @@ export function searchSystem(query: string, role: UserRole): SearchResultItem[] 
     grievancesData.forEach((g) => {
       if (
         g.description_en.toLowerCase().includes(clean) ||
+        g.description_ml.toLowerCase().includes(clean) ||
         g.category.toLowerCase().includes(clean) ||
         g.id.toLowerCase().includes(clean)
       ) {
         results.push({
           id: `grievance_${g.id}`,
-          title: `Grievance ${g.id} (${g.category.toUpperCase()})`,
+          title: isMl
+            ? `പരാതി ${g.id} (${g.category.toUpperCase()})`
+            : `Grievance ${g.id} (${g.category.toUpperCase()})`,
           category: 'grievance',
-          categoryLabel: CATEGORY_LABELS.grievance,
-          description: `Filed in Ward ${g.ward_id} · Assigned to ${g.assigned_dept} · Status: ${g.status.toUpperCase()}`,
-          href: `/president/assets`,
+          categoryLabel: catLabels.grievance,
+          description: isMl
+            ? `വാർഡ് ${g.ward_id} · വിഭാഗം: ${g.assigned_dept} · അവസ്ഥ: ${g.status.toUpperCase()}`
+            : `Filed in Ward ${g.ward_id} · Assigned to ${g.assigned_dept} · Status: ${g.status.toUpperCase()}`,
+          href: `/president/grievances`,
           badge: g.status.toUpperCase(),
           isPresidentOnly: true,
         });

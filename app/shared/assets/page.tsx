@@ -19,7 +19,13 @@ import { getWards, getAssets } from '@/lib/api';
 import { Ward, Asset } from '@/lib/types';
 
 export default function SharedAssetRegisterPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const {
+    t,
+    getLocalizedName,
+    getLocalizedCondition,
+    getLocalizedType,
+  } = useTranslation();
+
   const [wards, setWards] = useState<Ward[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedWardId, setSelectedWardId] = useState<number>(0);
@@ -70,7 +76,7 @@ export default function SharedAssetRegisterPage() {
               {t('nav_shared_assets')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              S1 Shared Public Asset Transparency Register · Sanchaya & IKM Custody Records
+              {t('shared_assets_subtitle')}
             </p>
           </div>
         </div>
@@ -89,7 +95,7 @@ export default function SharedAssetRegisterPage() {
             <option value={0}>{t('all_wards')}</option>
             {wards.map((w) => (
               <option key={w.id} value={w.id}>
-                Ward {w.number}: {getLocalizedName(w)}
+                {t('ward_col_ward')} {w.number}: {getLocalizedName(w)}
               </option>
             ))}
           </select>
@@ -117,19 +123,19 @@ export default function SharedAssetRegisterPage() {
             className="w-full p-2 bg-slate-50 rounded-lg border border-slate-300 font-medium"
           >
             <option value="all">{t('all_types')}</option>
-            <option value="road">Road</option>
-            <option value="building">Building</option>
-            <option value="water_tank">Water Tank</option>
-            <option value="streetlight">Streetlight</option>
-            <option value="drainage">Drainage</option>
-            <option value="anganwadi">Anganwadi</option>
-            <option value="school">School</option>
-            <option value="phc">PHC / Health</option>
+            <option value="road">{t('type_road')}</option>
+            <option value="building">{t('type_building')}</option>
+            <option value="water_tank">{t('type_water_tank')}</option>
+            <option value="streetlight">{t('type_streetlight')}</option>
+            <option value="drainage">{t('type_drainage')}</option>
+            <option value="anganwadi">{t('type_anganwadi')}</option>
+            <option value="school">{t('type_school')}</option>
+            <option value="phc">{t('type_phc')}</option>
           </select>
         </div>
 
         <div className="flex-1 min-w-[180px]">
-          <label className="text-slate-600 block mb-1 font-medium">Search Asset:</label>
+          <label className="text-slate-600 block mb-1 font-medium">{t('search_asset')}</label>
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             <input
@@ -149,14 +155,14 @@ export default function SharedAssetRegisterPage() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
               <tr>
-                <th className="py-3 px-4">Asset ID</th>
-                <th className="py-3 px-4">Asset Name</th>
-                <th className="py-3 px-4">Ward</th>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Condition</th>
-                <th className="py-3 px-4">Last Maintained</th>
-                <th className="py-3 px-4">Custodian</th>
-                <th className="py-3 px-4 text-right">View</th>
+                <th className="py-3 px-4">{t('col_asset_id')}</th>
+                <th className="py-3 px-4">{t('col_name')}</th>
+                <th className="py-3 px-4">{t('col_ward')}</th>
+                <th className="py-3 px-4">{t('col_type')}</th>
+                <th className="py-3 px-4">{t('col_condition')}</th>
+                <th className="py-3 px-4">{t('col_last_maintained')}</th>
+                <th className="py-3 px-4">{t('custodian')}</th>
+                <th className="py-3 px-4 text-right">{t('view')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
@@ -184,10 +190,10 @@ export default function SharedAssetRegisterPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        Ward {ward?.number}: {ward ? getLocalizedName(ward) : ''}
+                        {t('ward_col_ward')} {ward?.number}: {ward ? getLocalizedName(ward) : ''}
                       </td>
                       <td className="py-3 px-4 uppercase font-semibold text-slate-600">
-                        {asset.type.replace('_', ' ')}
+                        {getLocalizedType(asset.type)}
                       </td>
                       <td className="py-3 px-4">
                         <span
@@ -199,7 +205,7 @@ export default function SharedAssetRegisterPage() {
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
-                          {asset.condition}
+                          {getLocalizedCondition(asset.condition)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-600">{asset.last_maintained}</td>
@@ -212,7 +218,7 @@ export default function SharedAssetRegisterPage() {
                           }}
                           className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-700 transition-colors font-semibold"
                         >
-                          View
+                          {t('view')}
                         </button>
                       </td>
                     </tr>
@@ -236,13 +242,13 @@ export default function SharedAssetRegisterPage() {
               <div className="flex items-start justify-between border-b border-slate-200 pb-4">
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Public Asset Register #{selectedAsset.id}
+                    {t('asset_drawer_title')} #{selectedAsset.id}
                   </div>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-0.5">
                     {getLocalizedName(selectedAsset)}
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Ward {selectedAsset.ward_id} · Custodian: {selectedAsset.owner}
+                    {t('ward_col_ward')} {selectedAsset.ward_id} · {t('custodian')} {selectedAsset.owner}
                   </p>
                 </div>
                 <button
@@ -256,11 +262,11 @@ export default function SharedAssetRegisterPage() {
 
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-slate-500 block">Condition</span>
-                  <strong className="text-sm uppercase block mt-1">{selectedAsset.condition}</strong>
+                  <span className="text-slate-500 block">{t('col_condition')}</span>
+                  <strong className="text-sm uppercase block mt-1">{getLocalizedCondition(selectedAsset.condition)}</strong>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-slate-500 block">Last Maintenance</span>
+                  <span className="text-slate-500 block">{t('col_last_maintained')}</span>
                   <strong className="text-sm block mt-1">{selectedAsset.last_maintained}</strong>
                 </div>
               </div>
@@ -268,7 +274,7 @@ export default function SharedAssetRegisterPage() {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Geographic Pin</span>
+                  <span>{t('geotagged_location')}</span>
                 </h4>
                 <InteractiveMap
                   center={[selectedAsset.lat, selectedAsset.lng]}
@@ -279,7 +285,7 @@ export default function SharedAssetRegisterPage() {
                       lat: selectedAsset.lat,
                       lng: selectedAsset.lng,
                       title: getLocalizedName(selectedAsset),
-                      category: selectedAsset.type,
+                      category: getLocalizedType(selectedAsset.type),
                       color: '#2563eb',
                     },
                   ]}

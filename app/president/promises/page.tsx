@@ -16,7 +16,7 @@ import { getWards, getProjects } from '@/lib/api';
 import { Ward, GPDPProject, ProjectStatus } from '@/lib/types';
 
 export default function PromiseTrackerPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, getLocalizedCategory } = useTranslation();
   const [wards, setWards] = useState<Ward[]>([]);
   const [projects, setProjects] = useState<GPDPProject[]>([]);
   const [selectedWardId, setSelectedWardId] = useState<number>(0);
@@ -61,7 +61,7 @@ export default function PromiseTrackerPage() {
               {t('promise_title')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P6 Promise-vs-Delivery Traffic-Light Board · GPDP Execution & Delay Monitoring
+              {t('promises_subtitle')}
             </p>
           </div>
         </div>
@@ -81,14 +81,14 @@ export default function PromiseTrackerPage() {
             <option value={0}>{t('all_wards')}</option>
             {wards.map((w) => (
               <option key={w.id} value={w.id}>
-                Ward {w.number}: {getLocalizedName(w)}
+                {t('ward_col_ward')} {w.number}: {getLocalizedName(w)}
               </option>
             ))}
           </select>
         </div>
 
         <div className="text-xs text-slate-500">
-          Showing <strong>{filteredProjects.length}</strong> GPDP projects
+          {t('showing_projects')} <strong>{filteredProjects.length}</strong> {t('gpdp_projects_count')}
         </div>
       </div>
 
@@ -117,18 +117,18 @@ export default function PromiseTrackerPage() {
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-bold text-xs text-slate-900">{getLocalizedName(proj)}</h4>
                     <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                      Done
+                      {t('done_status')}
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Ward {ward?.number}: {ward ? getLocalizedName(ward) : ''} · Category: <span className="capitalize">{proj.category}</span>
+                    {t('ward_col_ward')} {ward?.number}: {ward ? getLocalizedName(ward) : ''} · {t('category')}: {getLocalizedCategory(proj.category)}
                   </div>
                   <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 text-slate-600">
-                    <span>Budget: <strong>₹{proj.budget_lakhs}L</strong></span>
-                    <span className="text-emerald-700 font-bold">Spent: ₹{proj.spent_lakhs}L</span>
+                    <span>{t('budget_label')}: <strong>₹{proj.budget_lakhs}L</strong></span>
+                    <span className="text-emerald-700 font-bold">{t('spent_label')}: ₹{proj.spent_lakhs}L</span>
                   </div>
                   <div className="text-[10px] text-slate-400">
-                    Delivered: {proj.end_date}
+                    {t('delivered')} {proj.end_date}
                   </div>
                 </div>
               );
@@ -159,18 +159,18 @@ export default function PromiseTrackerPage() {
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-bold text-xs text-slate-900">{getLocalizedName(proj)}</h4>
                     <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
-                      Active
+                      {t('active_status')}
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Ward {ward?.number}: {ward ? getLocalizedName(ward) : ''} · Category: <span className="capitalize">{proj.category}</span>
+                    {t('ward_col_ward')} {ward?.number}: {ward ? getLocalizedName(ward) : ''} · {t('category')}: {getLocalizedCategory(proj.category)}
                   </div>
                   <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 text-slate-600">
-                    <span>Budget: <strong>₹{proj.budget_lakhs}L</strong></span>
-                    <span className="text-amber-800 font-bold">Spent: ₹{proj.spent_lakhs}L</span>
+                    <span>{t('budget_label')}: <strong>₹{proj.budget_lakhs}L</strong></span>
+                    <span className="text-amber-800 font-bold">{t('spent_label')}: ₹{proj.spent_lakhs}L</span>
                   </div>
                   <div className="text-[10px] text-slate-400">
-                    Target End: {proj.end_date}
+                    {t('target_end')} {proj.end_date}
                   </div>
                 </div>
               );
@@ -205,14 +205,14 @@ export default function PromiseTrackerPage() {
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Ward {ward?.number}: {ward ? getLocalizedName(ward) : ''} · Category: <span className="capitalize">{proj.category}</span>
+                    {t('ward_col_ward')} {ward?.number}: {ward ? getLocalizedName(ward) : ''} · {t('category')}: {getLocalizedCategory(proj.category)}
                   </div>
                   <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 text-slate-600">
-                    <span>Budget: <strong>₹{proj.budget_lakhs}L</strong></span>
-                    <span className="text-red-700 font-bold">Spent: ₹{proj.spent_lakhs}L</span>
+                    <span>{t('budget_label')}: <strong>₹{proj.budget_lakhs}L</strong></span>
+                    <span className="text-red-700 font-bold">{t('spent_label')}: ₹{proj.spent_lakhs}L</span>
                   </div>
                   <div className="text-[10px] text-red-700 font-medium">
-                    Scheduled completion was {proj.end_date}
+                    {t('scheduled_completion_was')} {proj.end_date}
                   </div>
                 </div>
               );

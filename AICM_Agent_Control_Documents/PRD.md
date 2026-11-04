@@ -1,12 +1,12 @@
 # Product Requirements Document (PRD)
 ## Grama Panchayat Digital Twin Demo Portal — AICM
 
-**Document status:** Baseline / scope-control document  
-**Product:** Grama Panchayat Digital Twin Demo Portal (Web + Mobile PWA)  
-**Demo Panchayat:** Thekkumpuram Grama Panchayat (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്)  
-**District:** Kozhikode  
-**Assembly Constituency:** Kunnamangalam  
-**Data status:** Fictional demonstration data only  
+**Document status:** Baseline / scope-control document
+**Product:** Grama Panchayat Digital Twin Demo Portal (Web + Mobile PWA)
+**Demo Panchayat:** Kunnamangalam Constituency (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്)
+**District:** Kozhikode
+**Assembly Constituency:** Kunnamangalam
+**Data status:** Fictional demonstration data only
 **Last verified label required by the supplied build brief:** `2026-10-30`
 
 ---
@@ -58,7 +58,7 @@ Use exactly these values. Do not invent an alternative Panchayat identity.
 
 | Field | Required value |
 |---|---|
-| Panchayat | Thekkumpuram Grama Panchayat |
+| Panchayat | Kunnamangalam Constituency |
 | Malayalam | തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത് |
 | District | Kozhikode |
 | Assembly Constituency | Kunnamangalam |

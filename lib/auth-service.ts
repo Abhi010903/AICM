@@ -91,7 +91,7 @@ const RATE_LIMIT_COOLDOWN_MS = 30 * 1000; // 30 seconds
  * In a production architecture, this allowlist is maintained and checked strictly on the server.
  */
 export const AUTHORIZED_PRESIDENT_NUMBERS: readonly string[] = [
-  '9447100001', // Official President Mobile (Thekkumpuram Grama Panchayat)
+  '9447100001', // Official President Mobile (Kunnamangalam Constituency)
   '9847012345', // Alternate President Demonstration Mobile
 ];
 

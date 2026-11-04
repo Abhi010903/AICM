@@ -60,7 +60,7 @@ export const KLogo: React.FC<KLogoProps> = ({
               textVariant === 'light' ? 'text-white' : 'text-[#102542]'
             }`}
           >
-            AICM <span className={`${textVariant === 'light' ? 'text-coconut-400' : 'text-emerald-700'} font-extrabold font-sans`}>TWIN</span>
+            Constituency <span className={`${textVariant === 'light' ? 'text-coconut-400' : 'text-emerald-700'} font-extrabold font-sans`}>Digital Twin</span>
           </div>
           <div
             className={`font-semibold tracking-wider uppercase mt-1 ${dim.sub} ${

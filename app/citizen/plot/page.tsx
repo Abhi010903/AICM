@@ -8,10 +8,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  FileText,
-  Compass,
   ArrowRight,
-  ShieldAlert,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 import { SourceChip } from '@/components/common/SourceChip';
@@ -24,6 +21,7 @@ function MyPlotContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const isMl = language === 'ml';
   const initialSurvey = searchParams.get('survey') || '412/2';
   const [searchInput, setSearchInput] = useState<string>(initialSurvey);
   const [currentParcel, setCurrentParcel] = useState<LandParcel | null>(null);
@@ -60,10 +58,14 @@ function MyPlotContent() {
       if (found) {
         setCurrentParcel(found);
       } else {
-        setErrorMsg(`Survey parcel "${searchInput}" was not found in demo records.`);
+        setErrorMsg(
+          isMl
+            ? `സർവേ നമ്പർ "${searchInput}" ഡെമോ രേഖകളിൽ കണ്ടെത്താനായില്ല.`
+            : `Survey parcel "${searchInput}" was not found in demo records.`
+        );
       }
-    } catch (err) {
-      setErrorMsg('Error searching for parcel.');
+    } catch {
+      setErrorMsg(isMl ? 'തിരയുന്നതിൽ പിശകുണ്ടായി.' : 'Error searching for parcel.');
     } finally {
       setLoading(false);
     }
@@ -97,7 +99,9 @@ function MyPlotContent() {
               : currentParcel.classification === 'wetland'
               ? '#ca8a04'
               : '#2563eb',
-          label: `Survey No: ${currentParcel.survey_number} · ${currentParcel.classification.toUpperCase()}`,
+          label: isMl
+            ? `സർവേ ${currentParcel.survey_number} · ${currentParcel.classification}`
+            : `Survey No: ${currentParcel.survey_number} · ${currentParcel.classification.toUpperCase()}`,
           fillOpacity: 0.55,
         },
       ]
@@ -113,7 +117,9 @@ function MyPlotContent() {
               {t('nav_my_plot')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              C1 My Plot on the Map · Ente Bhoomi & ReLIS Cadastral Records
+              {isMl
+                ? 'C1 എന്റെ ഭൂമി ഭൂപടത്തിൽ · എന്റെ ഭൂമി & റീലിസ് കഡാസ്ട്രൽ രേഖകൾ'
+                : 'C1 My Plot on the Map · Ente Bhoomi & ReLIS Cadastral Records'}
             </p>
           </div>
         </div>
@@ -123,14 +129,22 @@ function MyPlotContent() {
       {/* Walkthrough Tip */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 6):</span> Search for survey number{' '}
-          <strong>412/2</strong> to view the plain-language cadastral rights for the same parcel evaluated in MLA Siting.
+          <span className="font-bold">{isMl ? 'ഡെമോ പാത (ഘട്ടം 6):' : 'Reviewer Script (Step 6):'}</span>{' '}
+          {isMl ? (
+            <>
+              എംഎൽഎ സൈറ്റിംഗിൽ പരിശോധിച്ച അതേ ഭൂമിയുടെ അവകാശങ്ങൾ ലളിതമായ ഭാഷയിൽ കാണാൻ സർവേ നമ്പർ <strong>412/2</strong> തിരയുക.
+            </>
+          ) : (
+            <>
+              Search for survey number <strong>412/2</strong> to view the plain-language cadastral rights for the same parcel evaluated in MLA Siting.
+            </>
+          )}
         </div>
         <button
           onClick={() => handleSelectDemoParcel('412/2')}
           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-[11px] ml-2 flex-shrink-0"
         >
-          Load 412/2
+          {isMl ? '412/2 കാണുക' : 'Load 412/2'}
         </button>
       </div>
 
@@ -143,7 +157,11 @@ function MyPlotContent() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Enter Survey Number (e.g., 412/2, 316/3, 324/4)..."
+              placeholder={
+                isMl
+                  ? 'സർവേ നമ്പർ നൽകുക (ഉദാ: 412/2, 316/3, 324/4)...'
+                  : 'Enter Survey Number (e.g., 412/2, 316/3, 324/4)...'
+              }
               className="w-full pl-9 p-2.5 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
@@ -158,7 +176,7 @@ function MyPlotContent() {
 
         {/* Quick Demo Parcel Chips */}
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
-          <span className="text-slate-500 font-semibold">Demo Parcels:</span>
+          <span className="text-slate-500 font-semibold">{isMl ? 'മാതൃകാ നമ്പറുകൾ:' : 'Demo Parcels:'}</span>
           {allParcels.slice(0, 6).map((p) => (
             <button
               key={p.survey_number}
@@ -189,10 +207,14 @@ function MyPlotContent() {
             <div className="flex items-center justify-between text-xs">
               <h3 className="font-bold text-slate-900 flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" />
-                <span>Cadastral Polygon & Bounding Coordinates</span>
+                <span>
+                  {isMl ? 'കഡാസ്ട്രൽ അതിർത്തിയും കോർഡിനേറ്റുകളും' : 'Cadastral Polygon & Bounding Coordinates'}
+                </span>
               </h3>
               <span className="font-mono text-slate-500">
-                Village: {currentParcel.village_en} · Ward {currentParcel.ward_id}
+                {isMl
+                  ? `വില്ലേജ്: ${currentParcel.village_ml} · വാർഡ് ${currentParcel.ward_id}`
+                  : `Village: ${currentParcel.village_en} · Ward ${currentParcel.ward_id}`}
               </span>
             </div>
 
@@ -204,12 +226,16 @@ function MyPlotContent() {
             />
 
             <div className="flex items-center justify-between pt-1 text-[11px] text-slate-500">
-              <span>GeoJSON Boundary Layer · Ente Bhoomi Cadastral Grid</span>
+              <span>
+                {isMl
+                  ? 'എന്റെ ഭൂമി കഡാസ്ട്രൽ അതിർത്തി രേഖ'
+                  : 'GeoJSON Boundary Layer · Ente Bhoomi Cadastral Grid'}
+              </span>
               <button
                 onClick={() => router.push(`/citizen/build-check?survey=${currentParcel.survey_number}`)}
                 className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
               >
-                <span>Check Building Permission</span>
+                <span>{t('check_building_permission')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -222,10 +248,12 @@ function MyPlotContent() {
               <div className="border-b border-slate-200 pb-2 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                    Cadastral Record
+                    {t('cadastral_record')}
                   </span>
                   <h3 className="text-xl font-extrabold text-slate-900">
-                    Survey {currentParcel.survey_number}
+                    {isMl
+                      ? `സർവേ ${currentParcel.survey_number}`
+                      : `Survey ${currentParcel.survey_number}`}
                   </h3>
                 </div>
 
@@ -238,19 +266,21 @@ function MyPlotContent() {
                       : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                   }`}
                 >
-                  {currentParcel.classification}
+                  {t(`class_${currentParcel.classification}`)}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                  <span className="text-slate-500 block">Total Area</span>
-                  <strong className="text-slate-900">{currentParcel.area_cents} Cents</strong>
+                  <span className="text-slate-500 block">{t('total_area')}</span>
+                  <strong className="text-slate-900">
+                    {currentParcel.area_cents} {t('cents')}
+                  </strong>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                  <span className="text-slate-500 block">Hazard Exposure</span>
+                  <span className="text-slate-500 block">{t('hazard_exposure')}</span>
                   <strong className="text-amber-700 uppercase">
-                    {currentParcel.hazard_zone}
+                    {t(`hazard_${currentParcel.hazard_zone}`)}
                   </strong>
                 </div>
               </div>
@@ -260,10 +290,10 @@ function MyPlotContent() {
             <div className="bg-emerald-50/80 p-4 rounded-xl border border-emerald-200 text-xs space-y-2">
               <h4 className="font-bold text-emerald-950 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>What You Can Do Here</span>
+                <span>{t('plot_what_you_can_do')}</span>
               </h4>
               <ul className="space-y-1.5 pl-2">
-                {(language === 'ml'
+                {(isMl
                   ? currentParcel.permitted_activities_ml
                   : currentParcel.permitted_activities_en
                 ).map((act, i) => (
@@ -279,10 +309,10 @@ function MyPlotContent() {
             <div className="bg-red-50/80 p-4 rounded-xl border border-red-200 text-xs space-y-2">
               <h4 className="font-bold text-red-950 flex items-center gap-1.5">
                 <XCircle className="w-4 h-4 text-red-600" />
-                <span>Restricted / Prohibited Actions</span>
+                <span>{t('plot_restricted_actions')}</span>
               </h4>
               <ul className="space-y-1.5 pl-2">
-                {(language === 'ml'
+                {(isMl
                   ? currentParcel.restricted_activities_ml
                   : currentParcel.restricted_activities_en
                 ).map((act, i) => (
@@ -301,8 +331,9 @@ function MyPlotContent() {
 }
 
 export default function MyPlotPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading plot...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">{t('loading')}</div>}>
       <MyPlotContent />
     </Suspense>
   );

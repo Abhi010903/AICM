@@ -69,7 +69,7 @@ export const Header: React.FC = () => {
             ) : (
               <div className="hidden md:flex items-center gap-2 text-xs text-coconut-300/80 font-medium">
                 <span className="w-2 h-2 rounded-full bg-coconut-500 animate-pulse" />
-                <span>Thekkumpuram Grama Panchayat Digital Twin</span>
+                <span>{t('app_brand')}</span>
               </div>
             )}
 
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
                       <Users className="w-3.5 h-3.5 text-emerald-400" />
                     )}
                     <span>
-                      {isPresident ? 'MLA' : session?.citizenAlias || 'Citizen'}
+                      {isPresident ? t('role_president') : session?.citizenAlias || t('role_citizen')}
                     </span>
                     {session?.district && (
                       <span className="text-[10px] text-slate-400 ml-0.5">
@@ -105,18 +105,18 @@ export const Header: React.FC = () => {
                     <button
                       onClick={exitPreviewMode}
                       className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white transition-colors"
-                      title="Return to MLA Dashboard"
+                      title={t('nav_return_president')}
                     >
                       <Eye className="w-3 h-3" />
-                      <span>Exit Preview</span>
+                      <span>{t('nav_exit_preview')}</span>
                     </button>
                   )}
 
                   {/* Sign Out */}
                   <button
                     onClick={logout}
-                    aria-label="Sign Out"
-                    title="Sign Out"
+                    aria-label={t('auth_signout')}
+                    title={t('auth_signout')}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
@@ -130,14 +130,14 @@ export const Header: React.FC = () => {
                     className="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>MLA Login</span>
+                    <span>{t('auth_president_login')}</span>
                   </Link>
                   <Link
                     href="/auth/citizen"
                     className="px-3 py-1.5 rounded-lg text-xs font-bold bg-coconut-700 hover:bg-coconut-600 text-white transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <Users className="w-3.5 h-3.5" />
-                    <span>Citizen Portal</span>
+                    <span>{t('auth_citizen_portal')}</span>
                   </Link>
                 </div>
               )}
@@ -196,9 +196,9 @@ export const Header: React.FC = () => {
             {isAuthenticated ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
-                  <span className="text-slate-400">Signed In As:</span>
+                  <span className="text-slate-400">{t('signed_in_as')}</span>
                   <span className="font-bold text-white">
-                    {isPresident ? 'MLA' : session?.citizenAlias || 'Citizen'}
+                    {isPresident ? t('role_president') : session?.citizenAlias || t('role_citizen')}
                   </span>
                 </div>
                 {isPreviewMode && (
@@ -210,7 +210,7 @@ export const Header: React.FC = () => {
                     className="w-full py-2 bg-amber-600 text-white font-bold rounded text-xs flex items-center justify-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    <span>Return to MLA Dashboard</span>
+                    <span>{t('nav_return_president')}</span>
                   </button>
                 )}
                 <button
@@ -221,7 +221,7 @@ export const Header: React.FC = () => {
                   className="w-full py-2 bg-red-950 text-red-200 border border-red-800 font-bold rounded text-xs flex items-center justify-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign Out</span>
+                  <span>{t('auth_signout')}</span>
                 </button>
               </div>
             ) : (
@@ -231,14 +231,14 @@ export const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2.5 rounded bg-blue-600 text-white text-xs font-bold text-center"
                 >
-                  MLA Login
+                  {t('auth_president_login')}
                 </Link>
                 <Link
                   href="/auth/citizen"
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2.5 rounded bg-coconut-700 text-white text-xs font-bold text-center"
                 >
-                  Citizen Portal
+                  {t('auth_citizen_portal')}
                 </Link>
               </div>
             )}

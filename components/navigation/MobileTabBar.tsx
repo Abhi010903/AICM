@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Compass, AlertCircle, Building, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { useTranslation } from '@/lib/i18n';
 
 export const MobileTabBar: React.FC = () => {
   const pathname = usePathname();
   const { isAuthenticated, role } = useAuth();
+  const { t } = useTranslation();
 
   const isPublicPage = pathname === '/' || pathname.startsWith('/auth');
   if (!isAuthenticated || isPublicPage) {
@@ -19,18 +21,18 @@ export const MobileTabBar: React.FC = () => {
 
   const tabs = isPresident
     ? [
-        { href: '/president', label: 'Overview', icon: Home },
-        { href: '/president/wards', label: 'Wards', icon: BarChart3 },
-        { href: '/president/siting', label: 'Siting', icon: Compass },
-        { href: '/president/assets', label: 'Assets', icon: Building },
-        { href: '/president/hazard', label: 'Hazard', icon: AlertCircle },
+        { href: '/president', label: t('tab_overview'), icon: Home },
+        { href: '/president/wards', label: t('tab_wards'), icon: BarChart3 },
+        { href: '/president/siting', label: t('tab_siting'), icon: Compass },
+        { href: '/president/assets', label: t('tab_assets'), icon: Building },
+        { href: '/president/hazard', label: t('tab_hazard'), icon: AlertCircle },
       ]
     : [
-        { href: '/citizen', label: 'Home', icon: Home },
-        { href: '/citizen/plot', label: 'My Plot', icon: Compass },
-        { href: '/citizen/build-check', label: 'Build', icon: BarChart3 },
-        { href: '/citizen/facilities', label: 'Services', icon: Building },
-        { href: '/citizen/grievance', label: 'Report', icon: AlertCircle },
+        { href: '/citizen', label: t('tab_home'), icon: Home },
+        { href: '/citizen/plot', label: t('tab_plot'), icon: Compass },
+        { href: '/citizen/build-check', label: t('tab_build'), icon: BarChart3 },
+        { href: '/citizen/facilities', label: t('tab_services'), icon: Building },
+        { href: '/citizen/grievance', label: t('tab_report'), icon: AlertCircle },
       ];
 
   return (

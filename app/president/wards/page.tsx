@@ -23,7 +23,7 @@ import { Ward, GPDPProject, Asset, Grievance } from '@/lib/types';
 type SortField = 'number' | 'population' | 'pdi_score' | 'spend_lakhs' | 'open_grievances';
 
 export default function WardLedgerPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, getLocalizedStatus } = useTranslation();
   const router = useRouter();
   const [wards, setWards] = useState<Ward[]>([]);
   const [projects, setProjects] = useState<GPDPProject[]>([]);
@@ -104,7 +104,7 @@ export default function WardLedgerPage() {
               {t('nav_wards')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              M1 Governance Ledger · 4-Stage Traceability (Promise → Spend → Asset → Outcome)
+              {t('wards_subtitle')}
             </p>
           </div>
         </div>
@@ -113,9 +113,9 @@ export default function WardLedgerPage() {
 
       {/* Sorting instructions pill */}
       <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-100 p-2.5 rounded-lg border border-slate-200">
-        <span className="font-semibold text-slate-800">Walkthrough Tip:</span>
+        <span className="font-semibold text-slate-800">{t('walkthrough_tip_title')}</span>
         <span>
-          Click table headers to sort. Click any row (e.g., <strong>Ward 7 Cheruvannur</strong>) to open the 4-stage lifecycle drawer.
+          {t('wards_walkthrough_tip')}
         </span>
       </div>
 
@@ -172,7 +172,7 @@ export default function WardLedgerPage() {
                     <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                   </div>
                 </th>
-                <th className="py-3 px-4 text-right">Action</th>
+                <th className="py-3 px-4 text-right">{t('action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
@@ -194,10 +194,10 @@ export default function WardLedgerPage() {
                   >
                     <td className="py-3 px-4">
                       <div className="font-bold text-slate-900">
-                        Ward {w.number}: {getLocalizedName(w)}
+                        {t('ward_col_ward')} {w.number}: {getLocalizedName(w)}
                       </div>
                       <div className="text-[11px] text-slate-500 font-normal">
-                        {w.households} households
+                        {w.households} {t('households')}
                       </div>
                     </td>
                     <td className="py-3 px-4 text-slate-800">{w.population.toLocaleString()}</td>
@@ -217,17 +217,17 @@ export default function WardLedgerPage() {
                     <td className="py-3 px-4 text-emerald-800 font-bold">₹{w.spend_lakhs}L</td>
                     <td className="py-3 px-4">
                       <span className="font-semibold text-slate-800">{pStat.done}</span>
-                      <span className="text-slate-400">/{pStat.total} done</span>
+                      <span className="text-slate-400">/{pStat.total} {t('done_status')}</span>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1 font-mono text-[11px]">
-                        <span className="text-emerald-700 bg-emerald-50 px-1 rounded" title="Good">
+                        <span className="text-emerald-700 bg-emerald-50 px-1 rounded" title={t('cond_good')}>
                           {aStat.good}G
                         </span>
-                        <span className="text-amber-700 bg-amber-50 px-1 rounded" title="Fair">
+                        <span className="text-amber-700 bg-amber-50 px-1 rounded" title={t('cond_fair')}>
                           {aStat.fair}F
                         </span>
-                        <span className="text-red-700 bg-red-50 px-1 rounded font-bold" title="Poor">
+                        <span className="text-red-700 bg-red-50 px-1 rounded font-bold" title={t('cond_poor')}>
                           {aStat.poor}P
                         </span>
                       </div>
@@ -274,13 +274,13 @@ export default function WardLedgerPage() {
               <div className="flex items-start justify-between border-b border-slate-200 pb-4">
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                    M1 Governance Ledger · Ward Detail
+                    {t('ward_drawer_title')}
                   </div>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-0.5">
-                    Ward {selectedWard.number}: {getLocalizedName(selectedWard)}
+                    {t('ward_col_ward')} {selectedWard.number}: {getLocalizedName(selectedWard)}
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Population: {selectedWard.population.toLocaleString()} · Households: {selectedWard.households} · PDI Score: {selectedWard.pdi_score}/100
+                    {t('ward_col_pop')}: {selectedWard.population.toLocaleString()} · {t('households')}: {selectedWard.households} · {t('ward_col_pdi')}: {selectedWard.pdi_score}/100
                   </p>
                 </div>
                 <button
@@ -306,10 +306,10 @@ export default function WardLedgerPage() {
                       <span>{t('timeline_promise')}</span>
                     </div>
                     <div className="text-sm font-extrabold text-slate-900">
-                      {getWardProjectsStat(selectedWard.id).total} Works
+                      {getWardProjectsStat(selectedWard.id).total} {t('works_count_suffix')}
                     </div>
                     <div className="text-[10px] text-slate-500">
-                      eGramSwaraj GPDP Plan
+                      {t('egramswaraj_plan_sub')}
                     </div>
                   </div>
 
@@ -323,7 +323,7 @@ export default function WardLedgerPage() {
                       ₹{selectedWard.spend_lakhs}L
                     </div>
                     <div className="text-[10px] text-slate-500">
-                      Treasury Disbursement
+                      {t('treasury_disbursement_sub')}
                     </div>
                   </div>
 
@@ -334,10 +334,10 @@ export default function WardLedgerPage() {
                       <span>{t('timeline_asset')}</span>
                     </div>
                     <div className="text-sm font-extrabold text-slate-900">
-                      {getWardAssetsStat(selectedWard.id).total} Assets
+                      {getWardAssetsStat(selectedWard.id).total} {t('assets_count_suffix')}
                     </div>
                     <div className="text-[10px] text-slate-500">
-                      Sanchaya / IKM Registry
+                      {t('sanchaya_registry_sub')}
                     </div>
                   </div>
 
@@ -351,7 +351,7 @@ export default function WardLedgerPage() {
                       {selectedWard.pdi_score} PDI
                     </div>
                     <div className="text-[10px] text-slate-500">
-                      9 Theme Composite Score
+                      {t('composite_score_sub')}
                     </div>
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export default function WardLedgerPage() {
 
               {/* SDG 7-Themes Breakdown */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-700">SDG Scorecard (Localised Goals)</h4>
+                <h4 className="text-xs font-bold text-slate-700">{t('sdg_scorecard')}</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   {Object.entries(selectedWard.sdg_scores).map(([goal, score]) => (
                     <div key={goal} className="p-2 bg-slate-50 rounded border border-slate-200">
@@ -373,9 +373,9 @@ export default function WardLedgerPage() {
               {/* Ward Projects List */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-700">GPDP Projects in this Ward</h4>
+                  <h4 className="text-xs font-bold text-slate-700">{t('gpdp_projects_in_ward')}</h4>
                   <span className="text-[11px] text-slate-500">
-                    Source: eGramSwaraj
+                    {t('source_egramswaraj')}
                   </span>
                 </div>
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -387,7 +387,7 @@ export default function WardLedgerPage() {
                       <div>
                         <div className="font-bold text-slate-900">{getLocalizedName(proj)}</div>
                         <div className="text-[11px] text-slate-500">
-                          Budget: ₹{proj.budget_lakhs}L · Spent: ₹{proj.spent_lakhs}L
+                          {t('budget_label')}: ₹{proj.budget_lakhs}L · {t('spent_label')}: ₹{proj.spent_lakhs}L
                         </div>
                       </div>
                       <span
@@ -399,7 +399,7 @@ export default function WardLedgerPage() {
                             : 'bg-amber-100 text-amber-800'
                         }`}
                       >
-                        {proj.status}
+                        {getLocalizedStatus(proj.status)}
                       </span>
                     </div>
                   ))}
@@ -419,7 +419,7 @@ export default function WardLedgerPage() {
                 onClick={() => router.push(`/president/assets?ward=${selectedWard.id}`)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow transition-all"
               >
-                <span>Filter Ward {selectedWard.number} Assets</span>
+                <span>{t('filter_ward_assets_btn')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

@@ -1,7 +1,7 @@
 {
-  "name": "Thekkumpuram Grama Panchayat Digital Twin",
+  "name": "Kunnamangalam Constituency Digital Twin",
   "short_name": "PanchayatTwin",
-  "description": "Decision intelligence and citizen services portal for Thekkumpuram Grama Panchayat",
+  "description": "Decision intelligence and citizen services portal for Kunnamangalam Constituency",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

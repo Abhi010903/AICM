@@ -19,7 +19,9 @@ import { Ward, LandParcel, HazardZoneCollection, SitingEvaluation } from '@/lib/
 import { evaluateSitingCompliance } from '@/lib/siting-rules';
 
 export default function SitingCompliancePage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, language } = useTranslation();
+  const isMl = language === 'ml';
+
   const [wards, setWards] = useState<Ward[]>([]);
   const [parcels, setParcels] = useState<LandParcel[]>([]);
   const [hazardZones, setHazardZones] = useState<HazardZoneCollection | null>(null);
@@ -101,7 +103,7 @@ export default function SitingCompliancePage() {
         id: hz.properties.id,
         coordinates: hz.geometry.coordinates,
         color: hz.properties.color,
-        label: `${hz.properties.name_en} (${hz.properties.severity})`,
+        label: `${isMl ? hz.properties.name_ml : hz.properties.name_en} (${hz.properties.severity})`,
         fillOpacity: 0.25,
       });
     });
@@ -120,7 +122,7 @@ export default function SitingCompliancePage() {
       id: `parcel_${selectedParcel.survey_number}`,
       coordinates: selectedParcel.geometry.coordinates,
       color: verdictColor,
-      label: `Survey No: ${selectedParcel.survey_number} · ${selectedParcel.classification.toUpperCase()}`,
+      label: `${t('survey_no')}: ${selectedParcel.survey_number} · ${selectedParcel.classification.toUpperCase()}`,
       fillOpacity: 0.6,
     });
   }
@@ -139,7 +141,7 @@ export default function SitingCompliancePage() {
               {t('siting_title')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P3 Plan Siting Compliance Engine · Statutory Land & Hazard Verification
+              {t('siting_subtitle')}
             </p>
           </div>
         </div>
@@ -149,9 +151,7 @@ export default function SitingCompliancePage() {
       {/* Walkthrough Highlight Banner */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 4):</span> Select parcel{' '}
-          <strong className="underline">412/2</strong> in Ward 7 Cheruvannur to verify the deterministic{' '}
-          <strong className="text-red-700">FAIL</strong> verdict with statutory Nilam & setback constraints.
+          {t('siting_reviewer_script')}
         </div>
         <button
           onClick={() => {
@@ -162,7 +162,7 @@ export default function SitingCompliancePage() {
           }}
           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-[11px] ml-2 flex-shrink-0"
         >
-          Load 412/2
+          {t('load_412_2')}
         </button>
       </div>
 
@@ -172,7 +172,7 @@ export default function SitingCompliancePage() {
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-slate-900 border-b border-slate-200 pb-2 flex items-center gap-2">
             <Compass className="w-4 h-4 text-blue-600" />
-            <span>Select Proposal Parameters</span>
+            <span>{t('select_proposal_params')}</span>
           </h3>
 
           {/* Ward Select */}
@@ -187,7 +187,7 @@ export default function SitingCompliancePage() {
             >
               {wards.map((w) => (
                 <option key={w.id} value={w.id}>
-                  Ward {w.number}: {getLocalizedName(w)}
+                  {t('ward_col_ward')} {w.number}: {getLocalizedName(w)}
                 </option>
               ))}
             </select>
@@ -205,7 +205,7 @@ export default function SitingCompliancePage() {
             >
               {wardParcels.map((p) => (
                 <option key={p.survey_number} value={p.survey_number}>
-                  Survey {p.survey_number} ({p.classification.toUpperCase()} · {p.area_cents} Cents)
+                  {t('survey_no')} {p.survey_number} ({p.classification.toUpperCase()} · {p.area_cents} {t('cents')})
                 </option>
               ))}
             </select>
@@ -221,21 +221,21 @@ export default function SitingCompliancePage() {
               onChange={handleWorkTypeChange}
               className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-slate-50 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
-              <option value="residential">Residential House Construction</option>
-              <option value="commercial">Commercial Building / Shop</option>
-              <option value="public_infra">Panchayat Public Facility / Hall</option>
-              <option value="drainage">Drainage & Culvert Work</option>
+              <option value="residential">{t('work_res')}</option>
+              <option value="commercial">{t('work_comm')}</option>
+              <option value="public_infra">{t('work_public')}</option>
+              <option value="drainage">{t('work_drainage')}</option>
             </select>
           </div>
 
           {/* Selected Parcel Summary */}
           {selectedParcel && (
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1 text-slate-700">
-              <div className="font-bold text-slate-900">Parcel Attributes:</div>
-              <div>Classification: <strong className="uppercase">{selectedParcel.classification}</strong></div>
-              <div>Area: <strong>{selectedParcel.area_cents} Cents</strong></div>
-              <div>Hazard Zone: <strong className="uppercase text-amber-700">{selectedParcel.hazard_zone}</strong></div>
-              <div>Road Setback: <strong>{selectedParcel.road_setback_ok ? 'Compliant (>3m)' : 'Breach (<3m)'}</strong></div>
+              <div className="font-bold text-slate-900">{t('parcel_attrs')}</div>
+              <div>{t('classification')} <strong className="uppercase">{selectedParcel.classification}</strong></div>
+              <div>{t('area')} <strong>{selectedParcel.area_cents} {t('cents')}</strong></div>
+              <div>{t('hazard_zone')} <strong className="uppercase text-amber-700">{selectedParcel.hazard_zone}</strong></div>
+              <div>{t('road_setback')} <strong>{selectedParcel.road_setback_ok ? t('compliant_3m') : t('breach_3m')}</strong></div>
             </div>
           )}
         </div>
@@ -263,7 +263,7 @@ export default function SitingCompliancePage() {
                   )}
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                      Compliance Verdict
+                      {t('compliance_verdict')}
                     </span>
                     <h2
                       className={`text-2xl font-black ${
@@ -280,14 +280,14 @@ export default function SitingCompliancePage() {
                 </div>
 
                 <div className="text-right text-xs">
-                  <span className="text-slate-500 block">Citizen View Equiv:</span>
+                  <span className="text-slate-500 block">{t('citizen_view_equiv')}</span>
                   <span className="font-bold px-2 py-0.5 rounded bg-white border border-slate-300 text-slate-800">
                     {evaluation.citizen_verdict}
                   </span>
                 </div>
               </div>
 
-              {/* All Triggered Statutory Reasons */}
+              {/* All Triggered Statutory Reasons - strictly in active language */}
               <div className="space-y-2 pt-2 border-t border-slate-200/60">
                 <h4 className="text-xs font-bold uppercase tracking-wide text-slate-700">
                   {t('siting_reasons')}
@@ -310,8 +310,9 @@ export default function SitingCompliancePage() {
                         />
                         <span className="text-slate-900 font-mono text-[11px]">{r.rule_id}</span>
                       </div>
-                      <p className="text-slate-700 font-medium">{r.message_en}</p>
-                      <p className="text-slate-500 text-[11px] font-malayalam">{r.message_ml}</p>
+                      <p className="text-slate-700 font-medium">
+                        {isMl ? r.message_ml : r.message_en}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -328,13 +329,13 @@ export default function SitingCompliancePage() {
               </h4>
               <div className="flex items-center gap-3 text-[11px]">
                 <span className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 bg-red-600 rounded-sm" /> High Flood
+                  <span className="w-2.5 h-2.5 bg-red-600 rounded-sm" /> {t('high_flood')}
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 bg-amber-500 rounded-sm" /> Moderate Flood
+                  <span className="w-2.5 h-2.5 bg-amber-500 rounded-sm" /> {t('moderate_flood')}
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 bg-blue-600 rounded-sm" /> Selected Parcel
+                  <span className="w-2.5 h-2.5 bg-blue-600 rounded-sm" /> {t('selected_parcel')}
                 </span>
               </div>
             </div>

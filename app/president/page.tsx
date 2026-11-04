@@ -38,7 +38,7 @@ import { getPanchayat, getWards, getProjects, getGrievances } from '@/lib/api';
 import { Panchayat, Ward, GPDPProject, Grievance } from '@/lib/types';
 
 export default function PresidentOverviewPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, language, getLocalizedName, getLocalizedStatus } = useTranslation();
   const { enterPreviewMode } = useAuth();
   const [panchayat, setPanchayat] = useState<Panchayat | null>(null);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -85,6 +85,8 @@ export default function PresidentOverviewPage() {
     );
   }
 
+  const isMl = language === 'ml';
+
   // Dynamic KPI calculations
   const openGrievancesCount = grievances.filter((g) => g.status === 'open').length;
   const delayedProjectsCount = projects.filter((p) => p.status === 'delayed').length;
@@ -114,7 +116,9 @@ export default function PresidentOverviewPage() {
               {t('role_president')} — {t('nav_overview')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              Thekkumpuram Grama Panchayat · Executive Decision-Support System
+              {isMl
+                ? 'കുന്നമംഗലം നിയോജകമണ്ഡലം · ഭരണനിർവ്വഹണ തീരുമാന സഹായ സംവിധാനം'
+                : 'Kunnamangalam Constituency · Executive Decision-Support System'}
             </p>
           </div>
         </div>
@@ -201,7 +205,7 @@ export default function PresidentOverviewPage() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} unit="L" />
                 <Tooltip
-                  formatter={(value: any) => [`₹${value} Lakhs`, 'Spend']}
+                  formatter={(value: any) => [`₹${value} Lakhs`, isMl ? 'ചെലവ്' : 'Spend']}
                   labelFormatter={(lbl) => {
                     const found = spendChartData.find((x) => x.name === lbl);
                     return found ? `${lbl}: ${found.fullName}` : lbl;
@@ -230,7 +234,7 @@ export default function PresidentOverviewPage() {
                 <XAxis type="number" domain={[50, 95]} tick={{ fontSize: 11 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} />
                 <Tooltip
-                  formatter={(value: any) => [`${value} / 100`, 'PDI Score']}
+                  formatter={(value: any) => [`${value} / 100`, isMl ? 'PDI സ്കോർ' : 'PDI Score']}
                   labelFormatter={(lbl) => {
                     const found = pdiChartData.find((x) => x.name === lbl);
                     return found ? `${lbl}: ${found.fullName}` : lbl;
@@ -240,7 +244,12 @@ export default function PresidentOverviewPage() {
                   x={72.5}
                   stroke="#dc2626"
                   strokeDasharray="4 4"
-                  label={{ value: 'Dist. Avg (72.5)', fill: '#dc2626', fontSize: 10, position: 'top' }}
+                  label={{
+                    value: isMl ? 'ജില്ലാ ശരാശരി (72.5)' : 'Dist. Avg (72.5)',
+                    fill: '#dc2626',
+                    fontSize: 10,
+                    position: 'top',
+                  }}
                 />
                 <Bar
                   dataKey="pdi"
@@ -263,10 +272,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P1 Ward Ledger
+                {t('nav_wards')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Plan → Spend → Asset → Outcome chain
+                {isMl ? 'പദ്ധതി → വിനിയോഗം → ആസ്തി → ഫലം' : 'Plan → Spend → Asset → Outcome chain'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -278,10 +287,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P2 Equity Analyser
+                {t('nav_equity')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                PDI vs Per-Capita spend scatter quadrants
+                {isMl ? 'PDI vs ആളോഹരി ചെലവ് ക്വാഡ്രന്റുകൾ' : 'PDI vs Per-Capita spend scatter quadrants'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -293,10 +302,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P3 Siting Checker
+                {t('nav_siting')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Statutory Nilam & hazard compliance
+                {isMl ? 'നിലം, ദുരന്ത സാധ്യത നിയമ അനുമതി' : 'Statutory Nilam & hazard compliance'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -308,10 +317,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P4 Asset Health
+                {t('nav_assets')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                124 assets register & maintenance status
+                {isMl ? 'ആസ്തി രജിസ്റ്ററും പരിപാലന അവസ്ഥയും' : '124 assets register & maintenance status'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -323,10 +332,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P5 Hazard Twin
+                {t('nav_hazard')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Flood zones, assets at risk & shelter paths
+                {isMl ? 'വെള്ളപ്പൊക്ക മേഖലകളും ദുരിതാശ്വാസ പാതകളും' : 'Flood zones, assets at risk & shelter paths'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -338,10 +347,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P6 Promise Tracker
+                {t('nav_promises')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Completed, ongoing & delayed GPDP works
+                {isMl ? 'പൂർത്തിയായവ, പുരോഗമിക്കുന്നവ, വൈകുന്നവ' : 'Completed, ongoing & delayed GPDP works'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -353,10 +362,10 @@ export default function PresidentOverviewPage() {
           >
             <div>
               <div className="font-bold text-sm text-slate-900 group-hover:text-blue-600">
-                P17 Budget Sandbox
+                {t('nav_budget')}
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Live simulation of inter-ward fund shift
+                {isMl ? 'ഫണ്ട് പുനർവിന്യാസ സിമുലേഷൻ' : 'Live simulation of inter-ward fund shift'}
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -370,20 +379,24 @@ export default function PresidentOverviewPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-coconut-100 text-coconut-800 text-[11px] font-bold uppercase tracking-wider mb-1">
               <Activity className="w-3.5 h-3.5 text-coconut-700" />
-              <span>Civic Engagement Intelligence</span>
+              <span>{isMl ? 'പൗര പങ്കാളിത്ത വിവരങ്ങൾ' : 'Civic Engagement Intelligence'}</span>
             </div>
             <h3 className="text-lg font-bold text-slate-900">
-              Panchayat-Wide Citizen Activity &amp; Service Demand
+              {isMl
+                ? 'നിയോജകമണ്ഡല പൗര പ്രവർത്തനങ്ങളും സേവന ആവശ്യങ്ങളും'
+                : 'Panchayat-Wide Citizen Activity & Service Demand'}
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
-              Monitor ward-level demand and follow up directly with citizens who raise grievances.
+              {isMl
+                ? 'വാർഡ് തല സേവന ആവശ്യങ്ങൾ നിരീക്ഷിക്കുകയും പൗര പരാതികളിൽ തുടർനടപടി സ്വീകരിക്കുകയും ചെയ്യുക.'
+                : 'Monitor ward-level demand and follow up directly with citizens who raise grievances.'}
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
             <span className="p-1 rounded bg-emerald-100 text-emerald-800 font-bold flex items-center gap-1 px-2 py-1">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Authorized MLA View</span>
+              <span>{isMl ? 'എംഎൽഎ ഔദ്യോഗിക കാഴ്ച' : 'Authorized MLA View'}</span>
             </span>
           </div>
         </div>
@@ -391,24 +404,48 @@ export default function PresidentOverviewPage() {
         {/* Aggregated Demand Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="text-slate-500 block text-[11px]">Monthly Service Requests</span>
-            <strong className="text-lg font-black text-slate-900">142 Requests</strong>
-            <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">+14% vs last month</span>
+            <span className="text-slate-500 block text-[11px]">
+              {isMl ? 'പ്രതിമാസ സേവന ആവശ്യങ്ങൾ' : 'Monthly Service Requests'}
+            </span>
+            <strong className="text-lg font-black text-slate-900">
+              142 {isMl ? 'ആവശ്യങ്ങൾ' : 'Requests'}
+            </strong>
+            <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
+              {isMl ? '+14% കഴിഞ്ഞ മാസത്തേക്കാൾ' : '+14% vs last month'}
+            </span>
           </div>
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="text-slate-500 block text-[11px]">Top Service Category</span>
-            <strong className="text-lg font-black text-blue-700">Drinking Water (38%)</strong>
-            <span className="text-[10px] text-slate-500 block mt-0.5">Ward 7 &amp; Ward 12</span>
+            <span className="text-slate-500 block text-[11px]">
+              {isMl ? 'പ്രധാന സേവന വിഭാഗം' : 'Top Service Category'}
+            </span>
+            <strong className="text-lg font-black text-blue-700">
+              {isMl ? 'കുടിവെള്ളം (38%)' : 'Drinking Water (38%)'}
+            </strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">
+              {isMl ? 'വാർഡ് 7 & വാർഡ് 12' : 'Ward 7 & Ward 12'}
+            </span>
           </div>
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="text-slate-500 block text-[11px]">Building Pre-Checks</span>
-            <strong className="text-lg font-black text-coconut-800">54 Inquiries</strong>
-            <span className="text-[10px] text-slate-500 block mt-0.5">ReLIS &amp; Wetland screening</span>
+            <span className="text-slate-500 block text-[11px]">
+              {isMl ? 'കെട്ടിട അനുമതി പരിശോധനകൾ' : 'Building Pre-Checks'}
+            </span>
+            <strong className="text-lg font-black text-coconut-800">
+              54 {isMl ? 'അന്വേഷണങ്ങൾ' : 'Inquiries'}
+            </strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">
+              {isMl ? 'റീലിസ് & തണ്ണീർത്തട സ്ക്രീനിംഗ്' : 'ReLIS & Wetland screening'}
+            </span>
           </div>
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="text-slate-500 block text-[11px]">Grievance Resolution Rate</span>
-            <strong className="text-lg font-black text-emerald-700">76.5% Closed</strong>
-            <span className="text-[10px] text-slate-500 block mt-0.5">Avg turnaround 3.2 days</span>
+            <span className="text-slate-500 block text-[11px]">
+              {isMl ? 'പരാതി പരിഹാര നിരക്ക്' : 'Grievance Resolution Rate'}
+            </span>
+            <strong className="text-lg font-black text-emerald-700">
+              76.5% {isMl ? 'പരിഹരിച്ചു' : 'Closed'}
+            </strong>
+            <span className="text-[10px] text-slate-500 block mt-0.5">
+              {isMl ? 'ശരാശരി 3.2 ദിവസത്തിൽ' : 'Avg turnaround 3.2 days'}
+            </span>
           </div>
         </div>
 
@@ -416,10 +453,13 @@ export default function PresidentOverviewPage() {
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <h4 className="font-bold text-slate-800">
-              Recent Citizen Grievances
+              {isMl ? 'സമീപകാല പൗര പരാതികൾ' : 'Recent Citizen Grievances'}
             </h4>
-            <Link href="/president/grievances" className="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-blue-500">
-              Open live grievance inbox
+            <Link
+              href="/president/grievances"
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-blue-500"
+            >
+              {isMl ? 'പരാതി ഇൻബോക്സ് തുറക്കുക' : 'Open live grievance inbox'}
             </Link>
           </div>
 
@@ -427,33 +467,41 @@ export default function PresidentOverviewPage() {
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                 <tr>
-                  <th className="py-2.5 px-3.5">Reporter</th>
-                  <th className="py-2.5 px-3.5">Mobile</th>
-                  <th className="py-2.5 px-3.5">Block</th>
-                  <th className="py-2.5 px-3.5">Ward</th>
-                  <th className="py-2.5 px-3.5">Complaint</th>
-                  <th className="py-2.5 px-3.5">Filed</th>
-                  <th className="py-2.5 px-3.5">Status</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'പരാതിക്കാരൻ' : 'Reporter'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'മൊബൈൽ' : 'Mobile'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'ബ്ലോക്ക്' : 'Block'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'വാർഡ്' : 'Ward'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'പരാതി' : 'Complaint'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'തീയതി' : 'Filed'}</th>
+                  <th className="py-2.5 px-3.5">{isMl ? 'അവസ്ഥ' : 'Status'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {grievances.slice(0, 5).map((grievance) => (
                   <tr key={grievance.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 px-3.5 font-bold text-slate-900">{grievance.reporter_name || 'Legacy record'}</td>
+                    <td className="py-2.5 px-3.5 font-bold text-slate-900">
+                      {grievance.reporter_name || (isMl ? 'പൗരൻ' : 'Legacy record')}
+                    </td>
                     <td className="py-2.5 px-3.5 text-slate-700">{grievance.reporter_phone || '—'}</td>
                     <td className="py-2.5 px-3.5 text-slate-700">{grievance.reporter_block || '—'}</td>
-                    <td className="py-2.5 px-3.5 text-slate-700">Ward {grievance.ward_id}</td>
-                    <td className="py-2.5 px-3.5 text-slate-600 max-w-xs truncate">{grievance.description_en}</td>
+                    <td className="py-2.5 px-3.5 text-slate-700">
+                      {isMl ? `വാർഡ് ${grievance.ward_id}` : `Ward ${grievance.ward_id}`}
+                    </td>
+                    <td className="py-2.5 px-3.5 text-slate-600 max-w-xs truncate">
+                      {isMl ? grievance.description_ml || grievance.description_en : grievance.description_en}
+                    </td>
                     <td className="py-2.5 px-3.5 text-slate-500 font-mono text-[11px]">{grievance.filed_date}</td>
                     <td className="py-2.5 px-3.5">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        grievance.status === 'resolved'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : grievance.status === 'in_progress'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {grievance.status.replace('_', ' ')}
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                          grievance.status === 'resolved'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : grievance.status === 'in_progress'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {getLocalizedStatus(grievance.status)}
                       </span>
                     </td>
                   </tr>
@@ -465,7 +513,9 @@ export default function PresidentOverviewPage() {
           <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500 flex items-center gap-2">
             <Info className="w-4 h-4 text-slate-400 flex-shrink-0" />
             <span>
-              This live table refreshes when the portal is reopened. Use the grievance inbox to update the assigned department, progress status, and resolution note.
+              {isMl
+                ? 'ഈ തത്സമയ പട്ടിക പോർട്ടൽ തുറക്കുമ്പോൾ പുതുക്കപ്പെടുന്നു. പരാതി ഇൻബോക്സ് ഉപയോഗിച്ച് ഉത്തരവാദിത്തമുള്ള വകുപ്പും പരിഹാര നിലയും അപ്ഡേറ്റ് ചെയ്യുക.'
+                : 'This live table refreshes when the portal is reopened. Use the grievance inbox to update the assigned department, progress status, and resolution note.'}
             </span>
           </div>
         </div>
@@ -476,13 +526,17 @@ export default function PresidentOverviewPage() {
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-coconut-500/20 text-coconut-300 text-xs font-bold border border-coconut-400/30">
             <Eye className="w-3.5 h-3.5 text-coconut-400" />
-            <span>MLA Delegation &amp; Audit Tool</span>
+            <span>{isMl ? 'എംഎൽഎ ഓഡിറ്റ് ഉപകരണം' : 'MLA Delegation & Audit Tool'}</span>
           </div>
           <h3 className="text-xl font-black tracking-tight">
-            Explore Citizen Services in Real-Time Preview
+            {isMl
+              ? 'പൗര സേവനങ്ങൾ തത്സമയം നിരീക്ഷിക്കുക'
+              : 'Explore Citizen Services in Real-Time Preview'}
           </h3>
           <p className="text-xs text-slate-300 leading-relaxed">
-            Verify what citizens experience when accessing cadastral plot checks, building suitability, public healthcare directories, and hazard warning routes without logging out.
+            {isMl
+              ? 'ലോഗ് ഔട്ട് ചെയ്യാതെ തന്നെ ഭൂമി പരിശോധന, നിർമ്മാണ അനുമതി, സേവന കേന്ദ്രങ്ങൾ, ദുരന്ത സുരക്ഷാ പാതകൾ എന്നിവ പൗരന്റെ കാഴ്ചയിൽ പരിശോധിക്കുക.'
+              : 'Verify what citizens experience when accessing cadastral plot checks, building suitability, public healthcare directories, and hazard warning routes without logging out.'}
           </p>
         </div>
 
@@ -491,7 +545,7 @@ export default function PresidentOverviewPage() {
           className="px-6 py-3.5 bg-gradient-to-r from-coconut-600 to-emerald-600 hover:from-coconut-500 hover:to-emerald-500 text-white font-black text-sm rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 flex-shrink-0"
         >
           <Eye className="w-5 h-5 text-coconut-200" />
-          <span>VIEW AS CITIZEN</span>
+          <span>{t('nav_view_as_citizen')}</span>
           <ArrowRight className="w-4 h-4 ml-1" />
         </button>
       </section>
@@ -504,7 +558,7 @@ export default function PresidentOverviewPage() {
             <h3 className="text-base font-bold">{t('phase_2_title')}</h3>
           </div>
           <span className="text-xs text-amber-300 font-mono bg-amber-950 px-2.5 py-0.5 rounded border border-amber-800">
-            Roadmap Preview Only
+            {isMl ? 'ഭാവി വികസനം മാത്രം' : 'Roadmap Preview Only'}
           </span>
         </div>
 
@@ -515,7 +569,9 @@ export default function PresidentOverviewPage() {
               <span>{t('phase_2_chat')}</span>
             </div>
             <p className="text-slate-400">
-              Multilingual Malayalam/English LLM conversational copilot with local scheme rule knowledge.
+              {isMl
+                ? 'തദ്ദേശ സ്വയംഭരണ ചട്ടങ്ങൾ അടിസ്ഥാനമാക്കിയുള്ള മലയാളം/ഇംഗ്ലീഷ് ഭാഷാ എ.ഐ സഹായി.'
+                : 'Multilingual Malayalam/English LLM conversational copilot with local scheme rule knowledge.'}
             </p>
           </div>
 
@@ -525,7 +581,9 @@ export default function PresidentOverviewPage() {
               <span>{t('phase_2_flood')}</span>
             </div>
             <p className="text-slate-400">
-              Real-time telemetry integration with IMD rainfall radar and Chaliyar river level IoT gauges.
+              {isMl
+                ? 'കാലാവസ്ഥാ റഡാറും ചാലിയാർ നദീ ജലനിരപ്പും സംയോജിപ്പിച്ച തത്സമയ പ്രവചന സംവിധാനം.'
+                : 'Real-time telemetry integration with IMD rainfall radar and Chaliyar river level IoT gauges.'}
             </p>
           </div>
 
@@ -535,7 +593,9 @@ export default function PresidentOverviewPage() {
               <span>{t('phase_2_msme')}</span>
             </div>
             <p className="text-slate-400">
-              Constituency MSME employment, industrial clusters, and patent innovation index tracking.
+              {isMl
+                ? 'മണ്ഡലത്തിലെ എം.എസ്.എം.ഇ തൊഴിൽ, വ്യവസായ മേഖലകൾ എന്നിവയുടെ നിരീക്ഷണ സംവിധാനം.'
+                : 'Constituency MSME employment, industrial clusters, and patent innovation index tracking.'}
             </p>
           </div>
         </div>

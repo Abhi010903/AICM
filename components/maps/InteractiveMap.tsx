@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, Info, Layers, Globe, Eye } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 
 export interface MapMarker {
   id: string | number;
@@ -97,6 +98,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   height = '420px',
   className = '',
 }) => {
+  const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
@@ -258,22 +260,22 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           // Build rich provenance popup
           const statusBadge =
             m.verificationStatus === 'verified'
-              ? '<span style="display:inline-block; font-size:9px; background:#dcfce7; color:#166534; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">GROUND-VERIFIED</span>'
+              ? `<span style="display:inline-block; font-size:9px; background:#dcfce7; color:#166534; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">${escapeHtml(t('verif_verified', 'GROUND-VERIFIED'))}</span>`
               : m.verificationStatus === 'synthetic'
-              ? '<span style="display:inline-block; font-size:9px; background:#f1f5f9; color:#475569; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">SYNTHETIC SEED</span>'
+              ? `<span style="display:inline-block; font-size:9px; background:#f1f5f9; color:#475569; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">${escapeHtml(t('verif_synthetic', 'SYNTHETIC SEED'))}</span>`
               : m.verificationStatus === 'illustrative'
-              ? '<span style="display:inline-block; font-size:9px; background:#fef9c3; color:#854d0e; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">ILLUSTRATIVE</span>'
+              ? `<span style="display:inline-block; font-size:9px; background:#fef9c3; color:#854d0e; font-weight:bold; padding:1px 5px; border-radius:4px; margin-top:3px;">${escapeHtml(t('verif_illustrative', 'ILLUSTRATIVE'))}</span>`
               : '';
 
           const popupHtml = `
             <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; min-width: 170px;">
               <strong style="font-size: 13px; color: #0f172a; display:block;">${escapeHtml(m.title)}</strong>
-              ${m.category ? `<div style="color: #64748b; font-size: 11px; margin-top: 1px;">Type: ${escapeHtml(m.category)}</div>` : ''}
+              ${m.category ? `<div style="color: #64748b; font-size: 11px; margin-top: 1px;">${escapeHtml(t('map_label_type', 'Type:'))} ${escapeHtml(m.category)}</div>` : ''}
               ${m.details ? `<div style="margin-top: 4px; color: #334155; font-size: 11px;">${escapeHtml(m.details)}</div>` : ''}
-              ${m.source ? `<div style="margin-top: 2px; color: #64748b; font-size: 10px;">Source: ${escapeHtml(m.source)}</div>` : ''}
-              ${m.lastInspected ? `<div style="margin-top: 3px; color: #475569; font-size: 10px;">Inspected: <strong>${escapeHtml(m.lastInspected)}</strong></div>` : ''}
+              ${m.source ? `<div style="margin-top: 2px; color: #64748b; font-size: 10px;">${escapeHtml(t('map_label_source', 'Source:'))} ${escapeHtml(m.source)}</div>` : ''}
+              ${m.lastInspected ? `<div style="margin-top: 3px; color: #475569; font-size: 10px;">${escapeHtml(t('map_label_inspected', 'Inspected:'))} <strong>${escapeHtml(m.lastInspected)}</strong></div>` : ''}
               ${statusBadge ? `<div style="margin-top: 2px;">${statusBadge}</div>` : ''}
-              <div style="margin-top: 4px; font-size: 9px; color: #94a3b8; font-family: monospace;">Coords: ${m.lat.toFixed(4)}° N, ${m.lng.toFixed(4)}° E</div>
+              <div style="margin-top: 4px; font-size: 9px; color: #94a3b8; font-family: monospace;">${escapeHtml(t('map_label_coords', 'Coords:'))} ${m.lat.toFixed(4)}° N, ${m.lng.toFixed(4)}° E</div>
             </div>
           `;
 
@@ -293,11 +295,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           iconAnchor: [9, 9],
         });
         const pinLayer = L.marker([selectedPoint[0], selectedPoint[1]], { icon: pinIcon }).addTo(map);
-        pinLayer.bindPopup('<strong>Selected Location</strong>').openPopup();
+        pinLayer.bindPopup(`<strong>${escapeHtml(t('map_selected_location', 'Selected Location'))}</strong>`).openPopup();
         layersRef.current.push(pinLayer);
       }
     });
-  }, [mapLoaded, markers, polygons, lines, selectedPoint]);
+  }, [mapLoaded, markers, polygons, lines, selectedPoint, t]);
 
   return (
     <div className={`relative rounded-xl overflow-hidden border border-slate-300 shadow-sm ${className}`}>
@@ -313,7 +315,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           }`}
           title="Clean Vector Cartography"
         >
-          Clean
+          {t('map_basemap_clean', 'Clean')}
         </button>
         <button
           type="button"
@@ -325,7 +327,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           }`}
           title="OpenStreetMap Standard"
         >
-          Street
+          {t('map_basemap_street', 'Street')}
         </button>
         <button
           type="button"
@@ -337,7 +339,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           }`}
           title="Esri Satellite Imagery"
         >
-          Satellite
+          {t('map_basemap_satellite', 'Satellite')}
         </button>
       </div>
 

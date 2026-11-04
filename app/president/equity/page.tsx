@@ -20,7 +20,9 @@ import { Ward } from '@/lib/types';
 import { calculatePerCapitaSpend } from '@/lib/calculations';
 
 export default function EquityAnalyserPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, getLocalizedName, language } = useTranslation();
+  const isMl = language === 'ml';
+
   const [wards, setWards] = useState<Ward[]>([]);
   const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,7 +102,7 @@ export default function EquityAnalyserPage() {
               {t('equity_title')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P2 GPDP Equity Matrix · PDI Score vs Per-Capita Spend (₹)
+              {t('equity_subtitle')}
             </p>
           </div>
         </div>
@@ -117,40 +119,40 @@ export default function EquityAnalyserPage() {
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-900">
           <div className="font-bold flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
-            <span>Under-Served, Over-Spent</span>
+            <span>{t('under_served_over_spent')}</span>
           </div>
           <div className="text-[11px] text-red-700 mt-1">
-            Low PDI & High Spend. High priority for process review.
+            {t('under_served_over_spent_desc')}
           </div>
         </div>
 
         <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900">
           <div className="font-bold flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-            <span>Well-Served, Under-Spent</span>
+            <span>{t('well_served_under_spent')}</span>
           </div>
           <div className="text-[11px] text-emerald-700 mt-1">
-            High PDI with efficient, low per-capita expenditure.
+            {t('well_served_under_spent_desc')}
           </div>
         </div>
 
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
           <div className="font-bold flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-            <span>Well-Served, High Spend</span>
+            <span>{t('well_served_high_spend')}</span>
           </div>
           <div className="text-[11px] text-blue-700 mt-1">
-            Sustained infrastructure development with high outcomes.
+            {t('well_served_high_spend_desc')}
           </div>
         </div>
 
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900">
           <div className="font-bold flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-600" />
-            <span>Under-Served, Low Spend</span>
+            <span>{t('under_served_low_spend')}</span>
           </div>
           <div className="text-[11px] text-amber-700 mt-1">
-            Critical intervention candidate for budget reallocation.
+            {t('under_served_low_spend_desc')}
           </div>
         </div>
       </div>
@@ -161,9 +163,9 @@ export default function EquityAnalyserPage() {
         <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-900">
-              Ward Equity Scatter Matrix (14 Wards)
+              {t('equity_chart_title')}
             </h3>
-            <span className="text-xs text-slate-500 font-mono">Click any dot</span>
+            <span className="text-xs text-slate-500 font-mono">{t('click_dot_hint')}</span>
           </div>
 
           <div className="h-80 w-full">
@@ -176,7 +178,7 @@ export default function EquityAnalyserPage() {
                   name="PDI Score"
                   domain={[55, 85]}
                   unit=" pts"
-                  label={{ value: 'PDI Composite Score', position: 'bottom', offset: 0, fontSize: 11 }}
+                  label={{ value: t('pdi_composite_score'), position: 'bottom', offset: 0, fontSize: 11 }}
                   tick={{ fontSize: 11 }}
                 />
                 <YAxis
@@ -184,7 +186,7 @@ export default function EquityAnalyserPage() {
                   dataKey="perCapita"
                   name="Per Capita"
                   unit=" ₹"
-                  label={{ value: 'Per-Capita Spend (₹)', angle: -90, position: 'insideLeft', fontSize: 11 }}
+                  label={{ value: t('per_capita_spend'), angle: -90, position: 'insideLeft', fontSize: 11 }}
                   tick={{ fontSize: 11 }}
                 />
                 <Tooltip
@@ -197,12 +199,12 @@ export default function EquityAnalyserPage() {
                           <div className="font-bold">
                             {data.name}: {data.fullName}
                           </div>
-                          <div className="text-slate-300 mt-1">PDI Score: {data.pdi}</div>
+                          <div className="text-slate-300 mt-1">{t('pdi_score_label')}: {data.pdi}</div>
                           <div className="text-slate-300">
-                            Per-Capita Spend: ₹{data.perCapita.toLocaleString()}
+                            {t('per_capita_spend')}: ₹{data.perCapita.toLocaleString()}
                           </div>
                           <div className="text-blue-300 font-semibold mt-1">
-                            Click dot to view audit details
+                            {t('click_dot_audit_hint')}
                           </div>
                         </div>
                       );
@@ -214,13 +216,13 @@ export default function EquityAnalyserPage() {
                   x={avgPdi}
                   stroke="#dc2626"
                   strokeDasharray="4 4"
-                  label={{ value: 'District Avg PDI (72.5)', fill: '#dc2626', fontSize: 10, position: 'top' }}
+                  label={{ value: t('dist_avg_pdi_label'), fill: '#dc2626', fontSize: 10, position: 'top' }}
                 />
                 <ReferenceLine
                   y={Math.round(avgPerCapita)}
                   stroke="#64748b"
                   strokeDasharray="4 4"
-                  label={{ value: `Avg Spend (₹${Math.round(avgPerCapita)})`, fill: '#64748b', fontSize: 10, position: 'right' }}
+                  label={{ value: `${t('avg_spend_label')} (₹${Math.round(avgPerCapita)})`, fill: '#64748b', fontSize: 10, position: 'right' }}
                 />
                 <Scatter
                   data={chartData}
@@ -246,10 +248,10 @@ export default function EquityAnalyserPage() {
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div className="border-b border-slate-200 pb-3">
             <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
-              Selected Ward Analysis
+              {t('selected_ward_analysis')}
             </span>
             <h3 className="text-lg font-bold text-slate-900 mt-0.5">
-              Ward {selectedWard?.number}: {getLocalizedName(selectedWard)}
+              {t('ward_col_ward')} {selectedWard?.number}: {getLocalizedName(selectedWard)}
             </h3>
           </div>
 
@@ -257,11 +259,11 @@ export default function EquityAnalyserPage() {
             <div className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                  <span className="text-slate-500 block">PDI Score</span>
+                  <span className="text-slate-500 block">{t('pdi_score_label')}</span>
                   <strong className="text-base text-slate-900">{selectedData.pdi} / 100</strong>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                  <span className="text-slate-500 block">Per-Capita Spend</span>
+                  <span className="text-slate-500 block">{t('per_capita_spend')}</span>
                   <strong className="text-base text-emerald-800">
                     ₹{selectedData.perCapita.toLocaleString()}
                   </strong>
@@ -292,43 +294,37 @@ export default function EquityAnalyserPage() {
                   )}
                   <span>
                     {selectedData.flagType === 'under_over'
-                      ? 'Flagged: Under-Served & Over-Spent'
+                      ? t('flagged_under_over')
                       : selectedData.flagType === 'well_under'
-                      ? 'Benchmark: High Efficiency Ward'
+                      ? t('benchmark_high_eff')
                       : selectedData.flagType === 'low_low'
-                      ? 'Flagged: Critical Intervention Candidate'
-                      : 'Equitable Growth Profile (High Performance & Investment)'}
+                      ? t('flagged_critical')
+                      : t('equitable_growth')}
                   </span>
                 </div>
                 <p className="text-[11px] leading-relaxed">
                   {selectedData.flagType === 'under_over'
-                    ? 'This ward displays high public expenditure (₹' +
-                      selectedData.perCapita.toLocaleString() +
-                      '/capita) yet remains below the district average in composite development outcomes (' +
-                      selectedData.pdi +
-                      '). Leadership audit recommended on project completion efficiency.'
+                    ? (isMl
+                        ? `ഈ വാർഡിൽ ഉയർന്ന ആളോഹരി ചെലവ് (₹${selectedData.perCapita.toLocaleString()}) കാണിക്കുന്നുണ്ടെങ്കിലും വികസന സൂചിക (PDI ${selectedData.pdi}) ജില്ലാ ശരാശരിയേക്കാൾ താഴെയാണ്. നിർവ്വഹണ കാര്യക്ഷമതാ പരിശോധന ആവശ്യമാണ്.`
+                        : `This ward displays high public expenditure (₹${selectedData.perCapita.toLocaleString()}/capita) yet remains below the district average in composite development outcomes (${selectedData.pdi}). Leadership audit recommended on project completion efficiency.`)
                     : selectedData.flagType === 'well_under'
-                    ? 'Achieving high development index metrics (' +
-                      selectedData.pdi +
-                      ') with disciplined, below-average capital allocation.'
+                    ? (isMl
+                        ? `കുറഞ്ഞ മൂലധന ചെലവിലും ഉയർന്ന വികസന സൂചിക (PDI ${selectedData.pdi}) നേടി കാര്യക്ഷമത തെളിയിച്ച മാതൃകാ വാർഡ്.`
+                        : `Achieving high development index metrics (${selectedData.pdi}) with disciplined, below-average capital allocation.`)
                     : selectedData.flagType === 'low_low'
-                    ? 'Low PDI score (' +
-                      selectedData.pdi +
-                      ') combined with low per-capita spend (₹' +
-                      selectedData.perCapita.toLocaleString() +
-                      '). This ward is an urgent priority for targeted GPDP capital grant infusions.'
-                    : 'Balanced, high-performing trajectory with sustained capital investment (₹' +
-                      selectedData.perCapita.toLocaleString() +
-                      '/capita) delivering above-average PDI (' +
-                      selectedData.pdi +
-                      ').'}
+                    ? (isMl
+                        ? `കുറഞ്ഞ പി.ഡി.ഐ സ്കോറും (${selectedData.pdi}) കുറഞ്ഞ ആളോഹരി ചെലവും (₹${selectedData.perCapita.toLocaleString()}). ലക്ഷ്യാധിഷ്ഠിത ഫണ്ട് അനുവദിച്ച് അടിയന്തര ഇടപെടൽ നടത്തേണ്ട വാർഡ്.`
+                        : `Low PDI score (${selectedData.pdi}) combined with low per-capita spend (₹${selectedData.perCapita.toLocaleString()}). This ward is an urgent priority for targeted GPDP capital grant infusions.`)
+                    : (isMl
+                        ? `സ്ഥിരമായ മൂലധന നിക്ഷേപത്തിലൂടെ (₹${selectedData.perCapita.toLocaleString()}/ആൾ) ശരാശരിക്ക് മുകളിലുള്ള വികസന നേട്ടം (${selectedData.pdi} PDI) കൈവരിച്ച സന്തുലിത വാർഡ്.`
+                        : `Balanced, high-performing trajectory with sustained capital investment (₹${selectedData.perCapita.toLocaleString()}/capita) delivering above-average PDI (${selectedData.pdi}).`)}
                 </p>
               </div>
 
               <div className="p-3 bg-slate-50 rounded border border-slate-200 space-y-1 text-slate-600">
-                <div className="font-semibold text-slate-800">Governance Recommendation</div>
+                <div className="font-semibold text-slate-800">{t('governance_rec_title')}</div>
                 <p className="text-[11px]">
-                  Use the <strong>P17 Budget Sandbox</strong> to test reallocating incremental capital funds to target lowest PDI indicators without violating fiscal caps.
+                  {t('governance_rec_text')}
                 </p>
               </div>
             </div>

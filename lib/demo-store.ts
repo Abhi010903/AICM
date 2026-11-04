@@ -112,15 +112,31 @@ export function setBannerDismissed(dismissed: boolean): void {
   } catch {}
 }
 
-export function resetDemoState(): void {
+export async function resetDemoState(): Promise<void> {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LANG_KEY);
     localStorage.removeItem(ROLE_KEY);
     sessionStorage.removeItem(BANNER_KEY);
-    window.location.href = '/';
+    // User language preference (LANG_KEY) is preserved so resetting demo does not
+    // disrupt the user's selected language.
+
+    // Purge runtime caches scoped to aicm- to ensure fresh application state loads on navigation
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((key) => key.startsWith('aicm-') && key.includes('runtime'))
+          .map((key) => caches.delete(key))
+      );
+    }
   } catch (e) {
     console.error('Failed to reset demo state', e);
+  } finally {
+    if (window.location.pathname === '/') {
+      window.location.reload();
+    } else {
+      window.location.replace('/');
+    }
   }
 }

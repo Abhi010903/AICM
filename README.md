@@ -1,9 +1,9 @@
 # Grama Panchayat Digital Twin Demo Portal (Web + Mobile PWA)
 
-> **Demo Identity Notice:**  
-> **Panchayat:** Thekkumpuram Grama Panchayat (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്) — *Demo data — fictional panchayat (Thekkumpuram, Kozhikode). Not connected to live government systems.*  
-> **District:** Kozhikode · **Assembly Constituency:** Kunnamangalam · **Wards:** 14  
-> **Population:** 28,450 · **Households:** 6,820 · **Area:** 32.4 sq km  
+> **Demo Identity Notice:**
+> **Panchayat:** Kunnamangalam Constituency (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്) — *Demo data — fictional panchayat (Thekkumpuram, Kozhikode). Not connected to live government systems.*
+> **District:** Kozhikode · **Assembly Constituency:** Kunnamangalam · **Wards:** 14
+> **Population:** 28,450 · **Households:** 6,820 · **Area:** 32.4 sq km
 > **Last verified stamp:** `2026-10-30`
 
 ---
@@ -163,7 +163,7 @@ The table below documents how all 18 routes map across the complete AICM hierarc
 
 ## 6. Assumptions & Governance Notes
 
-1. **Fictional Panchayat:** Thekkumpuram Grama Panchayat is a synthetic demonstration entity located in Kozhikode district, Kunnamangalam constituency.
+1. **Fictional Panchayat:** Kunnamangalam Constituency is a synthetic demonstration entity located in Kozhikode district, Kunnamangalam constituency.
 2. **Deterministic Seed Data:** All population numbers (28,450), household counts (6,820), 14 ward centroids, and GPDP expenditure totals are deterministic constants.
 3. **Local Demo Persistence:** Citizen grievances submitted in the browser are persisted in browser-local `localStorage` (`aicm-demo-state-v1`). Photo uploads remain local to the client browser and are never uploaded to an external server.
 4. **Offline Map Behavior:** OpenStreetMap raster tiles require network access on first fetch; if network connectivity is lost, the application shell, routes, data tables, and textual workflows remain fully operational, and the map displays an offline boundary fallback notice.

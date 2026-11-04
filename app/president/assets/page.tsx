@@ -21,7 +21,16 @@ import { getWards, getAssets, getGrievances } from '@/lib/api';
 import { Ward, Asset, Grievance, AssetCondition } from '@/lib/types';
 
 function AssetRegisterContent() {
-  const { t, getLocalizedName } = useTranslation();
+  const {
+    t,
+    getLocalizedName,
+    getLocalizedDescription,
+    getLocalizedStatus,
+    getLocalizedCondition,
+    getLocalizedType,
+    language,
+  } = useTranslation();
+  const isMl = language === 'ml';
   const searchParams = useSearchParams();
 
   const [wards, setWards] = useState<Ward[]>([]);
@@ -122,7 +131,7 @@ function AssetRegisterContent() {
               {t('nav_assets')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              P4 Asset Health Register · Condition Monitoring & Grievance Correlation
+              {t('assets_subtitle')}
             </p>
           </div>
         </div>
@@ -132,8 +141,7 @@ function AssetRegisterContent() {
       {/* Walkthrough Tip */}
       <div className="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-lg text-xs text-blue-900 flex items-center justify-between">
         <div>
-          <span className="font-bold">Reviewer Script (Step 3):</span> Inspect{' '}
-          <strong>Ward 7 Cheruvannur</strong> assets. Click a <strong className="text-red-700">Poor</strong> condition asset to view maintenance history and linked citizen grievances.
+          {t('assets_walkthrough_banner')}
         </div>
         <button
           onClick={() => {
@@ -145,21 +153,21 @@ function AssetRegisterContent() {
           }}
           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-[11px] ml-2 flex-shrink-0"
         >
-          Inspect Ward 7 Poor Asset
+          {t('inspect_w7_poor_btn')}
         </button>
       </div>
 
       {/* Condition Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-          <div className="text-xs text-slate-500 font-semibold">Total Assets Displayed</div>
+          <div className="text-xs text-slate-500 font-semibold">{t('total_assets_displayed')}</div>
           <div className="text-2xl font-bold text-slate-900 mt-1">{filteredAssets.length}</div>
         </div>
 
         <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 shadow-2xs">
           <div className="text-xs text-emerald-800 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Good Condition</span>
+            <span>{t('good_condition')}</span>
           </div>
           <div className="text-2xl font-bold text-emerald-900 mt-1">{countGood}</div>
         </div>
@@ -167,7 +175,7 @@ function AssetRegisterContent() {
         <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 shadow-2xs">
           <div className="text-xs text-amber-800 font-semibold flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>Fair / Moderate</span>
+            <span>{t('fair_moderate')}</span>
           </div>
           <div className="text-2xl font-bold text-amber-900 mt-1">{countFair}</div>
         </div>
@@ -175,7 +183,7 @@ function AssetRegisterContent() {
         <div className="p-3.5 bg-red-50 rounded-xl border border-red-200 shadow-2xs">
           <div className="text-xs text-red-800 font-semibold flex items-center gap-1">
             <AlertCircle className="w-3.5 h-3.5" />
-            <span>Poor (Urgent Repair)</span>
+            <span>{t('poor_urgent_repair')}</span>
           </div>
           <div className="text-2xl font-bold text-red-900 mt-1">{countPoor}</div>
         </div>
@@ -194,7 +202,7 @@ function AssetRegisterContent() {
             <option value={0}>{t('all_wards')}</option>
             {wards.map((w) => (
               <option key={w.id} value={w.id}>
-                Ward {w.number}: {getLocalizedName(w)}
+                {t('ward_col_ward')} {w.number}: {getLocalizedName(w)}
               </option>
             ))}
           </select>
@@ -224,20 +232,20 @@ function AssetRegisterContent() {
             className="w-full p-2 bg-slate-50 rounded-lg border border-slate-300 font-medium"
           >
             <option value="all">{t('all_types')}</option>
-            <option value="road">Road</option>
-            <option value="building">Building</option>
-            <option value="water_tank">Water Tank</option>
-            <option value="streetlight">Streetlight</option>
-            <option value="drainage">Drainage</option>
-            <option value="anganwadi">Anganwadi</option>
-            <option value="school">School</option>
-            <option value="phc">PHC / Health</option>
+            <option value="road">{t('type_road')}</option>
+            <option value="building">{t('type_building')}</option>
+            <option value="water_tank">{t('type_water_tank')}</option>
+            <option value="streetlight">{t('type_streetlight')}</option>
+            <option value="drainage">{t('type_drainage')}</option>
+            <option value="anganwadi">{t('type_anganwadi')}</option>
+            <option value="school">{t('type_school')}</option>
+            <option value="phc">{t('type_phc')}</option>
           </select>
         </div>
 
         {/* Search */}
         <div className="flex-1 min-w-[180px]">
-          <label className="text-slate-600 block mb-1 font-medium">Search Asset:</label>
+          <label className="text-slate-600 block mb-1 font-medium">{t('search_asset')}</label>
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             <input
@@ -257,14 +265,14 @@ function AssetRegisterContent() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
               <tr>
-                <th className="py-3 px-4">Asset ID</th>
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Ward</th>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Condition</th>
-                <th className="py-3 px-4">Last Maintained</th>
-                <th className="py-3 px-4">Tax / Custody</th>
-                <th className="py-3 px-4 text-right">Action</th>
+                <th className="py-3 px-4">{t('col_asset_id')}</th>
+                <th className="py-3 px-4">{t('col_name')}</th>
+                <th className="py-3 px-4">{t('col_ward')}</th>
+                <th className="py-3 px-4">{t('col_type')}</th>
+                <th className="py-3 px-4">{t('col_condition')}</th>
+                <th className="py-3 px-4">{t('col_last_maintained')}</th>
+                <th className="py-3 px-4">{t('col_tax_custody')}</th>
+                <th className="py-3 px-4 text-right">{t('action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
@@ -297,10 +305,10 @@ function AssetRegisterContent() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        Ward {ward?.number}: {ward ? getLocalizedName(ward) : ''}
+                        {t('ward_col_ward')} {ward?.number}: {ward ? getLocalizedName(ward) : ''}
                       </td>
                       <td className="py-3 px-4 uppercase font-semibold text-slate-600">
-                        {asset.type.replace('_', ' ')}
+                        {getLocalizedType(asset.type)}
                       </td>
                       <td className="py-3 px-4">
                         <span
@@ -312,7 +320,7 @@ function AssetRegisterContent() {
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
-                          {asset.condition}
+                          {getLocalizedCondition(asset.condition)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-600">{asset.last_maintained}</td>
@@ -350,13 +358,13 @@ function AssetRegisterContent() {
               <div className="flex items-start justify-between border-b border-slate-200 pb-4">
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                    Sanchaya / IKM Asset Record #{selectedAsset.id}
+                    {t('asset_drawer_title')} #{selectedAsset.id}
                   </div>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-0.5">
                     {getLocalizedName(selectedAsset)}
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Ward {selectedAsset.ward_id} · Custodian: {selectedAsset.owner}
+                    {t('ward_col_ward')} {selectedAsset.ward_id} · {t('custodian')} {selectedAsset.owner}
                   </p>
                 </div>
                 <button
@@ -371,7 +379,7 @@ function AssetRegisterContent() {
               {/* Status & Maintenance Metadata */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-slate-500 block">Condition Status</span>
+                  <span className="text-slate-500 block">{t('condition_status')}</span>
                   <span
                     className={`inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold uppercase ${
                       selectedAsset.condition === 'good'
@@ -381,12 +389,12 @@ function AssetRegisterContent() {
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {selectedAsset.condition} Condition
+                    {getLocalizedCondition(selectedAsset.condition)}
                   </span>
                 </div>
 
                 <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-slate-500 block">Last Maintained</span>
+                  <span className="text-slate-500 block">{t('col_last_maintained')}</span>
                   <strong className="text-sm text-slate-800 mt-1 block">
                     {selectedAsset.last_maintained}
                   </strong>
@@ -397,7 +405,7 @@ function AssetRegisterContent() {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Geotagged Asset Location</span>
+                  <span>{t('geotagged_location')}</span>
                 </h4>
                 <InteractiveMap
                   center={[selectedAsset.lat, selectedAsset.lng]}
@@ -408,7 +416,7 @@ function AssetRegisterContent() {
                       lat: selectedAsset.lat,
                       lng: selectedAsset.lng,
                       title: getLocalizedName(selectedAsset),
-                      category: selectedAsset.type,
+                      category: getLocalizedType(selectedAsset.type),
                       color:
                         selectedAsset.condition === 'good'
                           ? '#16a34a'
@@ -429,13 +437,13 @@ function AssetRegisterContent() {
                     <span>{t('asset_linked_grievances')} ({linkedGrievances.length})</span>
                   </h4>
                   <span className="text-[11px] text-slate-500 font-mono">
-                    CMO Grievance Portal
+                    {t('cmo_grievance_portal')}
                   </span>
                 </div>
 
                 {linkedGrievances.length === 0 ? (
                   <p className="text-xs text-slate-500 italic py-2">
-                    No active citizen grievances filed for this asset in this ward.
+                    {t('no_active_grievances_asset')}
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -447,17 +455,14 @@ function AssetRegisterContent() {
                         <div className="flex items-center justify-between font-bold text-amber-950">
                           <span>{g.id} ({g.category.toUpperCase()})</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200 uppercase font-mono">
-                            {g.status}
+                            {getLocalizedStatus(g.status)}
                           </span>
                         </div>
                         <p className="text-slate-800 font-medium">
-                          {g.description_en}
-                        </p>
-                        <p className="text-slate-600 text-[11px] font-malayalam">
-                          {g.description_ml}
+                          {getLocalizedDescription(g)}
                         </p>
                         <div className="text-[10px] text-slate-500 pt-1">
-                          Filed: {g.filed_date} · Assigned: {g.assigned_dept}
+                          {t('filed_date')} {g.filed_date} · {t('assigned_dept')} {g.assigned_dept}
                         </div>
                       </div>
                     ))}
@@ -483,8 +488,9 @@ function AssetRegisterContent() {
 }
 
 export default function AssetHealthPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading assets...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">{t('loading')}</div>}>
       <AssetRegisterContent />
     </Suspense>
   );

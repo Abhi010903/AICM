@@ -25,7 +25,7 @@ import evacuationRoutesData from '../data/evacuation_routes.geojson';
 describe('1. Data Integrity Tests', () => {
   it('panchayat.json matches required demo identity', () => {
     expect(panchayatData.id).toBe('thekkumpuram');
-    expect(panchayatData.name_en).toBe('Thekkumpuram Grama Panchayat');
+    expect(panchayatData.name_en).toBe('Kunnamangalam Constituency');
     expect(panchayatData.name_ml).toBe('തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്');
     expect(panchayatData.district_en).toBe('Kozhikode');
     expect(panchayatData.constituency_en).toBe('Kunnamangalam');
@@ -422,4 +422,85 @@ describe('4. Advanced Platform Evolution Tests', () => {
     });
     expect(drought.drought_status).toBe('SEVERE_DROUGHT');
   });
-});
+
+  it('verifies complete application-wide English and Malayalam dictionary parity and dataset localization', async () => {
+    const enKeys = Object.keys(translations.en).sort();
+    const mlKeys = Object.keys(translations.ml).sort();
+
+    // 100% Key Parity
+    expect(enKeys).toEqual(mlKeys);
+    expect(enKeys.length).toBeGreaterThanOrEqual(140);
+
+    // No empty translation strings
+    for (const key of enKeys) {
+      const enVal = (translations.en as Record<string, string>)[key];
+      const mlVal = (translations.ml as Record<string, string>)[key];
+      expect(enVal.trim().length, `Empty en value for key: ${key}`).toBeGreaterThan(0);
+      expect(mlVal.trim().length, `Empty ml value for key: ${key}`).toBeGreaterThan(0);
+    }
+
+    // Dataset bilingual attribute integrity
+    wardsData.forEach((w) => {
+      expect(w.name_en?.trim().length).toBeGreaterThan(0);
+      expect(w.name_ml?.trim().length).toBeGreaterThan(0);
+    });
+
+    assetsData.forEach((a) => {
+      expect(a.name_en?.trim().length).toBeGreaterThan(0);
+      expect(a.name_ml?.trim().length).toBeGreaterThan(0);
+    });
+
+    facilitiesData.forEach((f) => {
+      expect(f.name_en?.trim().length).toBeGreaterThan(0);
+      expect(f.name_ml?.trim().length).toBeGreaterThan(0);
+    });
+
+    gpdpProjectsData.forEach((p) => {
+      expect(p.title_en?.trim().length).toBeGreaterThan(0);
+      expect(p.title_ml?.trim().length).toBeGreaterThan(0);
+    });
+
+    grievancesData.forEach((g) => {
+      expect(g.description_en?.trim().length).toBeGreaterThan(0);
+      expect(g.description_ml?.trim().length).toBeGreaterThan(0);
+    });
+
+    landParcelsData.forEach((p) => {
+      expect(p.permitted_activities_ml.length).toBeGreaterThan(0);
+      expect(p.restricted_activities_ml.length).toBeGreaterThan(0);
+    });
+
+    // Bilingual search engine test
+    const { searchSystem } = await import('../lib/search-engine');
+    const enSearch = searchSystem('Cheruvannur', 'president', 'en');
+    expect(enSearch.length).toBeGreaterThan(0);
+    expect(enSearch[0].title).toContain('Cheruvannur');
+
+    const mlSearch = searchSystem('ചെറുവണ്ണൂർ', 'president', 'ml');
+    expect(mlSearch.length).toBeGreaterThan(0);
+    expect(mlSearch[0].title).toContain('ചെറുവണ്ണൂർ');
+
+    // Dual-language hazard zone asset exposure verification
+    const atRiskAssets = findAssetsInHazardZones(assetsData as any, hazardZonesData as any);
+    expect(atRiskAssets.length).toBeGreaterThan(0);
+    expect(atRiskAssets[0].zoneName_en).toBeTruthy();
+    expect(atRiskAssets[0].zoneName_ml).toBeTruthy();
+
+    // Dual-language telemetry evaluation verification
+    const { evaluateDisasterRisk } = await import('../lib/hazard-engine');
+    const evalResult = evaluateDisasterRisk({
+      rainfall_mm_24h: 120,
+      rainfall_intensity_mm_hr: 25,
+      river_level_meters: 8.8,
+      reservoir_storage_percent: 85,
+      imd_alert: 'ORANGE',
+      drainage_blockage_percent: 40,
+      monsoon_deficit_percent: 0,
+      groundwater_depletion_meters: 0.1,
+    });
+    expect(evalResult.explanation_ml?.length).toBeGreaterThan(0);
+    expect(evalResult.drought_summary_ml).toBeTruthy();
+    expect(evalResult.vulnerable_wards[0].ward_name_ml).toBeTruthy();
+    expect(evalResult.active_shelters[0].name_ml).toBeTruthy();
+  });
+  });

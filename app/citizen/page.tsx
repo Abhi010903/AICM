@@ -8,10 +8,6 @@ import {
   Hospital,
   AlertCircle,
   ArrowRight,
-  Sparkles,
-  Building2,
-  Calendar,
-  Layers,
   FileText,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
@@ -21,7 +17,7 @@ import { Ward, GPDPProject } from '@/lib/types';
 import { calculatePerCapitaSpend } from '@/lib/calculations';
 
 export default function CitizenDashboardPage() {
-  const { t, getLocalizedName } = useTranslation();
+  const { t, language, getLocalizedName } = useTranslation();
   const [ward7, setWard7] = useState<Ward | null>(null);
   const [wardProjects, setWardProjects] = useState<GPDPProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +41,8 @@ export default function CitizenDashboardPage() {
     ? calculatePerCapitaSpend(ward7.spend_lakhs, ward7.population)
     : 0;
 
+  const isMl = language === 'ml';
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
       {/* Title & Source Chip */}
@@ -55,7 +53,9 @@ export default function CitizenDashboardPage() {
               {t('citizen_hero_welcome')}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600">
-              Thekkumpuram Grama Panchayat · Transparent Citizen Digital Services
+              {isMl
+                ? 'കുന്നമംഗലം നിയോജകമണ്ഡലം · സുതാര്യമായ പൗര ഡിജിറ്റൽ സേവനങ്ങൾ'
+                : 'Kunnamangalam Constituency · Transparent Citizen Digital Services'}
             </p>
           </div>
         </div>
@@ -71,25 +71,29 @@ export default function CitizenDashboardPage() {
                 {t('citizen_assigned_ward')}
               </div>
               <h2 className="text-xl sm:text-2xl font-black">
-                Ward 7: {getLocalizedName(ward7)}
+                {isMl ? `വാർഡ് 7: ${getLocalizedName(ward7)}` : `Ward 7: ${getLocalizedName(ward7)}`}
               </h2>
               <p className="text-xs text-emerald-200/80 mt-0.5">
-                Population: {ward7.population.toLocaleString()} · Households: {ward7.households}
+                {isMl
+                  ? `ജനസംഖ്യ: ${ward7.population.toLocaleString()} · കുടുംബങ്ങൾ: ${ward7.households}`
+                  : `Population: ${ward7.population.toLocaleString()} · Households: ${ward7.households}`}
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-center text-xs">
               <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-800/60">
-                <span className="text-emerald-300 block text-[11px]">PDI Score</span>
+                <span className="text-emerald-300 block text-[11px]">{isMl ? 'PDI സ്കോർ' : 'PDI Score'}</span>
                 <strong className="text-lg font-black text-white">{ward7.pdi_score}</strong>
               </div>
               <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-800/60">
-                <span className="text-emerald-300 block text-[11px]">Spend/Capita</span>
+                <span className="text-emerald-300 block text-[11px]">{isMl ? 'ആളോഹരി ചെലവ്' : 'Spend/Capita'}</span>
                 <strong className="text-lg font-black text-white">₹{perCapita.toLocaleString()}</strong>
               </div>
               <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-800/60">
-                <span className="text-emerald-300 block text-[11px]">GPDP Works</span>
-                <strong className="text-lg font-black text-white">{wardProjects.length} Works</strong>
+                <span className="text-emerald-300 block text-[11px]">{isMl ? 'പദ്ധതികൾ' : 'GPDP Works'}</span>
+                <strong className="text-lg font-black text-white">
+                  {wardProjects.length} {isMl ? 'പദ്ധതികൾ' : 'Works'}
+                </strong>
               </div>
             </div>
           </div>
@@ -117,7 +121,7 @@ export default function CitizenDashboardPage() {
             </div>
           </div>
           <div className="flex items-center text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
-            <span>Inspect Survey Plot</span>
+            <span>{isMl ? 'ഭൂമി വിവരങ്ങൾ പരിശോധിക്കുക' : 'Inspect Survey Plot'}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
         </Link>
@@ -141,7 +145,7 @@ export default function CitizenDashboardPage() {
             </div>
           </div>
           <div className="flex items-center text-xs font-bold text-emerald-600 group-hover:translate-x-1 transition-transform">
-            <span>Check Building Suitability</span>
+            <span>{isMl ? 'നിർമ്മാണ അനുമതി പരിശോധിക്കുക' : 'Check Building Suitability'}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
         </Link>
@@ -165,7 +169,7 @@ export default function CitizenDashboardPage() {
             </div>
           </div>
           <div className="flex items-center text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform">
-            <span>Find Nearby Facilities</span>
+            <span>{isMl ? 'സേവന കേന്ദ്രങ്ങൾ കണ്ടെത്തുക' : 'Find Nearby Facilities'}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
         </Link>
@@ -189,7 +193,7 @@ export default function CitizenDashboardPage() {
             </div>
           </div>
           <div className="flex items-center text-xs font-bold text-red-600 group-hover:translate-x-1 transition-transform">
-            <span>Geotag Citizen Issue</span>
+            <span>{isMl ? 'പരാതി രേഖപ്പെടുത്തുക' : 'Geotag Citizen Issue'}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
         </Link>
@@ -203,7 +207,9 @@ export default function CitizenDashboardPage() {
         >
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-slate-600" />
-            <span>C4 What Was Built in Ward 7 (GPDP Works)</span>
+            <span>
+              {isMl ? 'വാർഡ് 7 ലെ വികസന പദ്ധതികൾ (C4)' : 'C4 What Was Built in Ward 7 (GPDP Works)'}
+            </span>
           </div>
           <ArrowRight className="w-4 h-4 text-slate-500" />
         </Link>
@@ -214,7 +220,9 @@ export default function CitizenDashboardPage() {
         >
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-slate-600" />
-            <span>C5/C6 Hazard Risk & Relief Shelter Finder</span>
+            <span>
+              {isMl ? 'ദുരന്ത സാധ്യതയും ദുരിതാശ്വാസ ക്യാമ്പുകളും (C5/C6)' : 'C5/C6 Hazard Risk & Relief Shelter Finder'}
+            </span>
           </div>
           <ArrowRight className="w-4 h-4 text-slate-500" />
         </Link>
