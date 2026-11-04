@@ -2,10 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { translations } from '../lib/i18n-dictionary';
 import { resetDemoState } from '../lib/demo-store';
 import { evaluateDisasterRisk, DEFAULT_TELEMETRY, WeatherTelemetryInput, DisasterEvaluationResult } from '../lib/hazard-engine';
-import wardsData from '../data/wards.json';
-import landParcelsData from '../data/land_parcels.json';
-import hazardZonesData from '../data/hazard_zones.geojson';
-import evacuationRoutesData from '../data/evacuation_routes.geojson';
+import mlaKnowledgeBase from '../data/mla-knowledge-base.json';
+
+const { wards: wardsData, land_parcels: landParcelsData, hazard_zones: hazardZonesData, evacuation_routes: evacuationRoutesData } = mlaKnowledgeBase;
 import fs from 'fs';
 import path from 'path';
 

@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
-## Grama Panchayat Digital Twin Demo Portal — AICM
+## Constituency Digital Twin Demo Portal — AICM
 
 **Document status:** Baseline / scope-control document
-**Product:** Grama Panchayat Digital Twin Demo Portal (Web + Mobile PWA)
+**Product:** Constituency Digital Twin Demo Portal (Web + Mobile PWA)
 **Demo Panchayat:** Kunnamangalam Constituency (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്)
 **District:** Kozhikode
 **Assembly Constituency:** Kunnamangalam
@@ -13,7 +13,7 @@
 
 ## 1. Purpose
 
-Build a single responsive web application, installable as a mobile Progressive Web App (PWA), that demonstrates a Grama Panchayat Digital Twin for two audiences:
+Build a single responsive web application, installable as a mobile Progressive Web App (PWA), that demonstrates a Constituency Digital Twin for two audiences:
 
 1. **Panchayat President** — administrative monitoring and decision-support.
 2. **Normal Citizen** — public information and citizen-service workflows.
@@ -106,7 +106,7 @@ The supplied prompt says “16 total” but explicitly enumerates 18 routes/view
 
 ### Landing
 - `/`
-- Project hero: `Grama Panchayat Digital Twin — Demo`.
+- Project hero: `Constituency Digital Twin — Demo`.
 - President and Citizen entry buttons.
 - EN / മലയാളം toggle persisted in localStorage.
 - Fictional-data disclaimer.

@@ -1,5 +1,5 @@
 # Security, Privacy and Data-Integrity Requirements
-## Grama Panchayat Digital Twin Demo Portal — AICM
+## Constituency Digital Twin Demo Portal — AICM
 
 **Security posture:** Low-risk local demonstration, not a production government service.  
 **Critical rule:** Do not represent this demo as a secure, authenticated, authoritative or live government system.

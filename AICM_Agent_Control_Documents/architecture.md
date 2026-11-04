@@ -1,5 +1,5 @@
 # Architecture
-## Grama Panchayat Digital Twin Demo Portal — AICM
+## Constituency Digital Twin Demo Portal — AICM
 
 **Status:** Implementation baseline  
 **Architecture principle:** Keep the demo simple, deterministic, traceable and replaceable with future data adapters without introducing out-of-scope infrastructure.

@@ -8,12 +8,9 @@
  */
 
 import { UserRole, Language } from './types';
-import wardsData from '../data/wards.json';
-import assetsData from '../data/assets.json';
-import facilitiesData from '../data/facilities.json';
-import gpdpProjectsData from '../data/gpdp_projects.json';
-import landParcelsData from '../data/land_parcels.json';
-import grievancesData from '../data/grievances.json';
+import mlaKnowledgeBase from '../data/mla-knowledge-base.json';
+
+const { wards: wardsData, assets: assetsData, facilities: facilitiesData, projects: gpdpProjectsData, land_parcels: landParcelsData, grievances: grievancesData } = mlaKnowledgeBase;
 
 export type SearchCategory =
   | 'ward'

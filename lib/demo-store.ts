@@ -1,5 +1,5 @@
 import { Grievance } from './types';
-import grievancesSeed from '../data/grievances.json';
+import mlaKnowledgeBase from '../data/mla-knowledge-base.json';
 
 const STORAGE_KEY = 'aicm-demo-state-v1';
 const LANG_KEY = 'aicm-language';
@@ -57,9 +57,10 @@ export function addDemoGrievance(grievance: Grievance): void {
 
 export function getAllGrievances(): Grievance[] {
   const current = getPersistedState();
-  const seed = (grievancesSeed as unknown) as Grievance[];
-  // Merge custom grievances in front of seed grievances
-  return [...current.custom_grievances, ...seed];
+  const canonical = mlaKnowledgeBase.grievances as Grievance[];
+  const canonicalIds = new Set(canonical.map((grievance) => grievance.id));
+  const custom = current.custom_grievances.filter((grievance) => !canonicalIds.has(grievance.id));
+  return [...custom, ...canonical];
 }
 
 export function getLanguagePreference(): 'en' | 'ml' {

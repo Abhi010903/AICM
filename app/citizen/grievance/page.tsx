@@ -17,9 +17,10 @@ import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { getAllGrievances } from '@/lib/demo-store';
 import { getGrievances } from '@/lib/api';
 import { Grievance, GrievanceCategory } from '@/lib/types';
+import { translateGrievanceDescription } from '@/lib/grievance-translation';
 
 export default function GrievanceTaggingPage() {
-  const { t, language, getLocalizedStatus, getLocalizedCategory } = useTranslation();
+  const { t, language, getLocalizedDescription, getLocalizedStatus, getLocalizedCategory } = useTranslation();
   const { session } = useAuth();
   const router = useRouter();
 
@@ -149,8 +150,8 @@ export default function GrievanceTaggingPage() {
       id: `TK-2026-${randomSuffix}`,
       ward_id: wardId,
       category,
-      description_en: trimmed,
-      description_ml: trimmed,
+      description_en: isMl ? translateGrievanceDescription(trimmed, 'en') : trimmed,
+      description_ml: isMl ? trimmed : translateGrievanceDescription(trimmed, 'ml'),
       lat: Number(pinCoords[0].toFixed(5)),
       lng: Number(pinCoords[1].toFixed(5)),
       status: 'open',
@@ -433,7 +434,7 @@ export default function GrievanceTaggingPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-slate-700">
-                  {isMl ? grievance.description_ml || grievance.description_en : grievance.description_en}
+                  {getLocalizedDescription(grievance)}
                 </p>
                 <p className="mt-1 text-[11px] text-slate-500">
                   {isMl ? `വാർഡ് ${grievance.ward_id}` : `Ward ${grievance.ward_id}`} · {getLocalizedCategory(grievance.category)} · {grievance.filed_date}

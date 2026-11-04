@@ -6,25 +6,32 @@ import { Grievance, GrievanceStatus } from '@/lib/types';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const liveFile = path.join(process.cwd(), 'data', 'grievances-live.json');
+const knowledgeBaseFile = path.join(process.cwd(), 'data', 'mla-knowledge-base.json');
+
+async function readKnowledgeBase(): Promise<Record<string, unknown>> {
+  try {
+    const raw = await fs.readFile(knowledgeBaseFile, 'utf8');
+    const parsed: unknown = JSON.parse(raw.replace(/^\uFEFF/, ''));
+    return parsed && typeof parsed === 'object' ? parsed as Record<string, unknown> : {};
+  } catch (error) {
+    console.error('Failed to read MLA knowledge base', error);
+    throw new Error('The MLA knowledge base could not be read.');
+  }
+}
 
 async function readLiveGrievances(): Promise<Grievance[]> {
-  try {
-    const raw = await fs.readFile(liveFile, 'utf8');
-    const parsed: unknown = JSON.parse(raw.replace(/^\uFEFF/, ''));
-    return Array.isArray(parsed) ? (parsed as Grievance[]) : [];
-  } catch (error) {
-    console.error('Failed to read live grievance store', error);
-    throw new Error('The live grievance store could not be read.');
-  }
+  const knowledgeBase = await readKnowledgeBase();
+  return Array.isArray(knowledgeBase.grievances) ? knowledgeBase.grievances as Grievance[] : [];
 }
 
 async function writeLiveGrievances(grievances: Grievance[]): Promise<void> {
   try {
-    await fs.writeFile(liveFile, `${JSON.stringify(grievances, null, 2)}\n`, 'utf8');
+    const knowledgeBase = await readKnowledgeBase();
+    knowledgeBase.grievances = grievances;
+    await fs.writeFile(knowledgeBaseFile, `${JSON.stringify(knowledgeBase, null, 2)}\n`, 'utf8');
   } catch (error) {
-    console.error('Failed to write live grievance store', error);
-    throw new Error('The live grievance store could not be updated.');
+    console.error('Failed to write MLA knowledge base', error);
+    throw new Error('The MLA knowledge base could not be updated.');
   }
 }
 

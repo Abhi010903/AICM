@@ -19,6 +19,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { KLogo } from '@/components/common/KLogo';
+import { PublicSearch } from '@/components/search/PublicSearch';
 
 const toneClasses = {
   green: 'bg-emerald-100 text-emerald-700',
@@ -110,17 +111,7 @@ export default function LandingPage() {
             <KLogo size="md" showText textVariant="dark" />
           </div>
 
-          <div className="hidden w-full max-w-[520px] md:block">
-            <label className="relative block">
-              <span className="sr-only">Search the digital twin</span>
-              <input
-                type="search"
-                placeholder={copy.search}
-                className="w-full rounded-full bg-slate-100 px-5 py-3 text-xs text-slate-700 outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-emerald-300"
-              />
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">⌕</span>
-            </label>
-          </div>
+          <PublicSearch className="hidden w-full max-w-[520px] md:block" />
 
           <button
             type="button"
@@ -157,6 +148,7 @@ export default function LandingPage() {
               <p className="mt-4 max-w-[500px] text-sm leading-5 text-slate-600">
                 {copy.intro}
               </p>
+              <PublicSearch className="mt-5 max-w-[560px] md:hidden" />
 
               <div className="mt-6 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
                 <RoleCard href="/auth/president" icon={Building2} title={copy.mla} text={copy.mlaText} tone="blue" />

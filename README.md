@@ -1,4 +1,4 @@
-# Grama Panchayat Digital Twin Demo Portal (Web + Mobile PWA)
+# Constituency Digital Twin Demo Portal (Web + Mobile PWA)
 
 > **Demo Identity Notice:**
 > **Panchayat:** Kunnamangalam Constituency (തെക്കുംപുരം ഗ്രാമപഞ്ചായത്ത്) — *Demo data — fictional panchayat (Thekkumpuram, Kozhikode). Not connected to live government systems.*
@@ -10,7 +10,7 @@
 
 ## 1. Project Overview & Pitch
 
-> *"This is a working Grama Panchayat Digital Twin demo for a fictional Kozhikode panchayat, built entirely on mock data modelled on the public sources we mapped — KSDI, Sanchaya, Ente Bhoomi, ReLIS, eGramSwaraj, PDI, KSDMA. Click any card to see which public source it corresponds to."*
+> *"This is a working Constituency Digital Twin demo for a fictional Kozhikode panchayat, built entirely on mock data modelled on the public sources we mapped — KSDI, Sanchaya, Ente Bhoomi, ReLIS, eGramSwaraj, PDI, KSDMA. Click any card to see which public source it corresponds to."*
 
 The portal provides an end-to-end responsive web application and Progressive Web App (PWA) demonstrating spatial digital twin governance for two primary roles:
 1. **Panchayat President:** Executive monitoring, ward ledgers, GPDP equity analysis, statutory siting compliance checker, public asset health, flood vulnerability, promise delivery tracking, and budget simulation.
@@ -38,6 +38,20 @@ npm install
 npm run dev
 # The application will start at http://localhost:3000
 ```
+
+### AI Assistant Configuration
+
+The landing page and citizen dashboard assistant use Groq's OpenAI-compatible API.
+Create a local `.env.local` file with a Groq API key:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=qwen/qwen3.8-27b
+```
+
+The API key is used only by the server-side assistant route and must not be exposed
+through a `NEXT_PUBLIC_` variable. If it is not configured, the assistant reports
+that it is unavailable instead of returning an ungrounded answer.
 
 ### Running Production Build & Verification
 ```bash

@@ -9,6 +9,7 @@ import { Header } from '@/components/navigation/Header';
 import { Sidebar } from '@/components/navigation/Sidebar';
 import { MobileTabBar } from '@/components/navigation/MobileTabBar';
 import { ServiceWorkerRegister } from '@/components/common/ServiceWorkerRegister';
+import { MlaAssistantAccess } from '@/components/mla/MlaAssistantAccess';
 
 export const viewport: Viewport = {
   themeColor: '#0f172a',
@@ -19,7 +20,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'Constituency Digital Twin — Kunnamangalam Constituency',
   description:
-    'Grama Panchayat Digital Twin portal connecting decentralized local governance data, spatial zoning, asset registers, PDI metrics, and disaster risk resilience under the Nature, People, Industry ESG framework.',
+    'Constituency Digital Twin portal connecting decentralized local governance data, spatial zoning, asset registers, PDI metrics, and disaster risk resilience under the Nature, People, Industry ESG framework.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -53,6 +54,7 @@ export default function RootLayout({
                 </div>
               </AuthGuard>
               <MobileTabBar />
+              <MlaAssistantAccess />
             </RoleProvider>
           </AuthProvider>
         </I18nProvider>

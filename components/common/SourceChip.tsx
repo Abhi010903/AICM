@@ -27,7 +27,7 @@ export const SourceChip: React.FC<SourceChipProps> = ({
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-[600] ${className}`}
+      className={`fixed bottom-20 right-4 z-[600] ${className}`}
     >
       {open && (
         <div className="absolute bottom-full right-0 mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-700 shadow-xl">

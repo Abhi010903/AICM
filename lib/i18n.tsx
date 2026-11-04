@@ -6,6 +6,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { translations } from './i18n-dictionary';
 import { getLanguagePreference, setLanguagePreference } from './demo-store';
 import { Language } from './types';
+import { translateGrievanceDescription } from './grievance-translation';
 
 // Initialize standard i18next instance configured with react-i18next
 if (!i18n.isInitialized) {
@@ -102,9 +103,17 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const getLocalizedDescription = (item: any): string => {
     if (!item) return '';
     if (language === 'ml') {
-      return item.description_ml || item.details_ml || item.description_en || item.details_en || '';
+      const malayalam = item.description_ml || item.details_ml;
+      const english = item.description_en || item.details_en || '';
+      return malayalam && malayalam !== english
+        ? malayalam
+        : translateGrievanceDescription(english, 'ml');
     }
-    return item.description_en || item.details_en || item.description_ml || '';
+    const english = item.description_en || item.details_en;
+    const malayalam = item.description_ml || item.details_ml || '';
+    return english && english !== malayalam
+      ? english
+      : translateGrievanceDescription(malayalam, 'en');
   };
 
   const getLocalizedStatus = (status?: string): string => {

@@ -11,16 +11,20 @@ import { getParcelBySurveyNumber } from '../lib/api';
 import { LandParcel, Ward } from '../lib/types';
 import { translations } from '../lib/i18n-dictionary';
 
-import panchayatData from '../data/panchayat.json';
-import wardsData from '../data/wards.json';
-import gpdpProjectsData from '../data/gpdp_projects.json';
-import assetsData from '../data/assets.json';
-import landParcelsData from '../data/land_parcels.json';
-import facilitiesData from '../data/facilities.json';
-import grievancesData from '../data/grievances.json';
-import pdiThemesData from '../data/pdi_themes.json';
-import hazardZonesData from '../data/hazard_zones.geojson';
-import evacuationRoutesData from '../data/evacuation_routes.geojson';
+import mlaKnowledgeBase from '../data/mla-knowledge-base.json';
+
+const {
+  panchayat: panchayatData,
+  wards: wardsData,
+  projects: gpdpProjectsData,
+  assets: assetsData,
+  land_parcels: landParcelsData,
+  facilities: facilitiesData,
+  grievances: grievancesData,
+  pdi_themes: pdiThemesData,
+  hazard_zones: hazardZonesData,
+  evacuation_routes: evacuationRoutesData,
+} = mlaKnowledgeBase;
 
 describe('1. Data Integrity Tests', () => {
   it('panchayat.json matches required demo identity', () => {

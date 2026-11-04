@@ -13,7 +13,7 @@ const statusStyles: Record<GrievanceStatus, string> = {
 };
 
 export default function PresidentGrievancesPage() {
-  const { t, language, getLocalizedStatus, getLocalizedCategory } = useTranslation();
+  const { t, language, getLocalizedDescription, getLocalizedStatus, getLocalizedCategory } = useTranslation();
   const [grievances, setGrievances] = useState<Grievance[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -180,7 +180,7 @@ export default function PresidentGrievancesPage() {
                     </span>
                   </div>
                   <p className="max-w-3xl text-sm leading-6 text-slate-700">
-                    {isMl ? grievance.description_ml || grievance.description_en : grievance.description_en}
+                    {getLocalizedDescription(grievance)}
                   </p>
                   <div className="flex flex-wrap gap-4 text-xs text-slate-600">
                     <span>

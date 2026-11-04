@@ -42,7 +42,7 @@ export const Header: React.FC = () => {
 
   const isPresident = role === 'president';
 
-  if (pathname === '/') {
+  if (pathname === '/' || pathname === '/auth/citizen' || pathname === '/auth/president') {
     return null;
   }
 
